@@ -1,0 +1,632 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hajeri_demo/main.dart';
+import 'package:hajeri_demo/model/Employee.dart';
+import 'package:hajeri_demo/url.dart';
+import 'dart:developer' as dev;
+import 'package:http/http.dart' as http;
+import 'package:toast/toast.dart';
+import 'blue_button.dart';
+
+class FormPage extends StatefulWidget {
+  final String action;
+  final String title;
+  final Employee currentEmployee;
+  final String orgId;
+  FormPage({Key key, this.currentEmployee, this.action, this.title, this.orgId})
+      : super(key: key);
+
+  @override
+  _FormPageState createState() => _FormPageState();
+}
+
+class _FormPageState extends State<FormPage> {
+  GlobalKey<FormState> _formState;
+
+  TextEditingController _cOrgName,
+      _cName,
+      _cBusinessName,
+      _cNumber,
+      _cAddress,
+      _cIdentity,
+      _cDistrict,
+      _cDepartment;
+  String stateDropDownValue, cityDropDownValue, departmentDropDownValue;
+  List<DropdownMenuItem<String>> _cityDropDownMenuItems,
+      _departmentDropDownMenuItems,
+      _stateDropDownMenuItems;
+  bool stateSelected = false;
+  bool departmentSelected = false;
+  bool showDialogBoxLoader = true;
+  List<dynamic> states;
+  List<dynamic> cities;
+  String orgId;
+  @override
+  void initState() {
+    super.initState();
+    orgId = widget.orgId;
+    _formState = GlobalKey<FormState>();
+    var employee = widget.currentEmployee;
+    _cName = TextEditingController(text: employee.name);
+    _cOrgName = TextEditingController(text: employee.organizationName);
+
+    _cBusinessName = TextEditingController(text: employee.organizationName);
+    _cNumber = TextEditingController(
+      text: (employee.number == 0) ? '' : employee.number.toString(),
+    );
+    _cAddress = TextEditingController(text: employee.addressLine1);
+    _cIdentity = TextEditingController(
+      text:
+          (employee.idCardNumber == 0) ? ' ' : employee.idCardNumber.toString(),
+    );
+    _cDepartment = TextEditingController(text: employee.addressLine1);
+    _cDistrict = TextEditingController(text: employee.district);
+    setStateAndCity();
+  }
+
+  Future<List<dynamic>> getStateList() async {
+    List<dynamic> data = [
+      {'': ''}
+    ];
+    // print('In get states');
+    // dev.log(kStates);
+    http.Response response = await http.get(kStates);
+
+    if (response.statusCode == 200) {
+      data = json.decode(response.body);
+      // dev.log(data.toString(), name: 'In get city');
+    } else {
+      data = [
+        {"id": -1, "statename": "error couldn't fetch states details"},
+      ];
+      // dev.log(data.toString(), name: 'In get city', error: response.headers);
+    }
+
+    return data;
+  }
+
+  Future<List<dynamic>> getCityList(String stateId) async {
+    List<dynamic> data = [
+      {'': ''}
+    ];
+    // dev.log('$kCity/$stateId', name: 'In get city');
+    http.Response response = await http.get('$kCity/$stateId');
+
+    if (response.statusCode == 200) {
+      data = json.decode(response.body);
+      // dev.log(data.toString(), name: 'In get city');
+    } else {
+      data = [
+        {"id": -1, "cityname": "error couldn't fetch states details"},
+      ];
+      // dev.log(data.toString(), name: 'In get city', error: response.headers);
+    }
+
+    return data;
+  }
+
+  Future<void> setStateAndCity() async {
+    states = await getStateList();
+    // dev.debugger();
+    var employee = widget.currentEmployee;
+    var currentState = employee.state;
+    if (currentState.isEmpty) {
+      stateDropDownValue = null;
+      _stateDropDownMenuItems = states.map((state) {
+        // log(state[
+        //         "statename"]
+        //     .toString());
+        if (currentState.isNotEmpty &&
+            currentState.trim().toLowerCase().compareTo(
+                    state["statename"].toString().trim().toLowerCase()) ==
+                0) {
+          stateDropDownValue = state['id'].toString();
+          // log(stateDropDownValue);
+        }
+        return DropdownMenuItem<String>(
+          value: state["id"].toString(),
+          child: Text(
+            state["statename"],
+          ),
+        );
+      }).toList();
+
+      cityDropDownValue = null;
+      stateSelected = false;
+    } else {
+      // dev.log(currentState, name: 'In set State and City');
+      _stateDropDownMenuItems = states.map((state) {
+        // log(state[
+        //         "statename"]
+        //     .toString());
+        if (currentState.isNotEmpty &&
+            currentState.trim().toLowerCase().compareTo(
+                    state["statename"].toString().trim().toLowerCase()) ==
+                0) {
+          stateDropDownValue = state['id'].toString();
+          // log(stateDropDownValue);
+        }
+        return DropdownMenuItem<String>(
+          value: state["id"].toString(),
+          child: Text(
+            state["statename"],
+          ),
+        );
+      }).toList();
+
+      cities = await getCityList(stateDropDownValue);
+      var currentCity = employee.city;
+      // dev.log(currentCity);
+      _cityDropDownMenuItems = cities.map((city) {
+        // dev.log(city[
+        //         "cityname"]
+        //     .toString());
+        if (currentCity
+                .trim()
+                .toLowerCase()
+                .compareTo(city["cityname"].toString().trim().toLowerCase()) ==
+            0) {
+          cityDropDownValue = city["id"].toString();
+          // dev.log(cityDropDownValue
+          //     .toString());
+        }
+        return DropdownMenuItem<String>(
+          value: city["id"].toString(),
+          child: Text(
+            city["cityname"],
+          ),
+        );
+      }).toList();
+
+      dev.log(cityDropDownValue);
+      dev.log(stateDropDownValue);
+      stateSelected = true;
+    }
+
+    showDialogBoxLoader = false;
+    setState(() {});
+    // dev.debugger();
+  }
+
+  Future<String> editEmployee() async {
+    var body = json.encode({
+      "nameofworker": _cName.text,
+      "departmentname": 'IT',
+      "addressline1": _cAddress.text,
+      "state": stateDropDownValue,
+      "district": "",
+      "city": cityDropDownValue
+    });
+
+    // String orgId = prefs.getString("worker_id");
+    dev.log(
+      '$kUpdateEmp${_cNumber.text} $body',
+      name: 'In update employee',
+    );
+    var response =
+        await http.post('$kUpdateEmp${_cNumber.text}', body: body, headers: {
+      'Content-Type': 'application/json',
+    });
+
+    print("reponse is " + response.body);
+    if (response.statusCode == 200) {
+      print("the reponse data is " + response.toString());
+      Toast.show("your employee is updated sucessfully", context,
+          duration: Toast.LENGTH_LONG,
+          gravity: Toast.BOTTOM,
+          textColor: Colors.blue);
+      return "success";
+      // cler_fields();
+    } else {
+      Toast.show("error occurred while updating employee", context,
+          duration: Toast.LENGTH_LONG,
+          gravity: Toast.BOTTOM,
+          textColor: Colors.red);
+      return "failure";
+    }
+  }
+
+  Future<String> addEmployee(String state, String city) async {
+    var body = json.encode({
+      "idcardno": _cIdentity.text.trim(),
+      "nameofworker": _cName.text.trim(),
+      "departmentname": _cDepartment.text.trim(),
+      "addressline1": _cAddress.text.trim(),
+      "mobileno": _cNumber.text.trim(),
+      "state": state,
+      "district": _cDistrict.text.trim(),
+      "city": city
+    });
+
+    // String orgId = prefs.getString("worker_id");
+    dev.log(
+        '$kAddEmp$orgId?idcardno=${_cIdentity.text}&nameofworker=${_cName.text}&departmentname=${_cDepartment.text}&mobileno=${_cNumber.text}&addressline1=${_cAddress.text}&state=$state&district=$city&city=$city  $body',
+        name: 'In add employee');
+    var response = await http.post(
+        '$kAddEmp$orgId?idcardno=${_cIdentity.text.trim()}&nameofworker=${_cName.text.trim()}&departmentname=${_cDepartment.text.trim()}&mobileno=${_cNumber.text.trim()}&addressline1=${_cAddress.text.trim()}&state=${state.trim()}&district=${city.trim()}&city=${city.trim()}',
+        body: body,
+        headers: {
+          'Content-Type': 'application/json',
+        });
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      dev.log(data.toString(), name: 'In add Employee success response');
+      Toast.show("your employee is added sucessfully", context,
+          duration: Toast.LENGTH_LONG,
+          gravity: Toast.BOTTOM,
+          textColor: Colors.blue);
+      return "success";
+      // cler_fields();
+    } else {
+      Toast.show("your employee is not added", context,
+          duration: Toast.LENGTH_LONG,
+          gravity: Toast.BOTTOM,
+          textColor: Colors.red);
+      return "failure";
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          backgroundColor: Colors.blue[800],
+          title: Text(widget.title),
+          centerTitle: true,
+        ),
+        body: showDialogBoxLoader
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Form(
+                      key: _formState,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            //Id
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: TextFormField(
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.left,
+                                controller: _cIdentity,
+                                validator: (value) {
+                                  if (value.trim().isEmpty) {
+                                    return 'Please Enter ID Number';
+                                  }
+                                  if (value
+                                      .trim()
+                                      .contains(new RegExp(r'[.@_-]'))) {
+                                    return 'Please Enter valid id card number'
+                                        .toLowerCase();
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) {},
+                                decoration: InputDecoration(
+                                  // errorText: null,
+                                  hintText: 'enter id card number',
+                                  labelText: 'ID Card',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            //Person Name
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: TextFormField(
+                                keyboardType: TextInputType.emailAddress,
+                                textAlign: TextAlign.left,
+                                controller: _cName,
+                                validator: (value) {
+                                  if (value.trim().isEmpty) {
+                                    return 'Please Enter Your Name';
+                                  }
+                                  if (value
+                                      .trim()
+                                      .contains(new RegExp(r'[.@_-]'))) {
+                                    return 'Please Enter Valid Name';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) {},
+                                decoration: InputDecoration(
+                                  // errorText: null,
+                                  hintText: 'Enter Name',
+                                  labelText: 'Contact Person Name',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            //Address
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: TextFormField(
+                                keyboardType: TextInputType.text,
+                                textAlign: TextAlign.left,
+                                controller: _cAddress,
+                                validator: (value) {
+                                  if (value.trim().isEmpty) {
+                                    return 'Please Enter Your Address';
+                                  }
+
+                                  return null;
+                                },
+                                onChanged: (value) {},
+                                decoration: InputDecoration(
+                                  // errorText: null,
+                                  hintText: 'Enter Address',
+                                  labelText: 'Address',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            //Department
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: TextFormField(
+                                keyboardType: TextInputType.text,
+                                textAlign: TextAlign.left,
+                                controller: _cDepartment,
+                                validator: (value) {
+                                  if (value.trim().isEmpty) {
+                                    return 'Please Enter Employee Department';
+                                  }
+
+                                  return null;
+                                },
+                                onChanged: (value) {},
+                                decoration: InputDecoration(
+                                  // errorText: null,
+                                  hintText: 'Enter Department Name',
+                                  labelText: 'Department Name',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            //Mobile Number
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: TextFormField(
+                                keyboardType: TextInputType.numberWithOptions(
+                                  decimal: false,
+                                  signed: false,
+                                ),
+                                textAlign: TextAlign.left,
+                                controller: _cNumber,
+                                validator: (value) {
+                                  if (value.trim().isEmpty) {
+                                    return 'Please Enter Your Mobile Number';
+                                  }
+                                  if (value.trim().length > 10 ||
+                                      value
+                                          .trim()
+                                          .contains(new RegExp(r'[A-Za-z]'))) {
+                                    return 'Please Enter Valid Number';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) {},
+                                decoration: InputDecoration(
+                                  // errorText: null,
+                                  hintText: 'Enter Contact Detail',
+                                  labelText: 'Mobile Number',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            //state drop down
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: DropdownButtonFormField(
+                                value: stateDropDownValue,
+                                onChanged: (String newValue) async {
+                                  FocusScope.of(context)
+                                      .requestFocus(new FocusNode());
+                                  SystemChannels.textInput
+                                      .invokeMethod('TextInput.hide');
+                                  stateDropDownValue = newValue;
+
+                                  if (cityDropDownValue != null &&
+                                      cityDropDownValue.isNotEmpty) {
+                                    cityDropDownValue = null;
+                                  }
+                                  cities =
+                                      await getCityList(stateDropDownValue);
+                                  _cityDropDownMenuItems = cities
+                                      .map(
+                                        (city) => DropdownMenuItem<String>(
+                                          value: city["id"].toString(),
+                                          child: Text(
+                                            city["cityname"],
+                                          ),
+                                        ),
+                                      )
+                                      .toList();
+                                  stateSelected = true;
+                                  setState(() {});
+                                },
+                                items: _stateDropDownMenuItems,
+
+                                decoration: InputDecoration(
+                                  labelText: 'Select State',
+                                  border: OutlineInputBorder(),
+                                ),
+                                // hint: const Text('Select State'),
+                              ),
+                            ),
+                            //District
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: TextFormField(
+                                keyboardType: TextInputType.emailAddress,
+                                textAlign: TextAlign.left,
+                                controller: _cDistrict,
+                                validator: (value) {
+                                  if (value.trim().isEmpty) {
+                                    return 'Please Enter District';
+                                  }
+
+                                  return null;
+                                },
+                                onChanged: (value) {},
+                                decoration: InputDecoration(
+                                  // errorText: null,
+                                  hintText: 'Enter District',
+                                  labelText: 'District',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            //city drop down
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: DropdownButtonFormField(
+                                // disabledHint: const Text(
+                                //     'Please Select State First'),
+                                value: cityDropDownValue,
+                                onChanged: (String newValue) {
+                                  setState(
+                                    () {
+                                      cityDropDownValue = newValue;
+                                    },
+                                  );
+                                },
+                                items: _cityDropDownMenuItems,
+                                // hint: const Text(
+                                //   'Select City',
+                                // ),
+                                decoration: InputDecoration(
+                                  errorText: !stateSelected
+                                      ? 'Please Select State First'
+                                      : null,
+                                  labelText: 'Select City',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            //Submit Button User
+                            BlueButton(
+                              onPressed: () async {
+                                if (_formState.currentState.validate()) {
+                                  Map<String, String> cityAndStateNewValue =
+                                      <String, String>{
+                                    "city": "",
+                                    "state": "",
+                                  };
+                                  cities.forEach((city) {
+                                    if (city['id']
+                                        .toString()
+                                        .trim()
+                                        .toLowerCase()
+                                        .contains(cityDropDownValue
+                                            .toString()
+                                            .trim()
+                                            .toLowerCase())) {
+                                      cityAndStateNewValue['city'] =
+                                          city["cityname"];
+                                    }
+                                  });
+                                  states.forEach((state) {
+                                    if (state['id']
+                                        .toString()
+                                        .trim()
+                                        .toLowerCase()
+                                        .contains(stateDropDownValue
+                                            .toString()
+                                            .trim()
+                                            .toLowerCase())) {
+                                      cityAndStateNewValue['state'] =
+                                          state["statename"];
+                                    }
+                                  });
+
+                                  if (widget.action
+                                      .toLowerCase()
+                                      .contains('add')) {
+                                    var isEmployeeAddedSuccess =
+                                        await addEmployee(
+                                            cityAndStateNewValue['state'],
+                                            cityAndStateNewValue['city']);
+                                    // dev.debugger();
+                                    Navigator.of(context).pop(
+                                      isEmployeeAddedSuccess.contains("success")
+                                          ? Employee(
+                                              addressLine1: _cAddress.text,
+                                              idCardNumber: 0,
+                                              departmentName: _cDepartment.text,
+                                              number: int.parse(_cNumber.text),
+                                              name: _cName.text,
+                                              state:
+                                                  cityAndStateNewValue['state'],
+                                              city:
+                                                  cityAndStateNewValue['state'])
+                                          : Employee.empty(),
+                                    );
+                                  } else {
+                                    var isEmployeeEditSuccess =
+                                        await editEmployee();
+                                    Navigator.of(context).pop(
+                                        isEmployeeEditSuccess
+                                                .contains("success")
+                                            ? Employee(
+                                                addressLine1: _cAddress.text,
+                                                number:
+                                                    int.parse(_cNumber.text),
+                                                name: _cName.text,
+                                                state: cityAndStateNewValue[
+                                                    'state'],
+                                                city: cityAndStateNewValue[
+                                                    'state'])
+                                            : Employee.empty());
+                                  }
+                                } else {
+                                  Toast.show(
+                                    "Some details are missing",
+                                    context,
+                                    duration: Toast.LENGTH_LONG,
+                                    gravity: Toast.BOTTOM,
+                                    textColor: Colors.redAccent,
+                                  );
+                                }
+                              },
+                              label: 'Submit',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+}

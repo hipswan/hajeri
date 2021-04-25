@@ -1,0 +1,256 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:hajeri_demo/Pages/landing.dart';
+import 'package:hajeri_demo/Pages/otp_verify.dart';
+import 'package:hajeri_demo/Pages/register.dart';
+import 'package:hajeri_demo/Pages/verify_otp.dart';
+import 'package:hajeri_demo/components/transition.dart';
+import 'package:hajeri_demo/url.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../constant.dart';
+
+class SignUp extends StatefulWidget {
+  static String id = "sign_up";
+  const SignUp({Key key}) : super(key: key);
+
+  @override
+  _SignUpState createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
+  TextEditingController _cNumber;
+
+  var _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _cNumber = TextEditingController();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue[800],
+        centerTitle: true,
+        title: Text(
+          'Hajeri',
+          textAlign: TextAlign.center,
+        ),
+      ),
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: height * 0.22,
+              child: Container(
+                color: Colors.white,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Not Registered yet?'),
+
+                      SizedBox(
+                        height: 15,
+                      ),
+
+                      //Register Now Button
+                      OutlinedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            Colors.white,
+                          ),
+                          side: MaterialStateProperty.all(
+                            BorderSide(
+                              color: Colors.blue[800],
+                              width: 3,
+                              style: BorderStyle.solid,
+                            ),
+                          ),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(
+                                  8.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            EnterExitRoute(
+                              exitPage: widget,
+                              enterPage: Register(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 20,
+                            horizontal: 100,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                              5.0,
+                            ),
+                            // gradient: kGradient,
+                          ),
+                          child: Text(
+                            'Register Now',
+                            style: TextStyle(
+                              color: Colors.blue[800],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            color: Colors.white,
+            height: height * 0.68,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: LimitedBox(
+                          maxHeight: height * 0.35,
+                          child: FractionallySizedBox(
+                            widthFactor: 0.75,
+                            heightFactor: 1,
+                            child: Card(
+                              child: Image(
+                                color: Colors.blue[50],
+                                colorBlendMode: BlendMode.hue,
+                                image: AssetImage(
+                                  'assets/images/hajeri_login.jpg',
+                                ),
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+
+                            // Placeholder(),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10.0,
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Sign Up',
+                            style: kTextStyleSignUp,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(
+                      8.0,
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: TextFormField(
+                        controller: _cNumber,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value.trim().length == 0) {
+                            return "Please Enter Mobile Number";
+                          }
+                          if (value.trim().length > 10 ||
+                              value.trim().length < 10 ||
+                              value
+                                  .trim()
+                                  .contains(new RegExp(r'[A-Za-z/@_-]'))) {
+                            return "Please Enter Valid Mobile Number";
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Mobile Number',
+                          prefixIcon: Icon(
+                            Icons.phone_android_rounded,
+                          ),
+                          hintText: 'Can I have your number?',
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 20.0,
+                    ),
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                          EdgeInsets.zero,
+                        ),
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.transparent,
+                        ),
+                      ),
+                      onPressed: () async {
+                        // ignore: null_aware_in_condition
+                        if (_formKey.currentState.validate()) {
+                          log('form validation successful');
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OtpVerify(
+                                number: _cNumber.text,
+                              ),
+                            ),
+                          );
+                        } else {}
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 25,
+                          horizontal: 100,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            5.0,
+                          ),
+                          gradient: kGradient,
+                        ),
+                        child: Text('Sign Up'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

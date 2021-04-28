@@ -145,6 +145,14 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                         ),
                       ],
                     ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                      ),
+                      child: Divider(
+                        color: Colors.white,
+                      ),
+                    ),
                     Row(
                       children: [
                         Expanded(
@@ -418,11 +426,14 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                                     ),
                                   ),
                                   subtitle: Text(
-                                    qrCodePoint['latlong'] ?? '',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
+                                    '',
                                   ),
+                                  // Text(
+                                  //   qrCodePoint['latlong'] ?? '',
+                                  //   style: TextStyle(
+                                  //     color: Colors.white,
+                                  //   ),
+                                  // ),
                                 ),
                               ),
                             ),
@@ -486,28 +497,28 @@ class MainQrDetail extends StatelessWidget {
               style: kMainQrPointTextStyle,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 8.0,
-            ),
-            child: Text(
-              latitude,
-              style: kMainQrPointTextStyle,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 8.0,
-            ),
-            child: Text(
-              longitude,
-              style: kMainQrPointTextStyle,
-            ),
-          ),
-          Text(
-            status,
-            style: kMainQrPointTextStyle,
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(
+          //     bottom: 8.0,
+          //   ),
+          //   child: Text(
+          //     latitude,
+          //     style: kMainQrPointTextStyle,
+          //   ),
+          // ),
+          // Padding(
+          //   padding: const EdgeInsets.only(
+          //     bottom: 8.0,
+          //   ),
+          //   child: Text(
+          //     longitude,
+          //     style: kMainQrPointTextStyle,
+          //   ),
+          // ),
+          // Text(
+          //   status,
+          //   style: kMainQrPointTextStyle,
+          // ),
         ],
       ),
     );

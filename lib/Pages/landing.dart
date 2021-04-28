@@ -19,11 +19,12 @@ class Landing extends StatefulWidget {
   _LandingState createState() => _LandingState();
 }
 
-class _LandingState extends State<Landing> {
+class _LandingState extends State<Landing> with SingleTickerProviderStateMixin {
   TargetPlatform platform;
   static List pageView;
   bool isOrg;
   PageController _pageController;
+  TabController _tabController;
   @override
   void initState() {
     super.initState();
@@ -40,10 +41,22 @@ class _LandingState extends State<Landing> {
           : Profile(),
     ];
 
+    _tabController = TabController(
+      length: 3,
+      initialIndex: widget.initialPageIndex,
+      vsync: this,
+    );
     _pageController = PageController(
       initialPage: widget.initialPageIndex,
     );
     _checkPermission();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<bool> _checkPermission() async {
@@ -118,6 +131,7 @@ class _LandingState extends State<Landing> {
             height: 60,
             elevation: 5,
             curveSize: 85,
+            controller: _tabController,
             style: TabStyle.fixedCircle,
             items: <TabItem>[
               TabItem(

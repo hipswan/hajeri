@@ -127,7 +127,7 @@ class MyApp extends StatelessWidget {
                 initialPageIndex: 1,
               );
             } else {
-              return Signup();
+              return SignUp();
             }
           },
         ),

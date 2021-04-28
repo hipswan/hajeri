@@ -326,21 +326,22 @@ class _GenerateQRState extends State<GenerateQR> {
                         child: Text('QR Point Name'),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 8.0,
-                      ),
-                      child: Column(
-                        children: [
-                          Text('Latitude : ${currentPositionLatLng?.latitude}'),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Text(
-                              'Longitude : ${currentPositionLatLng?.longitude}'),
-                        ],
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: EdgeInsets.symmetric(
+                    //     vertical: 8.0,
+                    //   ),
+                    //   child: Column(
+                    //     children: [
+                    //       Text('Latitude : ${currentPositionLatLng?.latitude}'),
+                    //       SizedBox(
+                    //         height: 10.0,
+                    //       ),
+                    //       Text(
+                    //           'Longitude : ${currentPositionLatLng?.longitude}'),
+                    //     ],
+                    //   ),
+                    // ),
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 28.0),
                       child: TextField(

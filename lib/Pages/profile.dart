@@ -68,12 +68,23 @@ class Profile extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.grey,
-                        child: Image.asset(
-                          'assets/images/hajeri_login.jpg',
+                      Container(
+                        height: 75,
+                        width: 75,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 2.0,
+                          ),
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            fit: BoxFit.contain,
+                            image: AssetImage(
+                              'assets/images/hajeri_login.jpg',
+                            ),
+                          ),
                         ),
+
                         //  Icon(
                         //   Icons.person_outline_rounded,
                         //   color: Colors.white,
@@ -86,11 +97,13 @@ class Profile extends StatelessWidget {
                       Column(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            prefs.getString('emp_name'),
+                            '${prefs.getString('emp_name').substring(0, 1).toUpperCase()}${prefs.getString('emp_name').substring(1).toLowerCase()}',
                             style: TextStyle(
                               color: Colors.white,
+                              fontSize: 20,
                             ),
                           ),
                           Text(

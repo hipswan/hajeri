@@ -39,7 +39,6 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
   Barcode result;
   String status;
   StreamSubscription<Barcode> _streamQrSubscription;
-  GoogleMapController mapController;
 
   QRViewController controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -393,35 +392,39 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
         _currrentUserLocation.longitude);
     dev.log("the diff distance is ${distanceInMeters.toString()}");
 
-    String userOrgId = prefs.getString("worker_id");
+    String userOrgId = prefs.getString("org_id");
+    String userId = prefs.getString("worker_id");
+
     // String userMobileNumber = prefs.getString("mobile");
     dev.log("org id from qr is $orgId");
     print("org id from user $userOrgId");
-    if (userOrgId == orgId) if (distanceInMeters < 3) {
-      var response = await http
-          .get("$kMarkAttendance$orgId/$userOrgId/Employee", headers: {
-        'Content-Type': 'application/json',
-      });
-      if (response.statusCode == 200) {
-        dev.log(response.body.toString(),
-            name: 'In scanner didt within 3 meters');
-        return "success";
+    if (userOrgId == orgId) {
+      if (distanceInMeters < 3) {
+        var response =
+            await http.get("$kMarkAttendance$orgId/$userId/Employee", headers: {
+          'Content-Type': 'application/json',
+        });
+        if (response.statusCode == 200) {
+          dev.log(response.body.toString(),
+              name: 'In scanner didt within 3 meters');
+          return "success";
+        } else {
+          return "failed to connect to Internet";
+        }
       } else {
-        return "failed to connect to Internet";
+        Toast.show("Please be under 3 meters of Organization", context,
+            duration: Toast.LENGTH_LONG,
+            gravity: Toast.BOTTOM,
+            textColor: Colors.red);
+        return "Please be under 3 meters of Organization";
       }
-    } else {
-      Toast.show("Please be under 3 meters of Organization", context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.red);
-      return "Please be under 3 meters of Organization";
     }
     // var response = await http.get('$kGetDistance$userMobileNumber', headers: {
     //   'Content-Type': 'application/json',
     // });
     else {
-      var response = await http
-          .get("$kMarkAttendance$orgId/$userOrgId/Employee", headers: {
+      var response =
+          await http.get("$kMarkAttendance$orgId/$userId/Employee", headers: {
         'Content-Type': 'application/json',
       });
       if (response.statusCode == 200) {
@@ -459,6 +462,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               Container(
                 child: Text(
                   "Hajeri Lag Gayi",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -485,6 +489,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               Container(
                 child: Text(
                   "Check Your Internet Connections",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -518,6 +523,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               Container(
                 child: Text(
                   "Youre not at right place go to qr code location",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -537,95 +543,24 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                 ),
                 onPressed: () {
                   print('button pressed');
-                  Scaffold.of(context)
-                      .showBottomSheet(
-                        (context) {
-                          return Container(
-                            height: constraints.maxHeight * 0.5,
-                            width: constraints.maxWidth,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(
-                                  10.0,
-                                ),
-                                topRight: Radius.circular(
-                                  10.0,
-                                ),
-                              ),
-                            ),
-                            child: Stack(
-                              children: [
-                                GoogleMap(
-                                  // liteModeEnabled: true,
-                                  // myLocationEnabled: true,
-                                  // myLocationButtonEnabled: true,
-                                  zoomControlsEnabled: false,
-                                  mapType: MapType.terrain,
-                                  onMapCreated: _onMapCreated,
-                                  initialCameraPosition: CameraPosition(
-                                    target: LatLng(
-                                      (_currrentUserLocation != null)
-                                          ? _currrentUserLocation.latitude
-                                          : 45.521563,
-                                      (_currrentUserLocation != null)
-                                          ? _currrentUserLocation.longitude
-                                          : -122.677433,
-                                    ),
-                                    zoom: 15.0,
-                                  ),
-                                  markers: <String, Marker>{
-                                    'position': Marker(
-                                      consumeTapEvents: true,
-                                      draggable: true,
-                                      markerId: MarkerId('Marker Id'),
-                                      position: LatLng(
-                                        (_currrentUserLocation != null)
-                                            ? _currrentUserLocation.latitude
-                                            : 45.521563,
-                                        (_currrentUserLocation != null)
-                                            ? _currrentUserLocation.longitude
-                                            : -122.677433,
-                                      ),
-                                      infoWindow: InfoWindow(
-                                        title: 'Info title',
-                                        snippet: 'Info snippet',
-                                      ),
-                                    )
-                                  }.values.toSet(),
-                                ),
-                                Positioned(
-                                  right: 5.0,
-                                  top: 5.0,
-                                  child: ElevatedButton(
-                                    style: ButtonStyle(
-                                      shape: MaterialStateProperty.all(
-                                        CircleBorder(),
-                                      ),
-                                      padding: MaterialStateProperty.all(
-                                        EdgeInsets.zero,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Icon(
-                                      Icons.close,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        elevation: 10,
-                      )
-                      .closed
-                      .whenComplete(
-                        () {
-                          // print('closed');
-                          mapController.dispose();
-                        },
-                      );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ViewLocation()),
+                  );
+                  // Scaffold.of(context)
+                  //     .showBottomSheet(
+                  //       (context) {
+                  //         return
+                  //       },
+                  //       elevation: 10,
+                  //     )
+                  //     .closed
+                  //     .whenComplete(
+                  //       () {
+                  //         // print('closed');
+                  //         mapController.dispose();
+                  //       },
+                  //     );
                 },
                 icon: Icon(
                   Icons.my_location_outlined,
@@ -642,10 +577,6 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     }
   }
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
   @override
   void dispose() {
     super.dispose();
@@ -654,5 +585,183 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     controller.dispose();
 
     // _animationController.dispose();
+  }
+}
+
+class ViewLocation extends StatefulWidget {
+  const ViewLocation({Key key}) : super(key: key);
+
+  @override
+  _ViewLocationState createState() => _ViewLocationState();
+}
+
+class _ViewLocationState extends State<ViewLocation> {
+  GoogleMapController mapController;
+  bool isRecenterFinished = true;
+  Map<String, Marker> _markers = {};
+
+  @override
+  void initState() {
+    _markers["position"] = Marker(
+      consumeTapEvents: true,
+      draggable: false,
+      markerId: MarkerId('Marker Id'),
+      position: LatLng(
+        (_currrentUserLocation != null)
+            ? _currrentUserLocation.latitude
+            : 45.521563,
+        (_currrentUserLocation != null)
+            ? _currrentUserLocation.longitude
+            : -122.677433,
+      ),
+      infoWindow: InfoWindow(
+        title: 'Info title',
+        snippet: 'Info snippet',
+      ),
+    );
+    super.initState();
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+
+  Future<Position> getUserLocation() async {
+    setState(() {
+      isRecenterFinished = false;
+    });
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      print(position);
+
+      return position;
+    } on TimeoutException catch (e) {
+      //TODO: Display  the error in alert and give acions user can performs
+    } on PermissionDeniedException catch (e) {
+      //TODO: Display the error with reason permissiondenied in alert and give acions user can performs
+
+    } on LocationServiceDisabledException catch (e) {
+      //TODO: Display the error with reason location sevice on in alert and give acions user can performs
+
+    }
+  }
+
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue[800],
+        centerTitle: true,
+        title: Text(
+          'Map',
+          textAlign: TextAlign.center,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          Position center = await getUserLocation();
+          mapController.moveCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: LatLng(
+                  center.latitude,
+                  center.longitude,
+                ),
+                zoom: 15.0,
+              ),
+            ),
+          );
+          setState(() {
+            _markers['position'] = Marker(
+                consumeTapEvents: true,
+                draggable: false,
+                markerId: MarkerId('Marker Id'),
+                position: LatLng(
+                  center.latitude,
+                  center.longitude,
+                ),
+                infoWindow: InfoWindow(
+                  title: 'Info title',
+                  snippet: 'Info snippet',
+                ),
+                onDragEnd: (value) {
+                  setState(() {});
+                });
+
+            isRecenterFinished = true;
+          });
+        },
+        tooltip: 'Center',
+        backgroundColor: Colors.white,
+        child: isRecenterFinished
+            ? Icon(
+                Icons.gps_fixed_outlined,
+                color: Colors.blue,
+              )
+            : CircularProgressIndicator(),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(
+              10.0,
+            ),
+            topRight: Radius.circular(
+              10.0,
+            ),
+          ),
+        ),
+        child: Stack(
+          children: [
+            GoogleMap(
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+              mapType: MapType.normal,
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(
+                  (_currrentUserLocation != null)
+                      ? _currrentUserLocation.latitude
+                      : 45.521563,
+                  (_currrentUserLocation != null)
+                      ? _currrentUserLocation.longitude
+                      : -122.677433,
+                ),
+                zoom: 15.0,
+              ),
+              markers: _markers.values.toSet(),
+            ),
+            // Positioned(
+            //   right: 5.0,
+            //   top: 5.0,
+            //   child: ElevatedButton(
+            //     style: ButtonStyle(
+            //       shape: MaterialStateProperty.all(
+            //         CircleBorder(),
+            //       ),
+            //       padding: MaterialStateProperty.all(
+            //         EdgeInsets.zero,
+            //       ),
+            //     ),
+            //     onPressed: () {
+            //       Navigator.of(context).pop();
+            //     },
+            //     child: Icon(
+            //       Icons.close,
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
+      ),
+    );
   }
 }

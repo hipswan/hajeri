@@ -41,35 +41,41 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
   bool isAnimationFinished = false;
   bool isTypeSelected = false;
   bool isMonthSelected = false;
-  bool showSpinner = false;
   bool showShimmer = true;
   String _localPath;
   TargetPlatform platform = TargetPlatform.android;
 
   DateTime today = DateTime.now();
-  DateTime _fromDate = DateTime.now();
+  DateTime _fromDate;
 
   TextEditingController search = new TextEditingController();
 
   List<DataRow> rows = [];
-  DateTime selectedDate;
   int days = 28;
   List empList;
   var attendanceData;
-  String dropDownSelect = "All Employee";
-  String date;
-  int _case = 0;
+
   String orgId;
   @override
   void initState() {
     super.initState();
-    orgId = widget.orgId;
-    _getEmployeeList();
-    selectedDate = DateTime.now();
-    date = selectedDate.toString().substring(0, 7);
-    _case = 0;
     _checkPermission();
     _prepare();
+
+    _fromDate = DateTime.now();
+    typeSelectValue = 'All Employee';
+    orgId = widget.orgId;
+
+    _getEmployeeList().then(
+      (value) => _getAttendanceList().then(
+        (value) => setState(
+          () {
+            isTypeSelected = true;
+            showShimmer = false;
+          },
+        ),
+      ),
+    );
 
     var initializationSettingsAndroid =
         new AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -85,7 +91,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
   }
 
   Future onSelectNotification(String payload) async {
-    print("Payload: $payload");
+    // print("Payload: $payload");
     OpenFile.open(payload);
   }
 
@@ -97,7 +103,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
     if (!hasExisted) {
       savedDir.create();
     }
-    log('$_localPath', name: 'local path');
+    // log('$_localPath', name: 'local path');
     return "success";
   }
 
@@ -128,24 +134,31 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
   Future<void> _getEmployeeList() async {
     List<dynamic> data;
     // String orgId = prefs.getString("worker_id");
-    var response = await http.get(kDropDownListForAttendance + orgId);
+    // log(
+    //   '$kDropDownListForAttendance$orgId',
+    // );
+    var response = await http.get(
+      '$kDropDownListForAttendance$orgId',
+    );
 
     if (response.statusCode == 200) {
       data = json.decode(response.body);
-      log('the data is ${data.toString()}');
+      // log('the data is ${data.toString()}');
       List<dynamic> employee = data[1]['Employee List'];
       if (employee.isNotEmpty) {
-        log(employee.toString());
-        _dropDownTypeMenuItems.addAll(employee
-            .map(
-              (e) => DropdownMenuItem<String>(
-                value: e['mobileno'].toString(),
-                child: Text(
-                  e['nameofworker'],
+        // log(employee.toString());
+        _dropDownTypeMenuItems.addAll(
+          employee
+              .map(
+                (e) => DropdownMenuItem<String>(
+                  value: e['mobileno'].toString(),
+                  child: Text(
+                    e['nameofworker'],
+                  ),
                 ),
-              ),
-            )
-            .toList());
+              )
+              .toList(),
+        );
         //emp_list.add({"nameofworker":"All Employee","mobileno":"All Employee"});
         // empList = empList[1]['Employee List'];
         // empList.insert(
@@ -155,17 +168,18 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
 
         // print("the emp list is $empList");
         //state_id=data['id'];
-        setState(() {});
-      } else {
-        _dropDownTypeMenuItems.add(DropdownMenuItem<String>(
-          value: "-1",
-          child: Text(
-            "No Employee",
-          ),
-        ));
-        setState(() {});
-      }
 
+      } else {
+        _dropDownTypeMenuItems.add(
+          DropdownMenuItem<String>(
+            value: "-1",
+            child: Text(
+              "No Employee",
+            ),
+          ),
+        );
+      }
+      setState(() {});
 //      print(data);
 
     } else {}
@@ -180,20 +194,20 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
     //     ), () {
     //   attendanceData = kAttendanceMockData;
     // });
-    log('$kMonthlyAttendance$orgId/$typeSelectValue/${_fromDate.toString().substring(0, 7)}');
+    // log('$kMonthlyAttendance$orgId/$typeSelectValue/${_fromDate.toString().substring(0, 7)}');
     var response = await http.get(
         '$kMonthlyAttendance$orgId/$typeSelectValue/${_fromDate.toString().substring(0, 7)}');
 
     if (response.statusCode == 200) {
       data = json.decode(response.body);
-      print("the data is " + data.toString());
+      // print("the data is " + data.toString());
 
 //      print(data);
       if (data is List) {
         attendanceData = data;
       } else {
         attendanceData = data['Visitor List'];
-        log(attendanceData.toString());
+        // log(attendanceData.toString());
       }
 
       // rows = data
@@ -233,7 +247,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
       // else
       //   _case = 1;
 
-      print("the attendence list is $attendanceData");
+      // print("the attendence list is $attendanceData");
 
       //state_id=data['id'];
       return attendanceData;
@@ -273,8 +287,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
       lastDate: DateTime(DateTime.now().year, DateTime.now().month),
       initialDate: _fromDate,
     );
-
-    print('  picked is $picked');
+    log('${picked.toIso8601String()}  ${_fromDate.toIso8601String()}');
     if (picked != null && picked != _fromDate) {
       setState(() {
         _fromDate = picked;
@@ -284,23 +297,6 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> _showDatePicker() async {
-      final picked = await showDatePicker(
-        context: context,
-        initialDate: _fromDate,
-        firstDate: DateTime(2015, 1),
-        lastDate: today,
-        currentDate: _fromDate,
-        initialDatePickerMode: DatePickerMode.year,
-      );
-      print('  picked is $picked');
-      if (picked != null && picked != _fromDate) {
-        setState(() {
-          _fromDate = picked;
-        });
-      }
-    }
-
     return Scaffold(
       drawer: widget.orgId.contains(prefs.getString('worker_id'))
           ? Drawer(
@@ -340,254 +336,251 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
         ),
         centerTitle: true,
       ),
-      body: ModalProgressHUD(
-        inAsyncCall: showSpinner,
-        child: Container(
-          color: Colors.white,
-          child: Column(
-            children: [
-              Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    10.0,
-                  ),
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  10.0,
                 ),
-                elevation: 5,
-                margin: EdgeInsets.symmetric(
+              ),
+              elevation: 5,
+              margin: EdgeInsets.symmetric(
+                vertical: 10.0,
+                horizontal: 10.0,
+              ),
+              child: Container(
+                width: double.maxFinite,
+                padding: EdgeInsets.symmetric(
                   vertical: 10.0,
-                  horizontal: 10.0,
                 ),
                 child: Container(
-                  width: double.maxFinite,
-                  padding: EdgeInsets.symmetric(
+                  margin: EdgeInsets.symmetric(
                     vertical: 10.0,
+                    horizontal: 50.0,
                   ),
-                  child: Container(
-                    margin: EdgeInsets.symmetric(
-                      vertical: 10.0,
-                      horizontal: 50.0,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 10.0,
-                          ),
-                          child: DropdownButtonFormField(
-                            value: typeSelectValue,
-                            onChanged: (String newValue) async {
-                              log('New type selected  $newValue');
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10.0,
+                        ),
+                        child: DropdownButtonFormField(
+                          value: typeSelectValue,
+                          onChanged: (String newValue) async {
+                            // log('New type selected  $newValue');
 
-                              if (!newValue.contains('-1')) {
-                                // setState(() {
-                                //   showShimmer = true;
-                                //   _fromDate = DateTime.now();
-                                //   isTypeSelected = true;
-                                //   typeSelectValue = newValue;
-                                // });
-                                setState(() {
-                                  typeSelectValue = newValue;
-                                  showShimmer = true;
-                                });
-                                attendanceData = await _getAttendanceList();
+                            if (!newValue.contains('-1')) {
+                              // setState(() {
+                              //   showShimmer = true;
+                              //   _fromDate = DateTime.now();
+                              //   isTypeSelected = true;
+                              //   typeSelectValue = newValue;
+                              // });
+                              setState(() {
+                                typeSelectValue = newValue;
+                                showShimmer = true;
+                              });
+                              attendanceData = await _getAttendanceList();
 
-                                setState(() {
-                                  isTypeSelected = true;
-                                  showShimmer = false;
-                                });
-                              }
-                            },
-                            items: _dropDownTypeMenuItems,
-                            hint: const Text(
-                              'Select Type',
-                            ),
+                              setState(() {
+                                isTypeSelected = true;
+                                showShimmer = false;
+                              });
+                            }
+                          },
+                          items: _dropDownTypeMenuItems,
+                          hint: const Text(
+                            'Select Type',
                           ),
                         ),
-                        // Padding(
-                        //   padding: const EdgeInsets.symmetric(
-                        //     vertical: 10.0,
-                        //   ),
-                        //   child: Container(
-                        //     width: double.infinity,
-                        //     child: OutlineButton(
-                        //       onPressed: () async {
-                        //         // await _showDatePicker();
-                        //         await _showMonthPicker();
-                        //         setState(() {
-                        //           isMonthSelected = true;
+                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(
+                      //     vertical: 10.0,
+                      //   ),
+                      //   child: Container(
+                      //     width: double.infinity,
+                      //     child: OutlineButton(
+                      //       onPressed: () async {
+                      //         // await _showDatePicker();
+                      //         await _showMonthPicker();
+                      //         setState(() {
+                      //           isMonthSelected = true;
 
-                        //           showShimmer = true;
-                        //         });
-                        //         _getAttendanceList();
-                        //       },
-                        //       child: Text(
-                        //           '${kMonthsSelectItems[_fromDate.month.toString()]}, ${_fromDate.year}'),
-                        //     ),
-                        //   ),
-                        // ),
-                        getPeripheralView(),
-                      ],
-                    ),
+                      //           showShimmer = true;
+                      //         });
+                      //         _getAttendanceList();
+                      //       },
+                      //       child: Text(
+                      //           '${kMonthsSelectItems[_fromDate.month.toString()]}, ${_fromDate.year}'),
+                      //     ),
+                      //   ),
+                      // ),
+                      getPeripheralView(),
+                    ],
                   ),
                 ),
               ),
-              Expanded(
-                  child: Card(
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 10.0,
-                      ),
-                      child: showShimmer
-                          ? Container(
-                              width: double.maxFinite,
-                              child: Shimmer.fromColors(
-                                baseColor: Colors.grey[300],
-                                highlightColor: Colors.grey[100],
-                                enabled: true,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 10.0,
-                                    horizontal: 10,
-                                  ),
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(
-                                                5.0,
-                                              ),
+            ),
+            Expanded(
+                child: Card(
+                    margin: EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                    ),
+                    child: showShimmer
+                        ? Container(
+                            width: double.maxFinite,
+                            child: Shimmer.fromColors(
+                              baseColor: Colors.grey[300],
+                              highlightColor: Colors.grey[100],
+                              enabled: true,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10.0,
+                                  horizontal: 10,
+                                ),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(
+                                              5.0,
                                             ),
-                                            color: Colors.white,
                                           ),
-                                          width: 250,
-                                          height: 40,
+                                          color: Colors.white,
                                         ),
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                            top: 30.0,
-                                          ),
-                                          child: SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal,
-                                            child: Row(
-                                              children: List.generate(
-                                                10,
-                                                (index) => Container(
-                                                  margin: EdgeInsets.only(
-                                                    right: 16.0,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                      Radius.circular(
-                                                        5.0,
-                                                      ),
+                                        width: 250,
+                                        height: 40,
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(
+                                          top: 30.0,
+                                        ),
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            children: List.generate(
+                                              10,
+                                              (index) => Container(
+                                                margin: EdgeInsets.only(
+                                                  right: 16.0,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                    Radius.circular(
+                                                      5.0,
                                                     ),
-                                                    color: Colors.white,
                                                   ),
-                                                  width: 75,
-                                                  height: 35,
+                                                  color: Colors.white,
                                                 ),
-                                              ).toList(),
-                                            ),
+                                                width: 75,
+                                                height: 35,
+                                              ),
+                                            ).toList(),
                                           ),
                                         ),
-                                        SizedBox(
-                                          height: 18.0,
-                                        ),
-                                        Column(
-                                          children: List.generate(10, (index) {
-                                            return Container(
-                                              margin: EdgeInsets.only(
-                                                bottom: 12.0,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(
-                                                    5.0,
-                                                  ),
+                                      ),
+                                      SizedBox(
+                                        height: 18.0,
+                                      ),
+                                      Column(
+                                        children: List.generate(10, (index) {
+                                          return Container(
+                                            margin: EdgeInsets.only(
+                                              bottom: 12.0,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(
+                                                  5.0,
                                                 ),
-                                                color: Colors.white,
                                               ),
-                                              width: double.maxFinite,
-                                              height: 30,
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ],
-                                    ),
+                                              color: Colors.white,
+                                            ),
+                                            width: double.maxFinite,
+                                            height: 30,
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                            )
-                          : getGridView()
+                            ),
+                          )
+                        : getGridView()
 
-                      // AttendanceGridTable
-                      )
+                    // AttendanceGridTable
+                    )
 
-                  // AttendanceSheet(
-                  //     attendanceData: attendanceData,
-                  //   ),
-                  ),
+                // AttendanceSheet(
+                //     attendanceData: attendanceData,
+                //   ),
+                ),
 
-              //       Card(
-              //           child: DataTable(
-              //             sortColumnIndex: null,
-              //             sortAscending: true,
-              //             columns: <DataColumn>[
-              //               DataColumn(
-              //                 label: Text(
-              //                   'Name',
-              //                 ),
-              //               ),
-              //               DataColumn(
-              //                 label: Text(
-              //                   'In Time',
-              //                 ),
-              //               ),
-              //               DataColumn(
-              //                 label: Text(
-              //                   'Out Time',
-              //                 ),
-              //               ),
-              //               DataColumn(
-              //                 label: Text(
-              //                   'Visiting Date',
-              //                 ),
-              //               ),
-              //               DataColumn(
-              //                 label: Text(
-              //                   'Current Date',
-              //                 ),
-              //               ),
-              //             ],
-              //             rows: rows,
-              //           ),
-              //         ),
-              // ),
-              // Expanded(
-              //   child: Card(
-              //     margin: EdgeInsets.symmetric(
-              //       vertical: 10.0,
-              //       horizontal: 10.0,
-              //     ),
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(
-              //         10.0,
-              //       ),
-              //     ),
-              //     child: Center(
-              //       child: Text(
-              //         'Attendance Report',
-              //       ),
-              //     ),
-              //   ),
-              // ),
-            ],
-          ),
+            //       Card(
+            //           child: DataTable(
+            //             sortColumnIndex: null,
+            //             sortAscending: true,
+            //             columns: <DataColumn>[
+            //               DataColumn(
+            //                 label: Text(
+            //                   'Name',
+            //                 ),
+            //               ),
+            //               DataColumn(
+            //                 label: Text(
+            //                   'In Time',
+            //                 ),
+            //               ),
+            //               DataColumn(
+            //                 label: Text(
+            //                   'Out Time',
+            //                 ),
+            //               ),
+            //               DataColumn(
+            //                 label: Text(
+            //                   'Visiting Date',
+            //                 ),
+            //               ),
+            //               DataColumn(
+            //                 label: Text(
+            //                   'Current Date',
+            //                 ),
+            //               ),
+            //             ],
+            //             rows: rows,
+            //           ),
+            //         ),
+            // ),
+            // Expanded(
+            //   child: Card(
+            //     margin: EdgeInsets.symmetric(
+            //       vertical: 10.0,
+            //       horizontal: 10.0,
+            //     ),
+            //     shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(
+            //         10.0,
+            //       ),
+            //     ),
+            //     child: Center(
+            //       child: Text(
+            //         'Attendance Report',
+            //       ),
+            //     ),
+            //   ),
+            // ),
+          ],
         ),
       ),
     );
@@ -596,22 +589,40 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
   Widget getGridView() {
     switch (typeSelectValue) {
       case 'All Employee':
-        return AttendanceDataGrid(
-          attendanceSheet: attendanceData,
-          type: typeSelectValue,
-        );
+        return (attendanceData as List).isEmpty
+            ? Center(
+                child: Text(
+                  'No Employee',
+                ),
+              )
+            : AttendanceDataGrid(
+                attendanceSheet: attendanceData,
+                type: typeSelectValue,
+              );
         break;
       case 'All Visitors':
-        return VisitorDataGrid(
-          attendanceSheet: attendanceData,
-          type: typeSelectValue,
-        );
+        return (attendanceData as List).isEmpty
+            ? Center(
+                child: Text(
+                  'No Visitor',
+                ),
+              )
+            : VisitorDataGrid(
+                attendanceSheet: attendanceData,
+                type: typeSelectValue,
+              );
         break;
       default:
-        return AttendanceDataGrid(
-          attendanceSheet: attendanceData,
-          type: typeSelectValue,
-        );
+        return (attendanceData as List).isEmpty
+            ? Center(
+                child: Text(
+                  'no record of attendance',
+                ),
+              )
+            : AttendanceDataGrid(
+                attendanceSheet: attendanceData,
+                type: typeSelectValue,
+              );
       // CalendarApp(
       //   attendanceSheet: attendanceData,
       //   type: typeSelectValue,

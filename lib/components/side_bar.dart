@@ -49,57 +49,90 @@ class _SideBarState extends State<SideBar> {
         color: Colors.blue[800],
       ),
       accountName: Text(
-          isOrg ? prefs.getString('org_name') : prefs.getString('emp_name')),
+        isOrg
+            ? '${prefs.getString('org_name').substring(0, 1).toUpperCase()}${prefs.getString('org_name').substring(1).toLowerCase()}'
+            : '${prefs.getString('emp_name').substring(0, 1).toUpperCase()}${prefs.getString('emp_name').substring(1).toLowerCase()}',
+        overflow: TextOverflow.fade,
+        style: TextStyle(
+          fontSize: 20,
+          letterSpacing: 0.5,
+        ),
+      ),
       accountEmail: Text(
         orgId ?? '-',
       ),
-      currentAccountPicture: GestureDetector(
-        onTap: () async {
-          result = await FilePicker.platform.pickFiles(
-            type: FileType.image,
-          );
-          if (result != null) {
-            imageFile = File(result.files.single.path);
+      currentAccountPicture: Container(
+        height: 75,
+        width: 75,
 
-            prefs.setString('avatar', imageFile.readAsStringSync());
-
-            setState(() {
-              imageArrived = true;
-            });
-            dev.log(result.toString(), name: 'In the sidebar file');
-          } else {
-            dev.log(result.toString(), name: 'In the sidebar file not found');
-          }
-        },
-        child: CircleAvatar(
-          backgroundColor: Colors.grey,
-          child: !imageArrived
-              ? Icon(
-                  Icons.person_outline_rounded,
-                  color: Colors.white,
-                  size: 42,
-                )
-              : Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      fit: BoxFit.fill,
-                      image: prefs.containsKey('avatar')
-                          ? FileImage(
-                              imageFile,
-                            )
-                          : NetworkImage(
-                              prefs.getString('avatar'),
-                            ),
-                    ),
-                  ),
-                ),
-
-          // FlutterLogo(
-          //   size: 42.0,
-          // ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white,
+            width: 2.0,
+          ),
+          image: DecorationImage(
+            fit: BoxFit.contain,
+            image: AssetImage(
+              'assets/images/hajeri_login.jpg',
+            ),
+          ),
         ),
+
+        //  Icon(
+        //   Icons.person_outline_rounded,
+        //   color: Colors.white,
+        //   size: 42,
+        // ),
       ),
+      // GestureDetector(
+      //   onTap: () async {
+      //     result = await FilePicker.platform.pickFiles(
+      //       type: FileType.image,
+      //     );
+      //     if (result != null) {
+      //       imageFile = File(result.files.single.path);
+
+      //       prefs.setString('avatar', imageFile.readAsStringSync());
+
+      //       setState(() {
+      //         imageArrived = true;
+      //       });
+      //       dev.log(result.toString(), name: 'In the sidebar file');
+      //     } else {
+      //       dev.log(result.toString(), name: 'In the sidebar file not found');
+      //     }
+      //   },
+      //   child: CircleAvatar(
+      //     backgroundColor: Colors.grey,
+      //     child: !imageArrived
+      //         ? Icon(
+      //             Icons.person_outline_rounded,
+      //             color: Colors.white,
+      //             size: 42,
+      //           )
+      //         : Container(
+      //             decoration: BoxDecoration(
+      //               shape: BoxShape.circle,
+      //               image: DecorationImage(
+      //                 fit: BoxFit.fill,
+      //                 image: prefs.containsKey('avatar')
+      //                     ? FileImage(
+      //                         imageFile,
+      //                       )
+      //                     : NetworkImage(
+      //                         prefs.getString('avatar'),
+      //                       ),
+      //               ),
+      //             ),
+      //           ),
+
+      //     // FlutterLogo(
+      //     //   size: 42.0,
+      //     // ),
+      //   ),
+      // ),
       // otherAccountsPictures: [],
     );
     final String section = widget.section;

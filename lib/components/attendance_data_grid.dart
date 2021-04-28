@@ -86,7 +86,7 @@ class _AttendanceDataGridState extends State<AttendanceDataGrid> {
     List<dynamic> data = [
       {'': ''}
     ];
-    print('In get states');
+    // print('In get states');
     log(kStates);
     http.Response response = await http.get(kStates);
 
@@ -106,19 +106,19 @@ class _AttendanceDataGridState extends State<AttendanceDataGrid> {
     List<dynamic> data = [
       {'': ''}
     ];
-    print('In get city');
-    log('$kCity/$stateId');
+    // print('In get city');
+    // log('$kCity/$stateId');
     http.Response response = await http.get('$kCity/$stateId');
-    print(
-      response.body,
-    );
+    // print(
+    //   response.body,
+    // );
     if (response.statusCode == 200) {
       data = json.decode(response.body);
     } else {
       data = [
         {"id": -1, "cityname": "error couldn't fetch states details"},
       ];
-      log('$data');
+      // log('$data');
     }
 
     return data;
@@ -126,15 +126,15 @@ class _AttendanceDataGridState extends State<AttendanceDataGrid> {
 
   Future<String> deleteEmployee({Employee employee}) async {
     try {
-      log('$kDeleteEmp${employee.number}');
+      // log('$kDeleteEmp${employee.number}');
       var response = await http.post('$kDeleteEmp${employee.number}',
           headers: {'Content-Type': 'application/json'},
           body:
               '{nameofworker: ${employee.name},departmentname: ${employee.departmentName},addressline1: ${employee.addressLine1},state: ${employee.state},district: ${employee.district},city: ${employee.city}}');
-      log(response.statusCode.toString());
+      // log(response.statusCode.toString());
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        log('the delete employee data is $data');
+        // log('the delete employee data is $data');
 
         return data['success_message']
                 .toString()
@@ -147,7 +147,7 @@ class _AttendanceDataGridState extends State<AttendanceDataGrid> {
         return 'response not received with ${response.statusCode}';
       }
     } on NoSuchMethodError catch (e) {
-      log(e.stackTrace.toString());
+      // log(e.stackTrace.toString());
     }
   }
 
@@ -189,8 +189,10 @@ class _AttendanceDataGridState extends State<AttendanceDataGrid> {
                 ? Container(
                     height: 75.0,
                     child: Scrollbar(
+                      key: UniqueKey(),
                       child: SingleChildScrollView(
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               currentAttendance

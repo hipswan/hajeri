@@ -199,14 +199,16 @@ class _DashboardState extends State<Dashboard> {
         employeeList = data
             .map<Employee>(
               (e) => Employee(
-                  name: e["nameofworker"],
-                  number: int.parse(e["mobileno"]),
-                  idCardNumber: int.parse('0'),
-                  organizationName: e["organizationname"],
-                  city: e["city"],
-                  area: e["area"],
-                  district: e["district"],
-                  state: e["state"]),
+                name: e["nameofworker"],
+                number: int.parse(e["clientmobno"]),
+                idCardNumber: int.parse('0'),
+                organizationName: e["shopkeeperid"],
+                // city: e["city"],
+                // area: e["area"],
+                departmentName: e["departmentname"],
+                // district: e["district"],
+                // state: e["state"],
+              ),
             )
             .toList();
       } else {
@@ -397,7 +399,9 @@ class _DashboardState extends State<Dashboard> {
                             showShimmer = true;
                             setState(() {});
                             employees = await _getTodayPresentEmployeeList();
-                            log('${employees.length} ${employees.first.name}');
+                            if (employees.first.name.isEmpty) {
+                              employees = [];
+                            }
                             showShimmer = false;
                             setState(() {});
                           }
@@ -447,6 +451,9 @@ class _DashboardState extends State<Dashboard> {
                             showShimmer = true;
                             setState(() {});
                             employees = await _getTodayVisitorList();
+                            if (employees.first.name.isEmpty) {
+                              employees = [];
+                            }
                             showShimmer = false;
                             setState(() {});
                           }
@@ -491,6 +498,9 @@ class _DashboardState extends State<Dashboard> {
                             showShimmer = true;
                             setState(() {});
                             employees = await _getOneMonthVisitorList();
+                            if (employees.first.name.isEmpty) {
+                              employees = [];
+                            }
                             showShimmer = false;
                             setState(() {});
                           }

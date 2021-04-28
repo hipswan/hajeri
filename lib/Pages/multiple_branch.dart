@@ -64,63 +64,138 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                   horizontal: 10.0,
                   vertical: 18.0,
                 ),
-                child: Row(
+                child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                        vertical: 8.0,
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 8.0,
                           ),
-                        ),
-                        child: CircleAvatar(
-                          backgroundColor: Colors.blueGrey,
-                          foregroundColor: Colors.white,
-                          maxRadius: 22.0,
-                          child: Text(
-                            prefs
-                                .getString('org_name')
-                                .toString()
-                                .substring(
-                                  0,
-                                  1,
-                                )
-                                .toUpperCase(),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10.0,
-                    ),
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          MainBranchDetail(
-                            name: 'Branch ID:',
-                            text: 'Name:',
-                          ),
-                          SizedBox(
-                            width: 5.0,
-                          ),
-                          Expanded(
-                            child: MainBranchDetail(
-                              name: prefs.getString(
-                                'worker_id',
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
                               ),
-                              text: prefs.getString(
-                                'org_name',
+                            ),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.blueGrey,
+                              foregroundColor: Colors.white,
+                              maxRadius: 22.0,
+                              child: Text(
+                                prefs
+                                    .getString('org_name')
+                                    .toString()
+                                    .substring(
+                                      0,
+                                      1,
+                                    )
+                                    .toUpperCase(),
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        SizedBox(
+                          width: 10.0,
+                        ),
+                        Expanded(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              MainBranchDetail(
+                                name: 'Branch ID:',
+                                text: 'Name:',
+                              ),
+                              SizedBox(
+                                width: 5.0,
+                              ),
+                              Expanded(
+                                child: MainBranchDetail(
+                                  name: prefs.getString(
+                                    'worker_id',
+                                  ),
+                                  text: prefs.getString(
+                                    'org_name',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(
+                      color: Colors.white,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return BranchForm(
+                                        branch: branch,
+                                        title: 'Edit Branch',
+                                        action: 'edit',
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                              onPressed: () async {
+                                String result = await deleteBranch(
+                                  id: branch['id'].toString(),
+                                );
+
+                                if (result != null) {
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pushNamed(
+                                                context,
+                                                MaintainBranch.id,
+                                              );
+                                            },
+                                            child: Text('back'),
+                                          )
+                                        ],
+                                        content: Text(
+                                          result,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

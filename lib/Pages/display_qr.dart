@@ -301,9 +301,9 @@ class _DisplayQrState extends State<DisplayQr> {
                       //       ? log(response.statusCode.toString())
                       //       : log(response.statusCode.toString());
                       // } on Exception catch (ex) {}
-
                       final taskId = await FlutterDownloader.enqueue(
-                          url: pdfDownloadUri,
+                          url:
+                              '''https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/A4size.pdf''',
                           savedDir: _localPath,
                           fileName: fileName,
                           showNotification: true,

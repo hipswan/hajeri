@@ -154,6 +154,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
                   value: e['mobileno'].toString(),
                   child: Text(
                     e['nameofworker'],
+                    overflow: TextOverflow.clip,
                   ),
                 ),
               )
@@ -297,6 +298,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Scaffold(
       drawer: widget.orgId.contains(prefs.getString('worker_id'))
           ? Drawer(
@@ -355,20 +357,19 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
                 width: double.maxFinite,
                 padding: EdgeInsets.symmetric(
                   vertical: 10.0,
+                  horizontal: 50.0,
                 ),
-                child: Container(
-                  margin: EdgeInsets.symmetric(
-                    vertical: 10.0,
-                    horizontal: 50.0,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10.0,
-                        ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10.0,
+                      ),
+                      child: Container(
+                        width: size.width - 120,
                         child: DropdownButtonFormField(
+                          isExpanded: true,
                           value: typeSelectValue,
                           onChanged: (String newValue) async {
                             // log('New type selected  $newValue');
@@ -393,36 +394,34 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
                             }
                           },
                           items: _dropDownTypeMenuItems,
-                          hint: const Text(
-                            'Select Type',
-                          ),
+                          decoration: InputDecoration(),
                         ),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(
-                      //     vertical: 10.0,
-                      //   ),
-                      //   child: Container(
-                      //     width: double.infinity,
-                      //     child: OutlineButton(
-                      //       onPressed: () async {
-                      //         // await _showDatePicker();
-                      //         await _showMonthPicker();
-                      //         setState(() {
-                      //           isMonthSelected = true;
+                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(
+                    //     vertical: 10.0,
+                    //   ),
+                    //   child: Container(
+                    //     width: double.infinity,
+                    //     child: OutlineButton(
+                    //       onPressed: () async {
+                    //         // await _showDatePicker();
+                    //         await _showMonthPicker();
+                    //         setState(() {
+                    //           isMonthSelected = true;
 
-                      //           showShimmer = true;
-                      //         });
-                      //         _getAttendanceList();
-                      //       },
-                      //       child: Text(
-                      //           '${kMonthsSelectItems[_fromDate.month.toString()]}, ${_fromDate.year}'),
-                      //     ),
-                      //   ),
-                      // ),
-                      getPeripheralView(),
-                    ],
-                  ),
+                    //           showShimmer = true;
+                    //         });
+                    //         _getAttendanceList();
+                    //       },
+                    //       child: Text(
+                    //           '${kMonthsSelectItems[_fromDate.month.toString()]}, ${_fromDate.year}'),
+                    //     ),
+                    //   ),
+                    // ),
+                    getPeripheralView(),
+                  ],
                 ),
               ),
             ),

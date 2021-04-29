@@ -7,9 +7,7 @@ import 'package:hajeri_demo/components/box_tile.dart';
 import 'package:hajeri_demo/components/side_bar.dart';
 import 'package:hajeri_demo/main.dart';
 import 'package:hajeri_demo/model/Employee.dart';
-
 import 'package:shimmer/shimmer.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 
 import '../url.dart';

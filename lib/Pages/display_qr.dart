@@ -139,229 +139,233 @@ class _DisplayQrState extends State<DisplayQr> {
               horizontal: 12.0,
               vertical: 12.0,
             ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    margin: EdgeInsets.fromLTRB(
-                      5.0,
-                      0.0,
-                      5.0,
-                      0.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.cyan[300],
-                      borderRadius: BorderRadius.circular(
-                        10.0,
+            child: Scrollbar(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.fromLTRB(
+                        5.0,
+                        0.0,
+                        5.0,
+                        0.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.cyan[300],
+                        borderRadius: BorderRadius.circular(
+                          10.0,
+                        ),
+                      ),
+                      padding: EdgeInsets.only(
+                        top: 5.0,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          FractionallySizedBox(
+                            widthFactor: 0.9,
+                            child: Divider(
+                              color: Colors.white,
+                              thickness: 2.5,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          Text(
+                            'Hajeri',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30.0,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          Text(
+                            'Contactless-Attendance System',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20.0,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          Text(
+                            prefs.getString('org_name'),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(
+                              20.0,
+                              10.0,
+                              20.0,
+                              10.0,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                5.0,
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: QrImage(
+                              padding: EdgeInsets.all(
+                                10.0,
+                              ),
+                              data:
+                                  'Hajeri_${prefs.getString("worker_id")}_${widget.latitude}_${widget.longitude}',
+
+                              // onError: (ex) {
+                              //   print("[QR] ERROR - $ex");
+                              //   setState(() {
+                              //     _inputErrorText =
+                              //     "Error! Maybe your input value is too long?";
+                              //   });
+                              // },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    padding: EdgeInsets.only(
-                      top: 5.0,
+                    Container(
+                      width: 300,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 5.0,
+                      ),
+                      child: DropdownButtonFormField(
+                        // disabledHint: const Text(
+                        //     'Please Select State First'),
+                        value: pdfSizeDropDownValue,
+                        // onTap: () {
+                        //   FocusScope.of(context).requestFocus(new FocusNode());
+                        // },
+                        onChanged: (String newValue) {
+                          setState(
+                            () {
+                              pdfSizeDropDownValue = newValue;
+                            },
+                          );
+                        },
+                        items: _pdfSizeFormatDropDownItems,
+                        // hint: const Text(
+                        //   'Select City',
+                        // ),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        FractionallySizedBox(
-                          widthFactor: 0.9,
-                          child: Divider(
-                            color: Colors.white,
-                            thickness: 2.5,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20.0),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          padding:
+                              MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            EdgeInsets.zero,
+                          ),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.transparent,
                           ),
                         ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        Text(
-                          'Hajeri',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30.0,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        Text(
-                          'Contactless-Attendance System',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 20.0,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        Text(
-                          prefs.getString('org_name'),
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Container(
-                          margin: EdgeInsets.fromLTRB(
-                            20.0,
-                            10.0,
-                            20.0,
-                            10.0,
+                        onPressed: () async {
+                          // log('Pressed Download Button');
+                          String fileName =
+                              '${prefs.getString('org_id')}_${widget.pointName}_$pdfSizeDropDownValue.pdf';
+
+                          log("https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
+                              name: 'In display qr');
+                          final taskId = await FlutterDownloader.enqueue(
+                            url:
+                                "https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
+                            savedDir: '/storage/emulated/0/Download/',
+                            fileName: fileName,
+                            showNotification: true,
+                            openFileFromNotification: true,
+                          );
+                          Toast.show(
+                            "file download",
+                            context,
+                            duration: Toast.LENGTH_LONG,
+                            gravity: Toast.BOTTOM,
+                            textColor: Colors.green,
+                          );
+                        },
+                        child: Container(
+                          width: 300,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 20.0,
                           ),
                           decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black,
-                            ),
                             borderRadius: BorderRadius.circular(
                               5.0,
                             ),
-                            color: Colors.white,
+                            gradient: kGradient,
                           ),
-                          child: QrImage(
-                            padding: EdgeInsets.all(
-                              10.0,
+                          child: Text(
+                            'Download QR Code',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          padding:
+                              MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            EdgeInsets.zero,
+                          ),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.transparent,
+                          ),
+                        ),
+                        onPressed: () async {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return GenerateQR(
+                                  latitude: widget.latitude,
+                                  longitude: widget.longitude,
+                                  pointName: widget.pointName,
+                                  action: 'edit',
+                                  title: 'Update Qr',
+                                );
+                              },
                             ),
-                            data:
-                                'Hajeri_${prefs.getString("worker_id")}_${widget.latitude}_${widget.longitude}',
-
-                            // onError: (ex) {
-                            //   print("[QR] ERROR - $ex");
-                            //   setState(() {
-                            //     _inputErrorText =
-                            //     "Error! Maybe your input value is too long?";
-                            //   });
-                            // },
+                          );
+                        },
+                        child: Container(
+                          width: 300,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 20.0,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                              5.0,
+                            ),
+                            gradient: kGradient,
+                          ),
+                          child: Text(
+                            'Update QR Code',
+                            textAlign: TextAlign.center,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 300,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 5.0,
-                    ),
-                    child: DropdownButtonFormField(
-                      // disabledHint: const Text(
-                      //     'Please Select State First'),
-                      value: pdfSizeDropDownValue,
-                      // onTap: () {
-                      //   FocusScope.of(context).requestFocus(new FocusNode());
-                      // },
-                      onChanged: (String newValue) {
-                        setState(
-                          () {
-                            pdfSizeDropDownValue = newValue;
-                          },
-                        );
-                      },
-                      items: _pdfSizeFormatDropDownItems,
-                      // hint: const Text(
-                      //   'Select City',
-                      // ),
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                          EdgeInsets.zero,
-                        ),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                          Colors.transparent,
-                        ),
-                      ),
-                      onPressed: () async {
-                        // log('Pressed Download Button');
-                        String fileName =
-                            '${prefs.getString('org_id')}_${widget.pointName}_$pdfSizeDropDownValue.pdf';
-
-                        log("https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
-                            name: 'In display qr');
-                        final taskId = await FlutterDownloader.enqueue(
-                          url:
-                              "https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
-                          savedDir: '/storage/emulated/0/Download/',
-                          fileName: fileName,
-                          showNotification: true,
-                          openFileFromNotification: true,
-                        );
-                        Toast.show(
-                          "file download",
-                          context,
-                          duration: Toast.LENGTH_LONG,
-                          gravity: Toast.BOTTOM,
-                          textColor: Colors.green,
-                        );
-                      },
-                      child: Container(
-                        width: 300,
-                        padding: EdgeInsets.symmetric(
-                          vertical: 20.0,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            5.0,
-                          ),
-                          gradient: kGradient,
-                        ),
-                        child: Text(
-                          'Download QR Code',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                          EdgeInsets.zero,
-                        ),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                          Colors.transparent,
-                        ),
-                      ),
-                      onPressed: () async {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return GenerateQR(
-                                latitude: widget.latitude,
-                                longitude: widget.longitude,
-                                pointName: widget.pointName,
-                                action: 'edit',
-                                title: 'Update Qr',
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: 300,
-                        padding: EdgeInsets.symmetric(
-                          vertical: 20.0,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            5.0,
-                          ),
-                          gradient: kGradient,
-                        ),
-                        child: Text(
-                          'Update QR Code',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

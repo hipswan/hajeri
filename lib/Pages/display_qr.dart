@@ -10,6 +10,7 @@ import 'package:hajeri_demo/Pages/generate_qr.dart';
 import 'package:hajeri_demo/main.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:toast/toast.dart';
 import '../constant.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
@@ -33,17 +34,32 @@ class DisplayQr extends StatefulWidget {
 }
 
 class _DisplayQrState extends State<DisplayQr> {
-  ScreenshotController _screenshotController;
   ReceivePort _port = ReceivePort();
   TargetPlatform platform = TargetPlatform.android;
+  List<String> _pdfSizeFormatItems = [
+    'A4size',
+    'A5size',
+    'A6size',
+  ];
+  String pdfSizeDropDownValue = 'A4size';
+  static List<DropdownMenuItem<String>> _pdfSizeFormatDropDownItems;
 
   String _localPath;
   @override
   void initState() {
     super.initState();
-    _screenshotController = ScreenshotController();
     _checkPermission();
     _prepare().then((value) => log(value));
+    _pdfSizeFormatDropDownItems = _pdfSizeFormatItems
+        .map(
+          (pdfSize) => DropdownMenuItem<String>(
+            value: pdfSize,
+            child: Text(
+              pdfSize,
+            ),
+          ),
+        )
+        .toList();
     IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) {
@@ -107,26 +123,28 @@ class _DisplayQrState extends State<DisplayQr> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.blue[800],
           title: Text('Display Qr'),
           centerTitle: true,
         ),
-        body: Card(
-          margin: EdgeInsets.symmetric(
-            horizontal: 12.0,
-            vertical: 12.0,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Flexible(
-                child: Screenshot(
-                  controller: _screenshotController,
-                  child: Container(
+        body: FractionallySizedBox(
+          heightFactor: 0.95,
+          child: Card(
+            margin: EdgeInsets.symmetric(
+              horizontal: 12.0,
+              vertical: 12.0,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
                     margin: EdgeInsets.fromLTRB(
                       5.0,
                       0.0,
@@ -218,171 +236,134 @@ class _DisplayQrState extends State<DisplayQr> {
                       ],
                     ),
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                      EdgeInsets.zero,
+                  Container(
+                    width: 300,
+                    padding: EdgeInsets.symmetric(
+                      vertical: 5.0,
                     ),
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                      Colors.transparent,
+                    child: DropdownButtonFormField(
+                      // disabledHint: const Text(
+                      //     'Please Select State First'),
+                      value: pdfSizeDropDownValue,
+                      // onTap: () {
+                      //   FocusScope.of(context).requestFocus(new FocusNode());
+                      // },
+                      onChanged: (String newValue) {
+                        setState(
+                          () {
+                            pdfSizeDropDownValue = newValue;
+                          },
+                        );
+                      },
+                      items: _pdfSizeFormatDropDownItems,
+                      // hint: const Text(
+                      //   'Select City',
+                      // ),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
-                  onPressed: () async {
-                    log('Pressed Download Button');
-                    // await _createFolder();
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                          EdgeInsets.zero,
+                        ),
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.transparent,
+                        ),
+                      ),
+                      onPressed: () async {
+                        // log('Pressed Download Button');
+                        String fileName =
+                            '${prefs.getString('org_id')}_${widget.pointName}_$pdfSizeDropDownValue.pdf';
 
-                    String fileName = DateTime.now().toIso8601String();
-
-                    // var path = '/storage/emulated/0/hajeri';
-                    _screenshotController
-                        .capture(
-                            pixelRatio: 1.5,
-                            //set path where screenshot will be saved
-                            delay: Duration(milliseconds: 20))
-                        .then((value) async {
-                      final PdfDocument document = PdfDocument();
-                      PdfPageSettings settings = PdfPageSettings();
-                      settings.setMargins(50);
-                      document.pageSettings = settings;
-                      final PdfBitmap qrImage = PdfBitmap(value);
-                      document
-                        ..pages.add().graphics.drawImage(
-                              qrImage,
-                              const Rect.fromLTWH(
-                                0,
-                                0,
-                                10,
-                                10,
-                              ),
-                            )
-                        ..compressionLevel = PdfCompressionLevel.best;
-
-                      List<int> bytes = document.save();
-
-                      document.dispose();
-                      // var a = File('$_localPath/mpdf.pdf').writeAsBytes(bytes);
-                      // log("the pdf is $a");
-
-                      Uri pdfDataUri =
-                          UriData.fromBytes(bytes, mimeType: "applicaion/pdf")
-                              .uri;
-
-                      var pdfDownloadUri =
-                          'data:application/pdf;base64,${base64.encode(bytes)}';
-                      // try {
-                      //   Uri pdfDataUri = Uri(
-                      //     scheme: 'data',
-                      //     path: pdfDownloadUri,
-                      //   );
-                      //   launch(pdfDataUri.toString());
-
-                      log(pdfDataUri.toString());
-                      // } on Exception catch (e) {
-                      //   e.toString();
-                      // }
-
-                      // var response = await http.get(pdfDownloadUri,
-                      //     headers: {"Content-type": "application/pdf"});
-                      // response.statusCode == 200
-                      //     ? log(response.body.toString())
-                      //     : log(response.request.url.toString());
-                      // log(pdfDownloadUri);
-
-                      // HttpClient httpClient = new HttpClient();
-
-                      // try {
-                      //   var request = await httpClient.get('data',pdfDownloadUri);
-                      //   var response = await request.close();
-                      //   response.statusCode == 200
-                      //       ? log(response.statusCode.toString())
-                      //       : log(response.statusCode.toString());
-                      // } on Exception catch (ex) {}
-                      final taskId = await FlutterDownloader.enqueue(
+                        log("https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
+                            name: 'In display qr');
+                        final taskId = await FlutterDownloader.enqueue(
                           url:
-                              '''https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/A4size.pdf''',
-                          savedDir: _localPath,
+                              "https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
+                          savedDir: '/storage/emulated/0/Download/',
                           fileName: fileName,
                           showNotification: true,
-                          openFileFromNotification: true);
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AboutUsPage(
-                            url: pdfDownloadUri,
-                          ),
+                          openFileFromNotification: true,
+                        );
+                        Toast.show(
+                          "file download",
+                          context,
+                          duration: Toast.LENGTH_LONG,
+                          gravity: Toast.BOTTOM,
+                          textColor: Colors.green,
+                        );
+                      },
+                      child: Container(
+                        width: 300,
+                        padding: EdgeInsets.symmetric(
+                          vertical: 20.0,
                         ),
-                      );
-                    });
-                  },
-                  child: Container(
-                    width: 300,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 20.0,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(
-                        5.0,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            5.0,
+                          ),
+                          gradient: kGradient,
+                        ),
+                        child: Text(
+                          'Download QR Code',
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      gradient: kGradient,
-                    ),
-                    child: Text(
-                      'Download QR Code',
-                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                          EdgeInsets.zero,
+                        ),
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.transparent,
+                        ),
+                      ),
+                      onPressed: () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return GenerateQR(
+                                latitude: widget.latitude,
+                                longitude: widget.longitude,
+                                pointName: widget.pointName,
+                                action: 'edit',
+                                title: 'Update Qr',
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 300,
+                        padding: EdgeInsets.symmetric(
+                          vertical: 20.0,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            5.0,
+                          ),
+                          gradient: kGradient,
+                        ),
+                        child: Text(
+                          'Update QR Code',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                      EdgeInsets.zero,
-                    ),
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                      Colors.transparent,
-                    ),
-                  ),
-                  onPressed: () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return GenerateQR(
-                            latitude: widget.latitude,
-                            longitude: widget.longitude,
-                            pointName: widget.pointName,
-                            action: 'edit',
-                            title: 'Update Qr',
-                          );
-                        },
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: 300,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 20.0,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(
-                        5.0,
-                      ),
-                      gradient: kGradient,
-                    ),
-                    child: Text(
-                      'Update QR Code',
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

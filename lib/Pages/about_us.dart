@@ -27,56 +27,58 @@ class AboutUsPageState extends State<AboutUsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: Drawer(
-        child: SideBar(
-          section: 'about_us',
-        ),
-      ),
-      backgroundColor: Colors.blue[800],
-      appBar: AppBar(
-        backgroundColor: Colors.blue[800],
-        title: Text(
-          'About  Us',
-        ),
-        centerTitle: true,
-      ),
-      body: Stack(
-        children: [
-          isLoading
-              ? LinearProgressIndicator(
-                  backgroundColor: Colors.redAccent,
-                )
-              : Container(),
-          WebView(
-            initialUrl: kAboutUs,
-            onProgress: (int progress) {
-              print("WebView is loading..");
-            },
-            onPageFinished: (String value) {
-              print('Page finished Loading');
-              setState(() {
-                isLoading = false;
-              });
-            },
-            // onWebViewCreated: (WebViewController webViewController) {
-            //   print('In  web view');
-            //   _controller = webViewController;
-            //   _loadHtmlFromAssets();
-            // },
-            // onPageFinished: (String value) async {
-            //   await Future.delayed(
-            //       Duration(
-            //         seconds: 60,
-            //       ), () {
-            //     print('Page finished Loading');
-            //     setState(() {
-            //       isLoading = false;
-            //     });
-            //   });
-            // },
+    return SafeArea(
+      child: Scaffold(
+        drawer: Drawer(
+          child: SideBar(
+            section: 'about_us',
           ),
-        ],
+        ),
+        backgroundColor: Colors.blue[800],
+        appBar: AppBar(
+          backgroundColor: Colors.blue[800],
+          title: Text(
+            'About  Us',
+          ),
+          centerTitle: true,
+        ),
+        body: Stack(
+          children: [
+            isLoading
+                ? LinearProgressIndicator(
+                    backgroundColor: Colors.redAccent,
+                  )
+                : Container(),
+            WebView(
+              initialUrl: kAboutUs,
+              onProgress: (int progress) {
+                print("WebView is loading..");
+              },
+              onPageFinished: (String value) {
+                print('Page finished Loading');
+                setState(() {
+                  isLoading = false;
+                });
+              },
+              // onWebViewCreated: (WebViewController webViewController) {
+              //   print('In  web view');
+              //   _controller = webViewController;
+              //   _loadHtmlFromAssets();
+              // },
+              // onPageFinished: (String value) async {
+              //   await Future.delayed(
+              //       Duration(
+              //         seconds: 60,
+              //       ), () {
+              //     print('Page finished Loading');
+              //     setState(() {
+              //       isLoading = false;
+              //     });
+              //   });
+              // },
+            ),
+          ],
+        ),
       ),
     );
   }

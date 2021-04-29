@@ -571,59 +571,61 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
                 ),
               ),
             ),
-            Expanded(
-              flex: 2,
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    10.0,
-                  ),
-                ),
-                elevation: 5,
-                margin: EdgeInsets.symmetric(
-                  // vertical: 10.0,
-                  horizontal: 10.0,
-                ),
-                child: Container(
-                  width: double.maxFinite,
-                  padding: EdgeInsets.symmetric(
-                    vertical: 5.0,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Shift  Detail',
-                          textAlign: TextAlign.center,
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                            vertical: 10.0,
-                            horizontal: 50.0,
-                          ),
-                          child: DropdownButtonFormField(
-                            value: btnValue,
-                            onChanged: (String newValue) {
-                              setState(() {
-                                btnValue = newValue;
-                              });
-                            },
-                            items: _dropDownMenuItems,
-                            hint: const Text(
-                              'Choose Shift',
-                            ),
-                          ),
-                        ),
-                        BlueButton(
-                          label: 'Update Shift',
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+
+            // Expanded(
+            //   flex: 2,
+            //   child: Card(
+            //     shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(
+            //         10.0,
+            //       ),
+            //     ),
+            //     elevation: 5,
+            //     margin: EdgeInsets.symmetric(
+            //       // vertical: 10.0,
+            //       horizontal: 10.0,
+            //     ),
+            //     child: Container(
+            //       width: double.maxFinite,
+            //       padding: EdgeInsets.symmetric(
+            //         vertical: 5.0,
+            //       ),
+            //       child: SingleChildScrollView(
+            //         child: Column(
+            //           crossAxisAlignment: CrossAxisAlignment.center,
+            //           children: [
+            //             Text(
+            //               'Shift  Detail',
+            //               textAlign: TextAlign.center,
+            //             ),
+            //             Container(
+            //               margin: EdgeInsets.symmetric(
+            //                 vertical: 10.0,
+            //                 horizontal: 50.0,
+            //               ),
+            //               child: DropdownButtonFormField(
+            //                 value: btnValue,
+            //                 onChanged: (String newValue) {
+            //                   setState(() {
+            //                     btnValue = newValue;
+            //                   });
+            //                 },
+            //                 items: _dropDownMenuItems,
+            //                 hint: const Text(
+            //                   'Choose Shift',
+            //                 ),
+            //               ),
+            //             ),
+            //             BlueButton(
+            //               label: 'Update Shift',
+            //             )
+            //           ],
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+
             Expanded(
               flex: 6,
               child: showShimmer

@@ -222,8 +222,9 @@ class _SignUpState extends State<SignUp> {
 
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => OtpVerify(
+                            EnterExitRoute(
+                              exitPage: widget,
+                              enterPage: OtpVerify(
                                 number: _cNumber.text,
                               ),
                             ),

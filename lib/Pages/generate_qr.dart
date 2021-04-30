@@ -37,19 +37,14 @@ class GenerateQR extends StatefulWidget {
 
 class _GenerateQRState extends State<GenerateQR> {
   GoogleMapController mapController;
-  var _cqrPointController;
+  TextEditingController _cqrPointController;
   bool _displayBanner = true;
-  Position currentPosition = Position(
-    longitude: 45.521563,
-    latitude: -122.677433,
-    timestamp: DateTime.now(),
-  );
   bool isLocationUpdated = false;
   bool isRecenterFinished = true;
   // LatLng _center = const LatLng(45.521563, -122.677433);
-
+  GlobalKey<FormState> _qrName = GlobalKey();
   final Map<String, Marker> _markers = {};
-  LatLng currentPositionLatLng;
+  LatLng currentPosition;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -90,9 +85,9 @@ class _GenerateQRState extends State<GenerateQR> {
   updateQrCodePoint() async {
     String orgId = prefs.getString("worker_id");
     String mobile = prefs.getString("mobile");
-    log('$kUpdateQRCodePoint$orgId/$mobile?qrcodepointname=${_cqrPointController.text}&latlong=${currentPosition.latitude.toString()},${currentPosition.longitude.toString()}');
+    log('$kUpdateQRCodePoint$orgId/$mobile?qrcodepointname=${_cqrPointController.text.toString().trim()}&latlong=${currentPosition.latitude.toString()},${currentPosition.longitude.toString()}');
     var response = await http.post(
-        '$kUpdateQRCodePoint$orgId/$mobile?qrcodepointname=${_cqrPointController.text}&latlong=${currentPosition.latitude.toString()},${currentPosition.longitude.toString()}');
+        '$kUpdateQRCodePoint$orgId/$mobile?qrcodepointname=${_cqrPointController.text.toString().trim()}&latlong=${currentPosition.latitude.toString()},${currentPosition.longitude.toString()}');
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
@@ -112,7 +107,7 @@ class _GenerateQRState extends State<GenerateQR> {
       );
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-      print(position);
+      // print(position);
       lat = position.latitude;
       lng = position.longitude;
     } else {
@@ -122,6 +117,12 @@ class _GenerateQRState extends State<GenerateQR> {
       lng = double.parse(
         widget.longitude,
       );
+      setState(() {
+        currentPosition = LatLng(
+          lat,
+          lng,
+        );
+      });
     }
 
     setState(() {
@@ -139,18 +140,12 @@ class _GenerateQRState extends State<GenerateQR> {
           ),
           onDragEnd: (value) {
             setState(() {
-              currentPositionLatLng = LatLng(value.latitude, value.longitude);
+              currentPosition = LatLng(value.latitude, value.longitude);
             });
             log(value.toString());
           });
-      log('${_markers.values.toSet()}');
 
-      currentPosition = Position(
-        latitude: lat,
-        longitude: lng,
-        timestamp: DateTime.now(),
-      );
-      currentPositionLatLng = LatLng(lat, lng);
+      currentPosition = LatLng(lat, lng);
       isLocationUpdated = true;
     });
 
@@ -177,8 +172,10 @@ class _GenerateQRState extends State<GenerateQR> {
 
   @override
   void dispose() {
-    super.dispose();
+    _cqrPointController.dispose();
+
     mapController.dispose();
+    super.dispose();
   }
 
   @override
@@ -259,7 +256,7 @@ class _GenerateQRState extends State<GenerateQR> {
                                 ),
                               );
                               setState(() {
-                                currentPositionLatLng =
+                                currentPosition =
                                     LatLng(center.latitude, center.longitude);
                                 _markers['position'] = Marker(
                                     consumeTapEvents: true,
@@ -275,7 +272,7 @@ class _GenerateQRState extends State<GenerateQR> {
                                     ),
                                     onDragEnd: (value) {
                                       setState(() {
-                                        currentPositionLatLng = LatLng(
+                                        currentPosition = LatLng(
                                             value.latitude, value.longitude);
                                         log(value.toString());
                                       });
@@ -344,11 +341,19 @@ class _GenerateQRState extends State<GenerateQR> {
 
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                      child: TextField(
-                        controller: _cqrPointController,
-                        decoration: InputDecoration(
-                          hintText: 'QR Point Name',
-                          border: OutlineInputBorder(),
+                      child: Form(
+                        key: _qrName,
+                        child: TextFormField(
+                          controller: _cqrPointController,
+                          validator: (value) {
+                            if (value.trim().isEmpty)
+                              return 'please enter qr code name';
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'QR Point Name',
+                            border: OutlineInputBorder(),
+                          ),
                         ),
                       ),
                     ),
@@ -398,20 +403,29 @@ class _GenerateQRState extends State<GenerateQR> {
                             //   'longitude',
                             //   currentPositionLatLng.longitude.toString(),
                             // );
-
-                            if (widget.action.contains('edit')) {
-                              await updateQrCodePoint();
-                            } else {
-                              await addQrCodePoint();
+                            if (_qrName.currentState.validate()) {
+                              if (widget.action.contains('edit')) {
+                                log(
+                                  'edit',
+                                  name: 'generate qr code',
+                                );
+                                await updateQrCodePoint();
+                              } else {
+                                log(
+                                  'add',
+                                  name: 'generate qr code',
+                                );
+                                await addQrCodePoint();
+                              }
+                              FocusScope.of(context)
+                                  .requestFocus(new FocusNode());
+                              await SystemChannels.textInput
+                                  .invokeMethod('TextInput.hide');
+                              Navigator.pushNamed(
+                                context,
+                                MaintainQr.id,
+                              );
                             }
-                            FocusScope.of(context)
-                                .requestFocus(new FocusNode());
-                            SystemChannels.textInput
-                                .invokeMethod('TextInput.hide');
-                            Navigator.pushNamed(
-                              context,
-                              MaintainQr.id,
-                            );
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(

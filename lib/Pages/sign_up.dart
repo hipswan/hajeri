@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hajeri_demo/Pages/landing.dart';
 import 'package:hajeri_demo/Pages/otp_verify.dart';
 import 'package:hajeri_demo/Pages/register.dart';
@@ -37,6 +38,7 @@ class _SignUpState extends State<SignUp> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.blue[800],
         centerTitle: true,
         title: Text(
@@ -219,7 +221,9 @@ class _SignUpState extends State<SignUp> {
                         // ignore: null_aware_in_condition
                         if (_formKey.currentState.validate()) {
                           log('form validation successful');
-
+                          FocusScope.of(context).requestFocus(new FocusNode());
+                          await SystemChannels.textInput
+                              .invokeMethod('TextInput.hide');
                           Navigator.push(
                             context,
                             EnterExitRoute(

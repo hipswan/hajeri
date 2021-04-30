@@ -338,8 +338,8 @@ class _DashboardState extends State<Dashboard> {
                     children: [
                       BoxTile(
                         size: Size(
-                          size.width * 0.35,
-                          size.width * 0.30,
+                          size.width * 0.5 * 0.75,
+                          size.height * 0.5 * 0.30,
                         ),
                         color: Color(0xff17a2b8),
                         onPressed: () async {
@@ -381,8 +381,8 @@ class _DashboardState extends State<Dashboard> {
                       ),
                       BoxTile(
                         size: Size(
-                          size.width * 0.35,
-                          size.width * 0.30,
+                          size.width * 0.5 * 0.75,
+                          size.height * 0.5 * 0.30,
                         ),
                         color: Color(0xff28a745),
                         onPressed: () async {
@@ -433,8 +433,8 @@ class _DashboardState extends State<Dashboard> {
                     children: [
                       BoxTile(
                         size: Size(
-                          size.width * 0.35,
-                          size.width * 0.30,
+                          size.width * 0.5 * 0.75,
+                          size.height * 0.5 * 0.30,
                         ),
                         color: Color(0xffffc107),
                         onPressed: () async {
@@ -479,8 +479,8 @@ class _DashboardState extends State<Dashboard> {
                       ),
                       BoxTile(
                         size: Size(
-                          size.width * 0.35,
-                          size.width * 0.30,
+                          size.width * 0.5 * 0.75,
+                          size.height * 0.5 * 0.30,
                         ),
                         color: Color(0xffdc3545),
                         selected: selected['4'],

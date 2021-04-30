@@ -31,9 +31,11 @@ class _MaintainQrState extends State<MaintainQr> {
     super.initState();
     isLatLngPresent().then((value) {
       if (value.contains("success")) {
-        isPointPresent = 'present';
+        qrCodePointList.isEmpty
+            ? isPointPresent = 'absent'
+            : isPointPresent = 'present';
       } else if (value.contains('failure')) {
-        isPointPresent = 'absent';
+        isPointPresent = 'error';
       }
       setState(() {});
     });
@@ -47,9 +49,9 @@ class _MaintainQrState extends State<MaintainQr> {
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      if (data.isNotEmpty) {
-        qrCodePointList = data;
-      }
+
+      qrCodePointList = data;
+
       log(data.toString());
 
       return "success";
@@ -79,12 +81,14 @@ class _MaintainQrState extends State<MaintainQr> {
             // debugger();
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) {
-                return GenerateQR(
-                  action: 'add',
-                  title: 'Generate Qr',
-                );
-              }),
+              MaterialPageRoute(
+                builder: (context) {
+                  return GenerateQR(
+                    action: 'add',
+                    title: 'Generate Qr',
+                  );
+                },
+              ),
             );
           },
           child: Icon(
@@ -118,6 +122,13 @@ class _MaintainQrState extends State<MaintainQr> {
         break;
       case "absent":
         return GenerateQR();
+        break;
+      case "error":
+        return Center(
+          child: Text(
+            'Data Not Fetched',
+          ),
+        );
         break;
     }
   }

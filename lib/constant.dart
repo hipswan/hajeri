@@ -28,6 +28,11 @@ const List<String> kTypeSelectItems = <String>[
 ];
 const kMainQrPointTextStyle = TextStyle(
   color: Colors.white,
+  fontSize: 16.0,
+);
+const kQrPointTextStyle = TextStyle(
+  color: Colors.white,
+  fontSize: 16.0,
 );
 
 const kMonthsSelectItems = <String, String>{
@@ -90,4 +95,13 @@ TextStyle kTextStyleAccount = TextStyle(
   fontSize: 22,
   color: Colors.white,
   fontWeight: FontWeight.bold,
+);
+
+var kBranchTextStyle = TextStyle(
+  color: Colors.white,
+  fontSize: 16.0,
+);
+var kMainBranchTextStyle = TextStyle(
+  color: Colors.white,
+  fontSize: 18.0,
 );

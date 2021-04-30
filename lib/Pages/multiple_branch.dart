@@ -384,16 +384,12 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                                     ),
                                   ),
                                   title: Text(
-                                    branch['userName'] ?? '',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
+                                    branch["personaname"] ?? '',
+                                    style: kBranchTextStyle,
                                   ),
                                   subtitle: Text(
-                                    branch['roles'] ?? '',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
+                                    branch['userName'] ?? '',
+                                    style: kBranchTextStyle,
                                   ),
                                 ),
                               ),
@@ -437,7 +433,7 @@ class MainBranchDetail extends StatelessWidget {
             ),
             child: Text(
               name,
-              style: kMainQrPointTextStyle,
+              style: kMainBranchTextStyle,
             ),
           ),
           SizedBox(
@@ -445,7 +441,7 @@ class MainBranchDetail extends StatelessWidget {
           ),
           Text(
             text,
-            style: kMainQrPointTextStyle,
+            style: kMainBranchTextStyle,
           ),
         ],
       ),

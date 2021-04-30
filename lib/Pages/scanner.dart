@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hajeri_demo/Pages/landing.dart';
 import 'package:hajeri_demo/components/blue_button.dart';
+import 'package:hajeri_demo/constant.dart';
 import 'package:hajeri_demo/url.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -12,12 +13,15 @@ import 'package:hajeri_demo/components/side_bar.dart';
 import 'package:hajeri_demo/main.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:toast/toast.dart';
 import 'dart:io';
 
 import 'generate_qr.dart';
 
 Position _currrentUserLocation;
+var orgLng;
+var orgLat;
 
 class Scanner extends StatefulWidget {
   static const id = 'scanner';
@@ -250,7 +254,12 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                           child: Column(
                             children: [
                               Image.asset('assets/images/hajeri_login.jpg'),
-                              Text('Scanning in progress'),
+                              Shimmer.fromColors(
+                                baseColor: Colors.black,
+                                highlightColor: Colors.black26,
+                                enabled: true,
+                                child: Text('Scanning in progress'),
+                              ),
                             ],
                           ),
                         ),
@@ -344,7 +353,20 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Not a Hajeri QR Code Scan Again'),
+              backgroundColor: Colors.white,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Not a Hajeri QR Code Scan Again',
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              margin: EdgeInsets.fromLTRB(
+                5.0,
+                0.0,
+                5.0,
+                20.0,
+              ),
             ),
           );
           await controller?.resumeCamera();
@@ -373,8 +395,8 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
 
     var orgId = qrCodeResult[1];
     dev.log("the org id is $orgId", name: 'In the scanner mark attendance');
-    var orgLat = qrCodeResult[2];
-    var orgLng = qrCodeResult[3];
+    orgLat = qrCodeResult[2];
+    orgLng = qrCodeResult[3];
     dev.log("the org lat is $orgLat", name: 'In the scanner mark attendance');
     dev.log("the org lng is $orgLng", name: 'In the scanner mark attendance');
     dev.log("the org lat in double is ${double.parse(orgLat)}",
@@ -390,7 +412,6 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
         double.parse(orgLng),
         _currrentUserLocation.latitude,
         _currrentUserLocation.longitude);
-    dev.log("the diff distance is ${distanceInMeters.toString()}");
 
     String userOrgId = prefs.getString("org_id");
     String userId = prefs.getString("worker_id");
@@ -399,6 +420,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     dev.log("org id from qr is $orgId");
     print("org id from user $userOrgId");
     if (userOrgId == orgId) {
+      dev.log("the diff distance is ${distanceInMeters.toString()}");
       if (distanceInMeters < 3) {
         var response =
             await http.get("$kMarkAttendance$orgId/$userId/Employee", headers: {
@@ -533,6 +555,9 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               ),
               ElevatedButton.icon(
                 style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                    Colors.blue[700],
+                  ),
                   shape: MaterialStateProperty.all(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
@@ -607,12 +632,8 @@ class _ViewLocationState extends State<ViewLocation> {
       draggable: false,
       markerId: MarkerId('Marker Id'),
       position: LatLng(
-        (_currrentUserLocation != null)
-            ? _currrentUserLocation.latitude
-            : 45.521563,
-        (_currrentUserLocation != null)
-            ? _currrentUserLocation.longitude
-            : -122.677433,
+        double.parse(orgLat),
+        double.parse(orgLng),
       ),
       infoWindow: InfoWindow(
         title: 'Info title',
@@ -655,6 +676,7 @@ class _ViewLocationState extends State<ViewLocation> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[800],
@@ -663,49 +685,6 @@ class _ViewLocationState extends State<ViewLocation> {
           'Map',
           textAlign: TextAlign.center,
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          Position center = await getUserLocation();
-          mapController.moveCamera(
-            CameraUpdate.newCameraPosition(
-              CameraPosition(
-                target: LatLng(
-                  center.latitude,
-                  center.longitude,
-                ),
-                zoom: 15.0,
-              ),
-            ),
-          );
-          setState(() {
-            _markers['position'] = Marker(
-                consumeTapEvents: true,
-                draggable: false,
-                markerId: MarkerId('Marker Id'),
-                position: LatLng(
-                  center.latitude,
-                  center.longitude,
-                ),
-                infoWindow: InfoWindow(
-                  title: 'Info title',
-                  snippet: 'Info snippet',
-                ),
-                onDragEnd: (value) {
-                  setState(() {});
-                });
-
-            isRecenterFinished = true;
-          });
-        },
-        tooltip: 'Center',
-        backgroundColor: Colors.white,
-        child: isRecenterFinished
-            ? Icon(
-                Icons.gps_fixed_outlined,
-                color: Colors.blue,
-              )
-            : CircularProgressIndicator(),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -739,26 +718,106 @@ class _ViewLocationState extends State<ViewLocation> {
               ),
               markers: _markers.values.toSet(),
             ),
-            // Positioned(
-            //   right: 5.0,
-            //   top: 5.0,
-            //   child: ElevatedButton(
-            //     style: ButtonStyle(
-            //       shape: MaterialStateProperty.all(
-            //         CircleBorder(),
-            //       ),
-            //       padding: MaterialStateProperty.all(
-            //         EdgeInsets.zero,
-            //       ),
-            //     ),
-            //     onPressed: () {
-            //       Navigator.of(context).pop();
-            //     },
-            //     child: Icon(
-            //       Icons.close,
-            //     ),
-            //   ),
-            // ),
+            Positioned(
+              bottom: 30.0,
+              child: Container(
+                height: 100,
+                width: size.width,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Landing(
+                            initialPageIndex: 1,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 16.0,
+                        horizontal: 16.0,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: kGradient,
+                        borderRadius: BorderRadius.circular(
+                          50.0,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            'Scan Aain |',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                          Icon(
+                            Icons.qr_code_scanner_rounded,
+                            color: Colors.white,
+                            size: 22.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 30.0,
+              right: 10.0,
+              child: FloatingActionButton(
+                onPressed: () async {
+                  Position center = await getUserLocation();
+                  mapController.moveCamera(
+                    CameraUpdate.newCameraPosition(
+                      CameraPosition(
+                        target: LatLng(
+                          center.latitude,
+                          center.longitude,
+                        ),
+                        zoom: 15.0,
+                      ),
+                    ),
+                  );
+                  // setState(() {
+                  //   _markers['position'] = Marker(
+                  //       consumeTapEvents: true,
+                  //       draggable: false,
+                  //       markerId: MarkerId('Marker Id'),
+                  //       position: LatLng(
+                  //         center.latitude,
+                  //         center.longitude,
+                  //       ),
+                  //       infoWindow: InfoWindow(
+                  //         title: 'Info title',
+                  //         snippet: 'Info snippet',
+                  //       ),
+                  //       onDragEnd: (value) {
+                  //         setState(() {});
+                  //       });
+
+                  //   isRecenterFinished = true;
+                  // });
+                },
+                tooltip: 'Center',
+                backgroundColor: Colors.white,
+                child: isRecenterFinished
+                    ? Icon(
+                        Icons.gps_fixed_outlined,
+                        color: Colors.blue,
+                      )
+                    : CircularProgressIndicator(),
+              ),
+            ),
           ],
         ),
       ),

@@ -116,6 +116,7 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                         Expanded(
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            textBaseline: TextBaseline.alphabetic,
                             children: [
                               MainQrDetail(
                                 name: 'Name:',
@@ -281,6 +282,7 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                               qrCodePoint["latlong"].toString().split(',');
 
                           return Slidable(
+                            key: ValueKey(index),
                             actionPane: SlidableScrollActionPane(),
                             actions: [
                               Padding(
@@ -294,12 +296,13 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                                       MaterialPageRoute(
                                         builder: (context) {
                                           return GenerateQR(
-                                              latitude: position[0],
-                                              longitude: position[1],
-                                              pointName: qrCodePoint[
-                                                  "nameofqrcodepoint"],
-                                              action: 'edit',
-                                              title: 'Update Qr');
+                                            latitude: position[0],
+                                            longitude: position[1],
+                                            pointName: qrCodePoint[
+                                                "nameofqrcodepoint"],
+                                            action: 'edit',
+                                            title: 'Update Qr',
+                                          );
                                         },
                                       ),
                                     );
@@ -421,12 +424,11 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                                   ),
                                   title: Text(
                                     qrCodePoint['nameofqrcodepoint'] ?? '',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
+                                    style: kQrPointTextStyle,
                                   ),
                                   subtitle: Text(
                                     '',
+                                    style: kQrPointTextStyle,
                                   ),
                                   // Text(
                                   //   qrCodePoint['latlong'] ?? '',

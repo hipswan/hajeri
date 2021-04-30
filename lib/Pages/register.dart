@@ -20,10 +20,10 @@ class RegisterState extends State<Register> {
   GlobalKey<FormState> _formState;
   static TextEditingController _cOrgName,
       _cName,
-      _cBusinessName,
       _cNumber,
       _cDistrict,
       _cAddress;
+  List<dynamic> states;
   static bool submitLoader = false;
   static bool switchControl = false;
   static String textHolder = 'Switch is On';
@@ -95,7 +95,7 @@ class RegisterState extends State<Register> {
     List<dynamic> data = [
       {'': ''}
     ];
-    print('In get city');
+    dev.log('$kCity/$stateId');
     http.Response response = await http.get('$kCity/$stateId');
     print(
       response.body,
@@ -118,17 +118,18 @@ class RegisterState extends State<Register> {
     _formState = GlobalKey<FormState>();
     _cName = TextEditingController();
     _cOrgName = TextEditingController();
-
-    _cBusinessName = TextEditingController();
+    _cDistrict = TextEditingController();
     _cNumber = TextEditingController();
     _cAddress = TextEditingController();
+    departmentDropDownValue = null;
+    businessNatureDropDownValue = null;
   }
 
   void toggleSwitch(bool value) async {
     _formState.currentState.reset();
     _cAddress.clear();
     _cName.clear();
-    _cBusinessName.clear();
+    _cDistrict.clear();
     _cNumber.clear();
     _cOrgName.clear();
     stateDropDownValue = null;
@@ -139,13 +140,13 @@ class RegisterState extends State<Register> {
       switchControl = true;
 
       // textHolder = 'Switch is Off';
-      List<dynamic> states = await getStateList();
+      states = await getStateList();
       _stateDropDownMenuItems = states
           .map(
             (state) => DropdownMenuItem<String>(
               value: state["id"].toString(),
               child: Text(
-                state["statename"],
+                state["statename"].toString(),
               ),
             ),
           )
@@ -166,6 +167,15 @@ class RegisterState extends State<Register> {
   }
 
   Future<String> createOrgAccount() async {
+    String orgState;
+    states.forEach((state) {
+      if (state['id']
+          .toString()
+          .trim()
+          .contains(stateDropDownValue.toString().trim())) {
+        orgState = state["statename"].toString();
+      }
+    });
     var headers = {'Content-Type': 'application/json'};
     var request = http.Request('POST', Uri.parse('$kAddOrg'));
     request.body = '''{
@@ -175,10 +185,21 @@ class RegisterState extends State<Register> {
       "contactpersondeparmentname": "$departmentDropDownValue",
       "address": "${_cAddress.text.trim()}",
       "mobile": "${_cNumber.text.trim()}",
-      "state": "$stateDropDownValue",
+      "state": "$orgState",
       "district":'${_cDistrict.text.trim()}',
       "city": "$cityDropDownValue"
     }''';
+    dev.log('''{
+      "nameoforganization": "${_cOrgName.text.trim()}",
+      "personaname": "${_cName.text.trim()}",
+      "natureofbusiness": "$businessNatureDropDownValue",
+      "contactpersondeparmentname": "$departmentDropDownValue",
+      "address": "${_cAddress.text.trim()}",
+      "mobile": "${_cNumber.text.trim()}",
+      "state": "$orgState",
+      "district":'${_cDistrict.text.trim()}',
+      "city": "$cityDropDownValue"
+    }''');
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
@@ -207,15 +228,33 @@ class RegisterState extends State<Register> {
   }
 
   Future<dynamic> addUser() async {
+    String userState;
+    states.forEach((state) {
+      if (state['id']
+          .toString()
+          .trim()
+          .toLowerCase()
+          .contains(stateDropDownValue.toString().trim().toLowerCase())) {
+        userState = state["statename"].toString();
+      }
+    });
+
     Map<String, String> body = {
       "personaname": "${_cName.text}",
       "address": "${_cAddress.text}",
       "mobile": "${_cNumber.text}",
-      "state": "$stateDropDownValue",
-      "district": "$stateDropDownValue",
+      "state": "$userState",
+      "district": "${_cDistrict.text}",
       "city": "$cityDropDownValue",
     };
-
+    dev.log('''{
+      "personaname": "${_cName.text}",
+      "address": "${_cAddress.text}",
+      "mobile": "${_cNumber.text}",
+      "state": "$userState",
+      "district": "${_cDistrict.text}",
+      "city": "$cityDropDownValue",
+    }''');
     var response = await http.post(
       kAddUser,
       body: jsonEncode(body),
@@ -258,7 +297,6 @@ class RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.blue[800],
           title: Text(
@@ -337,7 +375,7 @@ class RegisterState extends State<Register> {
                       _departmentDropDownMenuItems = snapshot.data
                           .map(
                             (department) => DropdownMenuItem<String>(
-                              value: department["id"].toString(),
+                              value: department["personname"].toString(),
                               child: Text(
                                 department["personname"],
                               ),
@@ -353,287 +391,306 @@ class RegisterState extends State<Register> {
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: switchControl
-                                    ? Builder(builder: (context) {
-                                        return Form(
-                                          key: _formState,
-                                          child: Column(
-                                            children: [
-                                              //Person Name
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  vertical: 8.0,
-                                                ),
-                                                child: TextFormField(
-                                                  keyboardType: TextInputType
-                                                      .emailAddress,
-                                                  textAlign: TextAlign.left,
-                                                  controller: _cName,
-                                                  validator: (value) {
-                                                    if (value.trim().isEmpty) {
-                                                      return 'Please Enter Your Name';
-                                                    }
-                                                    if (value.trim().contains(
-                                                        new RegExp(
-                                                            r'[.@_-]'))) {
-                                                      return 'Please Enter Valid Name';
-                                                    }
-                                                    return null;
-                                                  },
-                                                  onChanged: (value) {},
-                                                  decoration: InputDecoration(
-                                                    // errorText: null,
-                                                    hintText: 'Enter Name',
-                                                    labelText:
-                                                        'Contact Person Name',
-                                                    border:
-                                                        OutlineInputBorder(),
+                                    ? Builder(
+                                        builder: (context) {
+                                          return Form(
+                                            key: _formState,
+                                            child: Column(
+                                              children: [
+                                                //Person Name
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 8.0,
                                                   ),
-                                                ),
-                                              ),
-                                              //Address
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  vertical: 8.0,
-                                                ),
-                                                child: TextFormField(
-                                                  keyboardType:
-                                                      TextInputType.text,
-                                                  textAlign: TextAlign.left,
-                                                  controller: _cAddress,
-                                                  validator: (value) {
-                                                    if (value.trim().isEmpty) {
-                                                      return 'Please Enter Your Address';
-                                                    }
-
-                                                    return null;
-                                                  },
-                                                  onChanged: (value) {},
-                                                  decoration: InputDecoration(
-                                                    // errorText: null,
-                                                    hintText: 'Enter Address',
-                                                    labelText: 'Address',
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                  ),
-                                                ),
-                                              ),
-
-                                              //Mobile Number
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  vertical: 8.0,
-                                                ),
-                                                child: TextFormField(
-                                                  keyboardType: TextInputType
-                                                      .numberWithOptions(
-                                                    decimal: false,
-                                                    signed: false,
-                                                  ),
-                                                  textAlign: TextAlign.left,
-                                                  controller: _cNumber,
-                                                  validator: (value) {
-                                                    if (value.trim().isEmpty) {
-                                                      return 'Please Enter Your Mobile Number';
-                                                    }
-                                                    if (value.trim().length >
-                                                            10 ||
-                                                        value.trim().contains(
-                                                            new RegExp(
-                                                                r'[A-Za-z]'))) {
-                                                      return 'Please Enter Valid Number';
-                                                    }
-                                                    return null;
-                                                  },
-                                                  onChanged: (value) {},
-                                                  decoration: InputDecoration(
-                                                    // errorText: null,
-                                                    hintText:
-                                                        'Enter Contact Detail',
-                                                    labelText: 'Mobile Number',
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                  ),
-                                                ),
-                                              ),
-                                              //state drop down
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  vertical: 8.0,
-                                                ),
-                                                child: DropdownButtonFormField(
-                                                  // disabledHint: Text(
-                                                  //   'Please Select Department First',
-                                                  // ),
-                                                  // onTap: () {
-                                                  //   stateSelected = false;
-                                                  //   cityDropDownValue = null;
-                                                  //   setState(() {});
-                                                  // },
-                                                  onTap: () {
-                                                    FocusScope.of(context)
-                                                        .requestFocus(
-                                                            new FocusNode());
-                                                  },
-                                                  value: stateDropDownValue,
-                                                  onChanged:
-                                                      (String newValue) async {
-                                                    stateDropDownValue =
-                                                        newValue;
-
-                                                    if (cityDropDownValue !=
-                                                            null &&
-                                                        cityDropDownValue
-                                                            .isNotEmpty) {
-                                                      cityDropDownValue = null;
-                                                    }
-                                                    List<dynamic> cities =
-                                                        await getCityList(
-                                                            stateDropDownValue);
-                                                    _cityDropDownMenuItems =
-                                                        cities
-                                                            .map(
-                                                              (city) =>
-                                                                  DropdownMenuItem<
-                                                                      String>(
-                                                                value: city[
-                                                                        "id"]
-                                                                    .toString(),
-                                                                child: Text(
-                                                                  city[
-                                                                      "cityname"],
-                                                                ),
-                                                              ),
-                                                            )
-                                                            .toList();
-                                                    stateSelected = true;
-                                                    setState(() {});
-                                                  },
-                                                  items:
-                                                      _stateDropDownMenuItems,
-
-                                                  decoration: InputDecoration(
-                                                    labelText: 'Select State',
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                  ),
-                                                  // hint: const Text('Select State'),
-                                                ),
-                                              ),
-                                              //District
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  vertical: 8.0,
-                                                ),
-                                                child: TextFormField(
-                                                  keyboardType:
-                                                      TextInputType.text,
-                                                  textAlign: TextAlign.left,
-                                                  controller: _cDistrict,
-                                                  validator: (value) {
-                                                    if (value.trim().isEmpty) {
-                                                      return 'Please Enter Your Address';
-                                                    }
-
-                                                    return null;
-                                                  },
-                                                  onChanged: (value) {},
-                                                  decoration: InputDecoration(
-                                                    // errorText: null,
-                                                    hintText: 'Enter District',
-                                                    labelText: 'District',
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                  ),
-                                                ),
-                                              ),
-
-                                              //city drop down
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  vertical: 8.0,
-                                                ),
-                                                child: DropdownButtonFormField(
-                                                  // disabledHint: const Text(
-                                                  //     'Please Select State First'),
-                                                  value: cityDropDownValue,
-                                                  onTap: () {
-                                                    FocusScope.of(context)
-                                                        .requestFocus(
-                                                            new FocusNode());
-                                                  },
-                                                  onChanged: (String newValue) {
-                                                    setState(
-                                                      () {
-                                                        cityDropDownValue =
-                                                            newValue;
-                                                      },
-                                                    );
-                                                  },
-                                                  items: _cityDropDownMenuItems,
-                                                  // hint: const Text(
-                                                  //   'Select City',
-                                                  // ),
-                                                  decoration: InputDecoration(
-                                                    errorText: !stateSelected
-                                                        ? 'Please Select State First'
-                                                        : null,
-                                                    labelText: 'Select City',
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                  ),
-                                                ),
-                                              ),
-
-                                              //Submit Button User
-                                              ElevatedButton(
-                                                onPressed: () async {
-                                                  if (_formState.currentState
-                                                      .validate()) {
-                                                    var addUserResult =
-                                                        await addUser();
-                                                    dev.log(addUserResult
-                                                        .toString());
-                                                  } else {
-                                                    Toast.show(
-                                                      "Some details are missing",
-                                                      context,
-                                                      duration:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity: Toast.BOTTOM,
-                                                      textColor:
-                                                          Colors.redAccent,
-                                                    );
-                                                  }
-                                                },
-                                                style: ButtonStyle(
-                                                  backgroundColor:
-                                                      MaterialStateProperty.all(
-                                                    Colors.blue[700],
-                                                  ),
-                                                  padding: MaterialStateProperty
-                                                      .all<EdgeInsetsGeometry>(
-                                                    EdgeInsets.symmetric(
-                                                      vertical: 10.0,
+                                                  child: TextFormField(
+                                                    keyboardType: TextInputType
+                                                        .emailAddress,
+                                                    textAlign: TextAlign.left,
+                                                    controller: _cName,
+                                                    validator: (value) {
+                                                      if (value
+                                                          .trim()
+                                                          .isEmpty) {
+                                                        return 'Please Enter Your Name';
+                                                      }
+                                                      if (value.trim().contains(
+                                                          new RegExp(
+                                                              r'[.@_-]'))) {
+                                                        return 'Please Enter Valid Name';
+                                                      }
+                                                      return null;
+                                                    },
+                                                    onChanged: (value) {},
+                                                    decoration: InputDecoration(
+                                                      // errorText: null,
+                                                      hintText: 'Enter Name',
+                                                      labelText:
+                                                          'Contact Person Name',
+                                                      border:
+                                                          OutlineInputBorder(),
                                                     ),
                                                   ),
                                                 ),
-                                                child: Center(
-                                                  heightFactor: 2.0,
-                                                  child: Text(
-                                                    'Submit',
+                                                //Address
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 8.0,
+                                                  ),
+                                                  child: TextFormField(
+                                                    keyboardType:
+                                                        TextInputType.text,
+                                                    textAlign: TextAlign.left,
+                                                    controller: _cAddress,
+                                                    validator: (value) {
+                                                      if (value
+                                                          .trim()
+                                                          .isEmpty) {
+                                                        return 'Please Enter Your Address';
+                                                      }
+
+                                                      return null;
+                                                    },
+                                                    onChanged: (value) {},
+                                                    decoration: InputDecoration(
+                                                      // errorText: null,
+                                                      hintText: 'Enter Address',
+                                                      labelText: 'Address',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      })
+
+                                                //Mobile Number
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 8.0,
+                                                  ),
+                                                  child: TextFormField(
+                                                    keyboardType: TextInputType
+                                                        .numberWithOptions(
+                                                      decimal: false,
+                                                      signed: false,
+                                                    ),
+                                                    textAlign: TextAlign.left,
+                                                    controller: _cNumber,
+                                                    validator: (value) {
+                                                      if (value
+                                                          .trim()
+                                                          .isEmpty) {
+                                                        return 'Please Enter Your Mobile Number';
+                                                      }
+                                                      if (value.trim().length >
+                                                              10 ||
+                                                          value.trim().contains(
+                                                              new RegExp(
+                                                                  r'[A-Za-z]'))) {
+                                                        return 'Please Enter Valid Number';
+                                                      }
+                                                      return null;
+                                                    },
+                                                    onChanged: (value) {},
+                                                    decoration: InputDecoration(
+                                                      // errorText: null,
+                                                      hintText:
+                                                          'Enter Contact Detail',
+                                                      labelText:
+                                                          'Mobile Number',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                //state drop down
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 8.0,
+                                                  ),
+                                                  child:
+                                                      DropdownButtonFormField(
+                                                    // disabledHint: Text(
+                                                    //   'Please Select Department First',
+                                                    // ),
+                                                    // onTap: () {
+                                                    //   stateSelected = false;
+                                                    //   cityDropDownValue = null;
+                                                    //   setState(() {});
+                                                    // },
+                                                    onTap: () {
+                                                      FocusScope.of(context)
+                                                          .requestFocus(
+                                                              new FocusNode());
+                                                    },
+                                                    value: stateDropDownValue,
+                                                    onChanged: (String
+                                                        newValue) async {
+                                                      stateDropDownValue =
+                                                          newValue;
+
+                                                      if (cityDropDownValue !=
+                                                              null &&
+                                                          cityDropDownValue
+                                                              .isNotEmpty) {
+                                                        cityDropDownValue =
+                                                            null;
+                                                      }
+                                                      List<dynamic> cities =
+                                                          await getCityList(
+                                                              stateDropDownValue);
+                                                      _cityDropDownMenuItems =
+                                                          cities
+                                                              .map(
+                                                                (city) =>
+                                                                    DropdownMenuItem<
+                                                                        String>(
+                                                                  value: city[
+                                                                          "cityname"]
+                                                                      .toString(),
+                                                                  child: Text(
+                                                                    city["cityname"]
+                                                                        .toString(),
+                                                                  ),
+                                                                ),
+                                                              )
+                                                              .toList();
+                                                      stateSelected = true;
+                                                      setState(() {});
+                                                    },
+                                                    items:
+                                                        _stateDropDownMenuItems,
+
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Select State',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                    // hint: const Text('Select State'),
+                                                  ),
+                                                ),
+                                                //District
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 8.0,
+                                                  ),
+                                                  child: TextFormField(
+                                                    keyboardType:
+                                                        TextInputType.text,
+                                                    textAlign: TextAlign.left,
+                                                    controller: _cDistrict,
+                                                    validator: (value) {
+                                                      if (value
+                                                          .trim()
+                                                          .isEmpty) {
+                                                        return 'Please Enter District';
+                                                      }
+
+                                                      return null;
+                                                    },
+                                                    onChanged: (value) {},
+                                                    decoration: InputDecoration(
+                                                      // errorText: null,
+                                                      hintText:
+                                                          'Enter District',
+                                                      labelText: 'District',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                //city drop down
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 8.0,
+                                                  ),
+                                                  child:
+                                                      DropdownButtonFormField(
+                                                    // disabledHint: const Text(
+                                                    //     'Please Select State First'),
+                                                    value: cityDropDownValue,
+                                                    onTap: () {
+                                                      FocusScope.of(context)
+                                                          .requestFocus(
+                                                              new FocusNode());
+                                                    },
+                                                    onChanged:
+                                                        (String newValue) {
+                                                      setState(
+                                                        () {
+                                                          cityDropDownValue =
+                                                              newValue;
+                                                        },
+                                                      );
+                                                    },
+                                                    items:
+                                                        _cityDropDownMenuItems,
+                                                    // hint: const Text(
+                                                    //   'Select City',
+                                                    // ),
+                                                    decoration: InputDecoration(
+                                                      errorText: !stateSelected
+                                                          ? 'Please Select State First'
+                                                          : null,
+                                                      labelText: 'Select City',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                //Submit Button User
+                                                ElevatedButton(
+                                                  onPressed: () async {
+                                                    if (_formState.currentState
+                                                        .validate()) {
+                                                      var addUserResult =
+                                                          await addUser();
+                                                      dev.log(addUserResult
+                                                          .toString());
+                                                    } else {
+                                                      Toast.show(
+                                                        "Some details are missing",
+                                                        context,
+                                                        duration:
+                                                            Toast.LENGTH_LONG,
+                                                        gravity: Toast.BOTTOM,
+                                                        textColor:
+                                                            Colors.redAccent,
+                                                      );
+                                                    }
+                                                  },
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all(
+                                                      Colors.blue[700],
+                                                    ),
+                                                    padding:
+                                                        MaterialStateProperty.all<
+                                                            EdgeInsetsGeometry>(
+                                                      EdgeInsets.symmetric(
+                                                        vertical: 10.0,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  child: Center(
+                                                    heightFactor: 2.0,
+                                                    child: Text(
+                                                      'Submit',
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      )
                                     : Form(
                                         key: _formState,
                                         child: Column(
@@ -700,29 +757,6 @@ class RegisterState extends State<Register> {
                                                   hintText: 'Enter Name',
                                                   labelText:
                                                       'Contact Person Name',
-                                                  border: OutlineInputBorder(),
-                                                ),
-                                              ),
-                                            ),
-                                            //BusinessName
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                vertical: 8.0,
-                                              ),
-                                              child: TextFormField(
-                                                keyboardType:
-                                                    TextInputType.emailAddress,
-                                                textAlign: TextAlign.left,
-                                                controller: _cBusinessName,
-                                                validator: (value) {
-                                                  return null;
-                                                },
-                                                onChanged: (value) {},
-                                                decoration: InputDecoration(
-                                                  errorText: null,
-                                                  hintText: 'Enter Business',
-                                                  labelText: 'Name of Business',
                                                   border: OutlineInputBorder(),
                                                 ),
                                               ),
@@ -845,7 +879,7 @@ class RegisterState extends State<Register> {
                                                   departmentDropDownValue =
                                                       newValue;
                                                   if (!stateSelected) {
-                                                    List<dynamic> states =
+                                                    states =
                                                         await getStateList();
                                                     _stateDropDownMenuItems =
                                                         states
@@ -857,8 +891,8 @@ class RegisterState extends State<Register> {
                                                                         "id"]
                                                                     .toString(),
                                                                 child: Text(
-                                                                  state[
-                                                                      "statename"],
+                                                                  state["statename"]
+                                                                      .toString(),
                                                                 ),
                                                               ),
                                                             )
@@ -919,11 +953,12 @@ class RegisterState extends State<Register> {
                                                             (city) =>
                                                                 DropdownMenuItem<
                                                                     String>(
-                                                              value: city["id"]
+                                                              value: city[
+                                                                      "cityname"]
                                                                   .toString(),
                                                               child: Text(
-                                                                city[
-                                                                    "cityname"],
+                                                                city["cityname"]
+                                                                    .toString(),
                                                               ),
                                                             ),
                                                           )
@@ -956,7 +991,7 @@ class RegisterState extends State<Register> {
                                                 controller: _cDistrict,
                                                 validator: (value) {
                                                   if (value.trim().isEmpty) {
-                                                    return 'Please Enter Your Address';
+                                                    return 'Please Enter District';
                                                   }
 
                                                   return null;
@@ -981,6 +1016,11 @@ class RegisterState extends State<Register> {
                                                 // disabledHint: const Text(
                                                 //     'Please Select State First'),
                                                 value: cityDropDownValue,
+                                                onTap: () {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          new FocusNode());
+                                                },
                                                 onChanged: (String newValue) {
                                                   setState(
                                                     () {
@@ -1170,12 +1210,14 @@ class RegisterState extends State<Register> {
 
   @override
   void dispose() {
-    super.dispose();
+    stateDropDownValue = null;
+    cityDropDownValue = null;
     _cAddress.dispose();
     _cName.dispose();
     _cOrgName.dispose();
     _cNumber.dispose();
-    _cBusinessName.dispose();
     _formState.currentState.dispose();
+    _cDistrict.dispose();
+    super.dispose();
   }
 }

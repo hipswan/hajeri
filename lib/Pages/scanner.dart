@@ -90,6 +90,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
       drawer: Drawer(
@@ -273,18 +274,21 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                             SizedBox(
                               height: 10,
                             ),
-                            BlueButton(
-                              label: 'Scan Again',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Landing(
-                                      initialPageIndex: 1,
+                            Container(
+                              width: size.width * 0.5,
+                              child: BlueButton(
+                                label: 'Scan Again',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Landing(
+                                        initialPageIndex: 1,
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
                           ],
                         ),
@@ -356,7 +360,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               (status.contains('no internet') ||
                   status.contains('connectivity issue') ||
                   status.contains('error occured'))) {
-            Navigator.of(context).pop(true);
+            Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 backgroundColor: Colors.white,
@@ -378,7 +382,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
             await controller?.resumeCamera();
           } else {
             await controller?.stopCamera();
-            Navigator.of(context).pop(true);
+            Navigator.pop(context);
 
             dev.log('$status', name: 'In scanner result');
             setState(() {
@@ -386,7 +390,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
             });
           }
         } else {
-          Navigator.of(context).pop(true);
+          Navigator.pop(context);
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

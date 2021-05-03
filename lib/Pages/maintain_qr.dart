@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hajeri_demo/Pages/generate_qr.dart';
@@ -23,7 +25,7 @@ class MaintainQr extends StatefulWidget {
 }
 
 class _MaintainQrState extends State<MaintainQr> {
-  String isPointPresent = "no result";
+  String qrPointStatus = "no result";
   List qrCodePointList = [];
 
   @override
@@ -32,10 +34,10 @@ class _MaintainQrState extends State<MaintainQr> {
     isLatLngPresent().then((value) {
       if (value.contains("success")) {
         qrCodePointList.isEmpty
-            ? isPointPresent = 'absent'
-            : isPointPresent = 'present';
-      } else if (value.contains('failure')) {
-        isPointPresent = 'error';
+            ? qrPointStatus = 'absent'
+            : qrPointStatus = 'present';
+      } else {
+        qrPointStatus = value;
       }
       setState(() {});
     });
@@ -45,18 +47,24 @@ class _MaintainQrState extends State<MaintainQr> {
     String orgId = prefs.getString("worker_id");
     String mobile = prefs.getString("mobile");
     log('$kQRPointList$orgId/$mobile');
-    var response = await http.get('$kQRPointList$orgId/$mobile');
+    try {
+      var response = await http.get('$kQRPointList$orgId/$mobile');
 
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
 
-      qrCodePointList = data;
+        qrCodePointList = data;
 
-      log(data.toString());
+        log(data.toString());
 
-      return "success";
-    } else {
-      return 'failure';
+        return "success";
+      } else {
+        return 'server issue';
+      }
+    } on SocketException catch (e) {
+      return 'no internet';
+    } on Exception catch (e) {
+      return 'error occured';
     }
   }
 
@@ -109,7 +117,7 @@ class _MaintainQrState extends State<MaintainQr> {
   }
 
   getQRCodeView() {
-    switch (isPointPresent) {
+    switch (qrPointStatus) {
       case "no result":
         return Center(
           child: CircularProgressIndicator(),
@@ -125,8 +133,61 @@ class _MaintainQrState extends State<MaintainQr> {
         break;
       case "error":
         return Center(
-          child: Text(
-            'Data Not Fetched',
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/notify.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Error has occured',
+              ),
+            ],
+          ),
+        );
+        break;
+      case "no internet":
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/no_signal.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Device not connected to internet',
+              ),
+            ],
+          ),
+        );
+        break;
+      case "server issue":
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/server_down.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Server error',
+              ),
+            ],
           ),
         );
         break;

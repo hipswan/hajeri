@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hajeri_demo/components/blue_button.dart';
 import 'package:hajeri_demo/components/form_page.dart';
 import 'package:hajeri_demo/components/transition.dart';
@@ -121,8 +122,21 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
     return Card(
       child: _employees.isEmpty
           ? Center(
-              child: Text(
-                'No employee data found',
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    'assets/vectors/notify.svg',
+                    width: 150,
+                    height: 150,
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Text(
+                    'No employee data found',
+                  ),
+                ],
               ),
             )
           : SfDataGridTheme(
@@ -209,6 +223,11 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                     allowSorting: false,
                   ),
                   GridTextColumn(
+                    mappingName: 'department',
+                    headerText: 'Department',
+                    allowSorting: false,
+                  ),
+                  GridTextColumn(
                     mappingName: 'district',
                     headerText: 'District',
                     allowSorting: false,
@@ -261,6 +280,7 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                           'number',
                           'city',
                           'area',
+                          'department',
                           'district',
                           'state',
                         ],
@@ -405,6 +425,9 @@ class EmployeeDataSource extends DataGridSource<Employee> {
         break;
       case 'area':
         return employee.area;
+        break;
+      case 'department':
+        return employee.departmentName;
         break;
       case 'district':
         return employee.district;

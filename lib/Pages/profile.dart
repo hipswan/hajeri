@@ -94,25 +94,27 @@ class Profile extends StatelessWidget {
                       SizedBox(
                         width: 20,
                       ),
-                      Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${prefs.getString('emp_name').substring(0, 1).toUpperCase()}${prefs.getString('emp_name').substring(1).toLowerCase()}',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${prefs.getString('emp_name').substring(0, 1).toUpperCase()}${prefs.getString('emp_name').substring(1).toLowerCase()}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
                             ),
-                          ),
-                          Text(
-                            prefs.getString('worker_id'),
-                            style: TextStyle(
-                              color: Colors.white,
+                            Text(
+                              prefs.getString('worker_id'),
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       )
                     ],
                   ),

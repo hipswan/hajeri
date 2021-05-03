@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:async';
 import 'dart:io';
@@ -590,8 +591,21 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
       case 'All Employee':
         return (attendanceData as List).isEmpty
             ? Center(
-                child: Text(
-                  'No Employee',
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/vectors/notify.svg',
+                      width: 150,
+                      height: 150,
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Text(
+                      'No Employee',
+                    ),
+                  ],
                 ),
               )
             : AttendanceDataGrid(

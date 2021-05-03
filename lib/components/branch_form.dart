@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hajeri_demo/Pages/maintain_branch.dart';
 import 'package:hajeri_demo/components/blue_button.dart';
+import 'package:hajeri_demo/constant.dart';
 import 'package:hajeri_demo/main.dart';
 import 'dart:developer' as dev;
 import 'package:http/http.dart' as http;
@@ -67,7 +68,16 @@ class _BranchFormState extends State<BranchForm> {
     // _cDepartment = TextEditingController(
     //   text:  branch.isEmpty ? '': branch[""],
     // );
-
+    _departmentDropDownMenuItems = kDepartmentMenuItems
+        .map(
+          (department) => DropdownMenuItem<String>(
+            value: department,
+            child: Text(
+              department,
+            ),
+          ),
+        )
+        .toList();
     setStateAndCity();
   }
 
@@ -219,9 +229,9 @@ class _BranchFormState extends State<BranchForm> {
       }
     });
     dev.log(
-        '$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=Manager&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity');
+        '$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity');
     var response = await http.post(
-      '$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=Manager&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity',
+      '$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity',
     );
 
     if (response.statusCode == 200) {
@@ -275,7 +285,7 @@ class _BranchFormState extends State<BranchForm> {
     });
 
     var response = await http.post(
-      '$kUpdateBranch$orgId/${_cId.text}?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=Manager&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity',
+      '$kUpdateBranch$orgId/${_cId.text}?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity',
     );
 
     if (response.statusCode == 200) {
@@ -340,7 +350,7 @@ class _BranchFormState extends State<BranchForm> {
                           decoration: InputDecoration(
                             // errorText: null,
                             hintText: 'Enter Contact',
-                            labelText: 'Person Name: ',
+                            labelText: 'Person Name',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -368,7 +378,7 @@ class _BranchFormState extends State<BranchForm> {
                           decoration: InputDecoration(
                             // errorText: null,
                             hintText: 'Enter Org Name',
-                            labelText: 'Organization Name: ',
+                            labelText: 'Organization Name',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -394,9 +404,31 @@ class _BranchFormState extends State<BranchForm> {
                           decoration: InputDecoration(
                             // errorText: null,
                             hintText: 'Enter Address',
-                            labelText: 'Address ',
+                            labelText: 'Address',
                             border: OutlineInputBorder(),
                           ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: DropdownButtonFormField(
+                          value: departmentDropDownValue,
+                          onTap: () {
+                            FocusScope.of(context)
+                                .requestFocus(new FocusNode());
+                          },
+                          onChanged: (String newValue) async {
+                            departmentDropDownValue = newValue;
+
+                            setState(() {});
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Select Department',
+                            border: OutlineInputBorder(),
+                          ),
+                          items: _departmentDropDownMenuItems,
+                          // hint:
+                          //     const Text('Select Department'),
                         ),
                       ),
                       //Mobile Number
@@ -427,7 +459,7 @@ class _BranchFormState extends State<BranchForm> {
                           decoration: InputDecoration(
                             // errorText: null,
                             hintText: 'Enter Contact Detail',
-                            labelText: 'Mobile Number: ',
+                            labelText: 'Mobile Number',
                             border: OutlineInputBorder(),
                           ),
                         ),

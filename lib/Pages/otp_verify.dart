@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hajeri_demo/Pages/register.dart';
 import 'package:hajeri_demo/Pages/sign_up.dart';
@@ -27,61 +28,68 @@ class _OtpVerifyState extends State<OtpVerify> {
   String workerId, orgId, orgName, empName, role;
 
   Future<void> sendCode(String number) async {
-    // number = '7030515696';
-
-    print("phone no is " + number);
-    var response = await http.get('$kSendOtp$number', headers: {
-      'Content-Type': 'application/json',
-    });
-    if (response.statusCode == 200) {
-      setState(() {
-        isCodeSent = true;
+    try {
+      var response = await http.get('$kSendOtp$number', headers: {
+        'Content-Type': 'application/json',
       });
-      var data = json.decode(response.body);
-      dev.log("the data is " + data.toString(), name: 'In send otp verify');
-
-      if (data['already_present_status']
-          .toString()
-          .trim()
-          .toLowerCase()
-          .contains("not registered")) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          Register.id,
-          (route) => false,
-        );
-      } else
-      // if (data['already_present_status']
-      //     .toString()
-      //     .trim()
-      //     .toLowerCase()
-      //     .contains("yes")
-      //     )
-      {
-        if (data['worker_id'] == null)
-          workerId = "No Data";
-        else
-          workerId = data['worker_id'];
-        if (data['org_id'] == null)
-          orgId = "No Data";
-        else
-          orgId = data['org_id'];
-        if (data['org_name'] == null)
-          orgName = "No Data";
-        else
-          orgName = data['org_name'];
-        if (data['emp_name'] == null)
-          empName = "No Data";
-        else
-          empName = data['emp_name'];
-        role = data['role'];
-
+      if (response.statusCode == 200) {
         setState(() {
-          verificationCode = data['id'].toString() ?? "error";
-
-          // otpcode = verificationCode;
+          isCodeSent = true;
         });
+        var data = json.decode(response.body);
+        dev.log("the data is " + data.toString(), name: 'In send otp verify');
+
+        if (data['already_present_status']
+            .toString()
+            .trim()
+            .toLowerCase()
+            .contains("not registered")) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            Register.id,
+            (route) => false,
+          );
+        } else
+        // if (data['already_present_status']
+        //     .toString()
+        //     .trim()
+        //     .toLowerCase()
+        //     .contains("yes")
+        //     )
+        {
+          if (data['worker_id'] == null)
+            workerId = "No Data";
+          else
+            workerId = data['worker_id'];
+          if (data['org_id'] == null)
+            orgId = "No Data";
+          else
+            orgId = data['org_id'];
+          if (data['org_name'] == null)
+            orgName = "No Data";
+          else
+            orgName = data['org_name'];
+          if (data['emp_name'] == null)
+            empName = "No Data";
+          else
+            empName = data['emp_name'];
+          role = data['role'];
+
+          setState(() {
+            verificationCode = data['id'].toString() ?? "error";
+
+            // otpcode = verificationCode;
+          });
+        }
+      } else {
+        dev.log(
+          '''Could't fetch otp''',
+        );
       }
+    } on SocketException catch (e) {
+      dev.log(e.message);
+    } on Exception catch (e) {
+      dev.log(e.toString());
     }
   }
 

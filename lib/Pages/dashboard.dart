@@ -31,6 +31,8 @@ class _DashboardState extends State<Dashboard> {
   List<Employee> employees;
   String orgId;
   bool isOrg;
+  String selectedView = 'Employee List';
+
   var selected = <String, bool>{
     '1': true,
     '2': false,
@@ -94,7 +96,7 @@ class _DashboardState extends State<Dashboard> {
     var response = await http.get("$kEmployeeList$orgId");
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      print("the _getEmployeeList data is " + data.toString());
+      log("the _getEmployeeList data is " + data.toString());
       employeeList = data
           .map<Employee>(
             (e) => Employee(
@@ -102,6 +104,7 @@ class _DashboardState extends State<Dashboard> {
                 number: e["mobileno"] == null ? 0 : int.parse(e["mobileno"]),
                 idCardNumber: int.parse('0'),
                 organizationName: e["organizationname"],
+                departmentName: e["departmentname"],
                 city: e["city"],
                 area: e["area"],
                 district: e["district"],
@@ -283,7 +286,6 @@ class _DashboardState extends State<Dashboard> {
       _getEmployeeList().then((employeelist) {
         showShimmer = false;
         employees = employeelist;
-
         setState(() {});
       });
     }
@@ -351,6 +353,7 @@ class _DashboardState extends State<Dashboard> {
                               '4': false,
                             };
                             selected['1'] = true;
+                            selectedView = 'Employee List';
                             showShimmer = true;
                             setState(() {});
                             employees = await _getEmployeeList();
@@ -394,6 +397,8 @@ class _DashboardState extends State<Dashboard> {
                               '4': false,
                             };
                             selected['2'] = true;
+                            selectedView = '''Today's Attendance''';
+
                             showShimmer = true;
                             setState(() {});
                             employees = await _getTodayPresentEmployeeList();
@@ -446,6 +451,8 @@ class _DashboardState extends State<Dashboard> {
                               '4': false,
                             };
                             selected['3'] = true;
+                            selectedView = '''Today's Visitor''';
+
                             showShimmer = true;
                             setState(() {});
                             employees = await _getTodayVisitorList();
@@ -493,6 +500,8 @@ class _DashboardState extends State<Dashboard> {
                               '4': false,
                             };
                             selected['4'] = true;
+                            selectedView = '''Total Visitor''';
+
                             showShimmer = true;
                             setState(() {});
                             employees = await _getOneMonthVisitorList();
@@ -623,7 +632,7 @@ class _DashboardState extends State<Dashboard> {
                           )
                         : EmployeeDataGrid(
                             employees: employees,
-                            view: 'Employee List',
+                            view: selectedView,
                             selectionModeDisabled: true,
                           ),
                     // EmployeeTable(datasource: employees),

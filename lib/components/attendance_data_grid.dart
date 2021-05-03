@@ -188,6 +188,9 @@ class _AttendanceDataGridState extends State<AttendanceDataGrid> {
             return !currentAttendance.contains('A')
                 ? Container(
                     height: 75.0,
+                    padding: EdgeInsets.only(
+                      left: 5.0,
+                    ),
                     child: Scrollbar(
                       key: UniqueKey(),
                       child: SingleChildScrollView(

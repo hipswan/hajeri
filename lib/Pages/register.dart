@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hajeri_demo/Pages/sign_up.dart';
@@ -55,16 +56,27 @@ class RegisterState extends State<Register> {
     List<dynamic> data = [
       {'': ''}
     ];
-    print('In get states');
-    http.Response response = await http.get(kStates);
+    try {
+      http.Response response = await http.get(kStates);
 
-    if (response.statusCode == 200) {
-      data = json.decode(response.body);
-    } else {
+      if (response.statusCode == 200) {
+        data = json.decode(response.body);
+      } else {
+        data = [
+          {"id": -1, "statename": "error couldn't fetch states details"},
+        ];
+        dev.log('$data');
+      }
+    } on SocketException catch (e) {
+      dev.log(e.message, name: 'register:getstates()');
       data = [
-        {"id": -1, "statename": "error couldn't fetch states details"},
+        {"id": -1, "statename": "no internet"},
       ];
-      dev.log('$data');
+    } on Exception catch (e) {
+      dev.log(e.toString(), name: 'register:getstates()');
+      data = [
+        {"id": -1, "statename": "something went wrong"},
+      ];
     }
 
     return data;
@@ -74,18 +86,28 @@ class RegisterState extends State<Register> {
     List<dynamic> data = [
       {'': ''}
     ];
-    print('In get department');
-    http.Response response = await http.get(kDepartment);
-    print(
-      response.body,
-    );
-    if (response.statusCode == 200) {
-      data = json.decode(response.body);
-    } else {
+    try {
+      http.Response response = await http.get(kDepartment);
+      print(
+        response.body,
+      );
+      if (response.statusCode == 200) {
+        data = json.decode(response.body);
+      } else {
+        data = [
+          {"id": -1, "personname": "error couldn't fetch states details"},
+        ];
+      }
+    } on SocketException catch (e) {
+      dev.log(e.message, name: 'register:getdepartment()');
       data = [
-        {"id": -1, "personname": "error couldn't fetch states details"},
+        {"id": -1, "personname": "no internet"},
       ];
-      dev.log('$data');
+    } on Exception catch (e) {
+      dev.log(e.toString(), name: 'register:getdepartment()');
+      data = [
+        {"id": -1, "statename": "something went wrong"},
+      ];
     }
 
     return data;
@@ -126,7 +148,7 @@ class RegisterState extends State<Register> {
   }
 
   void toggleSwitch(bool value) async {
-    _formState.currentState.reset();
+    _formState.currentState?.reset();
     _cAddress.clear();
     _cName.clear();
     _cDistrict.clear();
@@ -176,31 +198,35 @@ class RegisterState extends State<Register> {
         orgState = state["statename"].toString();
       }
     });
-    var headers = {'Content-Type': 'application/json'};
-    var request = http.Request('POST', Uri.parse('$kAddOrg'));
-    request.body = '''{
-      "nameoforganization": "${_cOrgName.text.trim()}",
-      "personaname": "${_cName.text.trim()}",
-      "natureofbusiness": "$businessNatureDropDownValue",
-      "contactpersondeparmentname": "$departmentDropDownValue",
-      "address": "${_cAddress.text.trim()}",
-      "mobile": "${_cNumber.text.trim()}",
-      "state": "$orgState",
-      "district":'${_cDistrict.text.trim()}',
-      "city": "$cityDropDownValue"
-    }''';
-    dev.log('''{
-      "nameoforganization": "${_cOrgName.text.trim()}",
-      "personaname": "${_cName.text.trim()}",
-      "natureofbusiness": "$businessNatureDropDownValue",
-      "contactpersondeparmentname": "$departmentDropDownValue",
-      "address": "${_cAddress.text.trim()}",
-      "mobile": "${_cNumber.text.trim()}",
-      "state": "$orgState",
-      "district":'${_cDistrict.text.trim()}',
-      "city": "$cityDropDownValue"
-    }''');
-    request.headers.addAll(headers);
+    // var headers = {'Content-Type': 'application/json'};
+    var request = http.Request(
+      'POST',
+      Uri.parse(
+          '$kAddOrg?nameoforganization=${_cOrgName.text.trim()}&personaname=${_cName.text.trim()}&natureofbusiness=$businessNatureDropDownValue&contactpersondeparmentname=$departmentDropDownValue&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$stateDropDownValue&district=${_cDistrict.text.trim()}&city=$cityDropDownValue'),
+    );
+    // request.body = '''{
+    //   "nameoforganization": "${_cOrgName.text.trim()}",
+    //   "personaname": "${_cName.text.trim()}",
+    //   "natureofbusiness": "$businessNatureDropDownValue",
+    //   "contactpersondeparmentname": "$departmentDropDownValue",
+    //   "address": "${_cAddress.text.trim()}",
+    //   "mobile": "${_cNumber.text.trim()}",
+    //   "state": "$orgState",
+    //   "district":'${_cDistrict.text.trim()}',
+    //   "city": "$cityDropDownValue"
+    // }''';
+    // dev.log('''{
+    //   "nameoforganization": "${_cOrgName.text.trim()}",
+    //   "personaname": "${_cName.text.trim()}",
+    //   "natureofbusiness": "$businessNatureDropDownValue",
+    //   "contactpersondeparmentname": "$departmentDropDownValue",
+    //   "address": "${_cAddress.text.trim()}",
+    //   "mobile": "${_cNumber.text.trim()}",
+    //   "state": "$orgState",
+    //   "district":'${_cDistrict.text.trim()}',
+    //   "city": "$cityDropDownValue"
+    // }''');
+    // request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
 
@@ -239,28 +265,28 @@ class RegisterState extends State<Register> {
       }
     });
 
-    Map<String, String> body = {
-      "personaname": "${_cName.text}",
-      "address": "${_cAddress.text}",
-      "mobile": "${_cNumber.text}",
-      "state": "$userState",
-      "district": "${_cDistrict.text}",
-      "city": "$cityDropDownValue",
-    };
-    dev.log('''{
-      "personaname": "${_cName.text}",
-      "address": "${_cAddress.text}",
-      "mobile": "${_cNumber.text}",
-      "state": "$userState",
-      "district": "${_cDistrict.text}",
-      "city": "$cityDropDownValue",
-    }''');
+    // Map<String, String> body = {
+    //   "personaname": "${_cName.text}",
+    //   "address": "${_cAddress.text}",
+    //   "mobile": "${_cNumber.text}",
+    //   "state": "$userState",
+    //   "district": "${_cDistrict.text}",
+    //   "city": "$cityDropDownValue",
+    // };
+    // dev.log('''{
+    //   "personaname": "${_cName.text}",
+    //   "address": "${_cAddress.text}",
+    //   "mobile": "${_cNumber.text}",
+    //   "state": "$userState",
+    //   "district": "${_cDistrict.text}",
+    //   "city": "$cityDropDownValue",
+    // }''');
     var response = await http.post(
-      kAddUser,
-      body: jsonEncode(body),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      '''$kAddUser?personaname: ${_cName.text.trim()}&address: ${_cAddress.text.trim()}&mobile: ${_cNumber.text.trim()}&state: $userState&district: ${_cDistrict.text.trim()}&city: $cityDropDownValue''',
+      // body: jsonEncode(body),
+      // headers: {
+      //   'Content-Type': 'application/json',
+      // },
     );
 
     if (response.statusCode == 200) {
@@ -290,11 +316,11 @@ class RegisterState extends State<Register> {
         textColor: Colors.red,
       );
     }
-    return body;
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -314,42 +340,43 @@ class RegisterState extends State<Register> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
-                  Container(
-                    width: 100,
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Organization',
-                      style: TextStyle(
-                        fontWeight:
-                            switchControl ? FontWeight.normal : FontWeight.bold,
+                  Expanded(
+                    flex: 5,
+                    child: Center(
+                      child: Text(
+                        'Organization',
+                        style: TextStyle(
+                          fontWeight: switchControl
+                              ? FontWeight.normal
+                              : FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 15,
-                  ),
-                  Transform.scale(
-                    scale: 1.5,
-                    child: Switch(
-                      onChanged: toggleSwitch,
-                      value: switchControl,
-                      activeColor: Colors.white,
-                      activeTrackColor: Colors.blue,
-                      inactiveThumbColor: Colors.white,
-                      inactiveTrackColor: Colors.grey,
+                  Expanded(
+                    flex: 2,
+                    child: Transform.scale(
+                      scale: 1.5,
+                      child: Switch(
+                        onChanged: toggleSwitch,
+                        value: switchControl,
+                        activeColor: Colors.white,
+                        activeTrackColor: Colors.blue,
+                        inactiveThumbColor: Colors.white,
+                        inactiveTrackColor: Colors.grey,
+                      ),
                     ),
                   ),
-                  SizedBox(
-                    width: 15,
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    width: 100,
-                    child: Text(
-                      'User',
-                      style: TextStyle(
-                        fontWeight:
-                            switchControl ? FontWeight.bold : FontWeight.normal,
+                  Expanded(
+                    flex: 5,
+                    child: Center(
+                      child: Text(
+                        'User',
+                        style: TextStyle(
+                          fontWeight: switchControl
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
                       ),
                     ),
                   ),
@@ -709,6 +736,7 @@ class RegisterState extends State<Register> {
                                                     TextInputType.emailAddress,
                                                 textAlign: TextAlign.left,
                                                 controller: _cOrgName,
+                                                maxLength: kMaxOrganizationName,
                                                 validator: (value) {
                                                   if (value.trim().isEmpty) {
                                                     return 'Please Enter Your Organisation Name';

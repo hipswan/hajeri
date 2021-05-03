@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hajeri_demo/Pages/generate_qr.dart';
@@ -25,7 +27,7 @@ class MaintainBranch extends StatefulWidget {
 }
 
 class _MaintainBranchState extends State<MaintainBranch> {
-  String isBranchPresent = "no result";
+  String branchStatus = "no result";
   List branchList = [];
 
   @override
@@ -33,11 +35,9 @@ class _MaintainBranchState extends State<MaintainBranch> {
     super.initState();
     getOrgBranch().then((value) {
       if (value.contains("success")) {
-        isBranchPresent = 'present';
-      } else if (value.contains('empty')) {
-        isBranchPresent = 'absent';
+        branchList.isEmpty ? branchStatus = 'absent' : branchStatus = 'present';
       } else {
-        isBranchPresent = 'error';
+        branchStatus = value;
       }
       setState(() {});
     });
@@ -46,22 +46,28 @@ class _MaintainBranchState extends State<MaintainBranch> {
   Future<String> getOrgBranch() async {
     String orgId = prefs.getString("worker_id");
     log('$kBranchList$orgId');
-    var response = await http.get(
-      '$kBranchList$orgId',
-    );
+    try {
+      var response = await http.get(
+        '$kBranchList$orgId',
+      );
 
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      if (data.isNotEmpty) {
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+
         branchList = data;
-      } else {
-        return "empty";
-      }
-      log(data.toString());
+        log(
+          branchList.toString(),
+          name: 'In branch list',
+        );
 
-      return "success";
-    } else {
-      return 'failure';
+        return "success";
+      } else {
+        return 'server issue';
+      }
+    } on SocketException catch (e) {
+      return 'no internet';
+    } on Exception catch (e) {
+      return 'error';
     }
   }
 
@@ -115,7 +121,7 @@ class _MaintainBranchState extends State<MaintainBranch> {
   }
 
   getBranchView() {
-    switch (isBranchPresent) {
+    switch (branchStatus) {
       case "no result":
         return Center(
           child: CircularProgressIndicator(),
@@ -127,16 +133,69 @@ class _MaintainBranchState extends State<MaintainBranch> {
         );
         break;
       case "absent":
-        return Center(
-          child: Text(
-            "No Branch Added",
-          ),
+        return BranchForm(
+          branch: {},
+          title: 'Add Sub Branch',
+          action: 'add',
         );
         break;
       case "error":
-        return Container(
-          child: Text(
-            "Network issue",
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/notify.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Error has occured',
+              ),
+            ],
+          ),
+        );
+        break;
+      case "no internet":
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/no_signal.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Device not connected to internet',
+              ),
+            ],
+          ),
+        );
+        break;
+      case "server issue":
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/server_down.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Server error',
+              ),
+            ],
           ),
         );
         break;

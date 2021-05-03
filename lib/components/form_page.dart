@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hajeri_demo/constant.dart';
 import 'package:hajeri_demo/main.dart';
 import 'package:hajeri_demo/model/Employee.dart';
 import 'package:hajeri_demo/url.dart';
@@ -51,7 +52,8 @@ class _FormPageState extends State<FormPage> {
     var employee = widget.currentEmployee;
     _cName = TextEditingController(text: employee.name);
     _cOrgName = TextEditingController(text: employee.organizationName);
-
+    departmentDropDownValue =
+        employee.departmentName.isEmpty ? null : employee.departmentName;
     _cBusinessName = TextEditingController(text: employee.organizationName);
     _cNumber = TextEditingController(
       text: (employee.number == 0) ? '' : employee.number.toString(),
@@ -63,6 +65,16 @@ class _FormPageState extends State<FormPage> {
     );
     _cDepartment = TextEditingController(text: employee.addressLine1);
     _cDistrict = TextEditingController(text: employee.district);
+    _departmentDropDownMenuItems = kDepartmentMenuItems
+        .map(
+          (department) => DropdownMenuItem<String>(
+            value: department,
+            child: Text(
+              department,
+            ),
+          ),
+        )
+        .toList();
     setStateAndCity();
   }
 
@@ -190,14 +202,14 @@ class _FormPageState extends State<FormPage> {
     // dev.debugger();
   }
 
-  Future<String> editEmployee() async {
+  Future<String> editEmployee(String state, String city) async {
     var body = json.encode({
       "nameofworker": _cName.text,
-      "departmentname": 'IT',
+      "departmentname": departmentDropDownValue,
       "addressline1": _cAddress.text,
-      "state": stateDropDownValue,
-      "district": "",
-      "city": cityDropDownValue
+      "state": state,
+      "district": _cDistrict.text,
+      "city": city,
     });
 
     // String orgId = prefs.getString("worker_id");
@@ -232,7 +244,7 @@ class _FormPageState extends State<FormPage> {
     var body = json.encode({
       "idcardno": _cIdentity.text.trim(),
       "nameofworker": _cName.text.trim(),
-      "departmentname": _cDepartment.text.trim(),
+      "departmentname": departmentDropDownValue,
       "addressline1": _cAddress.text.trim(),
       "mobileno": _cNumber.text.trim(),
       "state": state,
@@ -241,15 +253,10 @@ class _FormPageState extends State<FormPage> {
     });
 
     // String orgId = prefs.getString("worker_id");
-    dev.log(
-        '$kAddEmp$orgId?idcardno=${_cIdentity.text}&nameofworker=${_cName.text}&departmentname=${_cDepartment.text}&mobileno=${_cNumber.text}&addressline1=${_cAddress.text}&state=$state&district=$city&city=$city  $body',
-        name: 'In add employee');
-    var response = await http.post(
-        '$kAddEmp$orgId?idcardno=${_cIdentity.text.trim()}&nameofworker=${_cName.text.trim()}&departmentname=${_cDepartment.text.trim()}&mobileno=${_cNumber.text.trim()}&addressline1=${_cAddress.text.trim()}&state=${state.trim()}&district=${city.trim()}&city=${city.trim()}',
-        body: body,
-        headers: {
-          'Content-Type': 'application/json',
-        });
+    dev.log('$kAddEmp$orgId  $body', name: 'In add employee');
+    var response = await http.post('$kAddEmp$orgId', body: body, headers: {
+      'Content-Type': 'application/json',
+    });
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
@@ -378,29 +385,28 @@ class _FormPageState extends State<FormPage> {
                                 ),
                               ),
                             ),
-                            //Department
+                            //Department drop down
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8.0,
-                              ),
-                              child: TextFormField(
-                                keyboardType: TextInputType.text,
-                                textAlign: TextAlign.left,
-                                controller: _cDepartment,
-                                validator: (value) {
-                                  if (value.trim().isEmpty) {
-                                    return 'Please Enter Employee Department';
-                                  }
-
-                                  return null;
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: DropdownButtonFormField(
+                                value: departmentDropDownValue,
+                                onTap: () {
+                                  FocusScope.of(context)
+                                      .requestFocus(new FocusNode());
                                 },
-                                onChanged: (value) {},
+                                onChanged: (String newValue) async {
+                                  departmentDropDownValue = newValue;
+
+                                  setState(() {});
+                                },
                                 decoration: InputDecoration(
-                                  // errorText: null,
-                                  hintText: 'Enter Department Name',
-                                  labelText: 'Department Name',
+                                  labelText: 'Select Department',
                                   border: OutlineInputBorder(),
                                 ),
+                                items: _departmentDropDownMenuItems,
+                                // hint:
+                                //     const Text('Select Department'),
                               ),
                             ),
                             //Mobile Number
@@ -592,7 +598,10 @@ class _FormPageState extends State<FormPage> {
                                     );
                                   } else {
                                     var isEmployeeEditSuccess =
-                                        await editEmployee();
+                                        await editEmployee(
+                                      cityAndStateNewValue['state'],
+                                      cityAndStateNewValue['city'],
+                                    );
                                     Navigator.of(context).pop(
                                         isEmployeeEditSuccess
                                                 .contains("success")

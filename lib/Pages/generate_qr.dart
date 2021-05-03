@@ -85,9 +85,12 @@ class _GenerateQRState extends State<GenerateQR> {
   updateQrCodePoint() async {
     String orgId = prefs.getString("worker_id");
     String mobile = prefs.getString("mobile");
-    log('$kUpdateQRCodePoint$orgId/$mobile?qrcodepointname=${_cqrPointController.text.toString().trim()}&latlong=${currentPosition.latitude.toString()},${currentPosition.longitude.toString()}');
+    log(
+      '$kGenerateQrCodePoint$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
+    );
     var response = await http.post(
-        '$kUpdateQRCodePoint$orgId/$mobile?qrcodepointname=${_cqrPointController.text.toString().trim()}&latlong=${currentPosition.latitude.toString()},${currentPosition.longitude.toString()}');
+      '$kGenerateQrCodePoint$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
+    );
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
@@ -161,9 +164,9 @@ class _GenerateQRState extends State<GenerateQR> {
   addQrCodePoint() async {
     String orgId = prefs.getString("worker_id");
     String mobile = prefs.getString("mobile");
-    log('$kQRCodePoint$orgId/$mobile?latlong=${currentPosition.latitude.toString()},${currentPosition.longitude.toString()}&nameofqrcodepoint=${_cqrPointController.text}');
+    log('$kGenerateQrCodePoint$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes');
     var response = await http.post(
-        '$kQRCodePoint$orgId/$mobile?latlong=${currentPosition.latitude.toString()},${currentPosition.longitude.toString()}&nameofqrcodepoint=${_cqrPointController.text}');
+        '$kGenerateQrCodePoint$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes');
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       log(data.toString(), name: 'In add qr code point');
@@ -344,6 +347,7 @@ class _GenerateQRState extends State<GenerateQR> {
                       child: Form(
                         key: _qrName,
                         child: TextFormField(
+                          maxLength: kMaxQrCodePointName,
                           controller: _cqrPointController,
                           validator: (value) {
                             if (value.trim().isEmpty)
@@ -407,13 +411,13 @@ class _GenerateQRState extends State<GenerateQR> {
                               if (widget.action.contains('edit')) {
                                 log(
                                   'edit',
-                                  name: 'generate qr code',
+                                  name: 'update() generate qr code',
                                 );
                                 await updateQrCodePoint();
                               } else {
                                 log(
                                   'add',
-                                  name: 'generate qr code',
+                                  name: 'add() generate qr code',
                                 );
                                 await addQrCodePoint();
                               }

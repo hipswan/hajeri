@@ -4,11 +4,9 @@ import '../constant.dart';
 
 class BlueButton extends StatelessWidget {
   final String label;
-  final double width;
   final Function onPressed;
   final padding;
-  const BlueButton(
-      {Key key, this.label, this.width, this.onPressed, this.padding})
+  const BlueButton({Key key, this.label, this.onPressed, this.padding})
       : super(key: key);
 
   @override
@@ -40,7 +38,6 @@ class BlueButton extends StatelessWidget {
         padding: padding ??
             EdgeInsets.symmetric(
               vertical: 10.0,
-              horizontal: 20.0,
             ),
         decoration: BoxDecoration(
           gradient: kGradient,
@@ -50,10 +47,12 @@ class BlueButton extends StatelessWidget {
             ),
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: Colors.white,
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: Colors.white,
+            ),
           ),
         ),
       ),

@@ -215,6 +215,7 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
                 ? 0
                 : int.parse(e["idcardno"]),
             organizationName: e["organizationname"],
+            departmentName: e['departmentname'],
             city: e["city"],
             area: e["area"],
             district: e["district"],
@@ -288,289 +289,297 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    BlueButton(
-                      label: 'Add Employee',
-                      onPressed: () async {
-                        Employee addedEmployee = await Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) {
-                            return FormPage(
-                              orgId: orgId,
-                              currentEmployee: Employee.empty(),
-                              action: 'add',
-                              title: 'Add Employee',
+                    Container(
+                      height: 50.0,
+                      width: mediaQuery.size.width * 0.5 * 0.8,
+                      child: BlueButton(
+                        label: 'Add Employee',
+                        onPressed: () async {
+                          Employee addedEmployee = await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return FormPage(
+                                orgId: orgId,
+                                currentEmployee: Employee.empty(),
+                                action: 'add',
+                                title: 'Add Employee',
+                              );
+                            }),
+                          );
+                          if (addedEmployee == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text(
+                                    'error has occured during add employee'),
+                              ),
                             );
-                          }),
-                        );
-                        if (addedEmployee == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                  'error has occured during add employee'),
+                          } else if (addedEmployee.name.isNotEmpty) {
+                            employees.add(addedEmployee);
+
+                            setState(() {});
+                          }
+                        },
+                      ),
+                    ),
+                    Container(
+                      height: 50,
+                      width: mediaQuery.size.width * 0.5 * 0.8,
+                      child: BlueButton(
+                        label: 'Upload Excel',
+                        onPressed: () async {
+                          showDialog(
+                            context: context,
+                            builder: (context) => new AlertDialog(
+                              title: new Text('Upload Excel'),
+                              content: new Text(
+                                'Please use this feature on web for seamless user-experience',
+                              ),
+                              actions: <Widget>[
+                                new GestureDetector(
+                                  onTap: () => Navigator.of(context).pop(true),
+                                  child: Text("Back"),
+                                ),
+                              ],
                             ),
                           );
-                        } else if (addedEmployee.name.isNotEmpty) {
-                          employees.add(addedEmployee);
+                          // List<dynamic> employeesData = await showDialog(
+                          //   useRootNavigator: true,
+                          //   context: context,
+                          //   barrierColor: Colors.blue[800].withAlpha(100),
+                          //   builder: (context) {
+                          //     excelFilePath = '';
 
-                          setState(() {});
-                        }
-                      },
-                    ),
-                    BlueButton(
-                      label: 'Upload Excel',
-                      onPressed: () async {
-                        showDialog(
-                          context: context,
-                          builder: (context) => new AlertDialog(
-                            title: new Text('Upload Excel'),
-                            content: new Text(
-                              'Please use this feature on web for seamless user-experience',
-                            ),
-                            actions: <Widget>[
-                              new GestureDetector(
-                                onTap: () => Navigator.of(context).pop(true),
-                                child: Text("Back"),
-                              ),
-                            ],
-                          ),
-                        );
-                        // List<dynamic> employeesData = await showDialog(
-                        //   useRootNavigator: true,
-                        //   context: context,
-                        //   barrierColor: Colors.blue[800].withAlpha(100),
-                        //   builder: (context) {
-                        //     excelFilePath = '';
+                          //     return StatefulBuilder(
+                          //         builder: (context, setState) {
+                          //       return Center(
+                          //         child: Card(
+                          //           child: Container(
+                          //             padding: EdgeInsets.fromLTRB(
+                          //               0,
+                          //               8.0,
+                          //               0,
+                          //               8.0,
+                          //             ),
+                          //             width: mediaQuery.size.width - 36,
+                          //             child: SingleChildScrollView(
+                          //               child: Column(
+                          //                 mainAxisAlignment:
+                          //                     MainAxisAlignment.center,
+                          //                 children: [
+                          //                   Row(
+                          //                     mainAxisAlignment:
+                          //                         MainAxisAlignment.center,
+                          //                     children: [
+                          //                       Container(
+                          //                         height: 50,
+                          //                         width: 150,
+                          //                         margin: EdgeInsets.fromLTRB(
+                          //                           5,
+                          //                           10.0,
+                          //                           5,
+                          //                           10.0,
+                          //                         ),
+                          //                         decoration: BoxDecoration(
+                          //                           color: Colors.grey[200],
+                          //                           borderRadius:
+                          //                               BorderRadius.circular(
+                          //                             10.0,
+                          //                           ),
+                          //                           boxShadow: [
+                          //                             BoxShadow(
+                          //                               color: Colors.blue[800],
+                          //                             ),
+                          //                             BoxShadow(
+                          //                               color: Colors.blue[800],
+                          //                               spreadRadius: -12.0,
+                          //                               blurRadius: 12.0,
+                          //                             ),
+                          //                           ],
+                          //                         ),
+                          //                         child: SingleChildScrollView(
+                          //                           child: Column(
+                          //                             children: [
+                          //                               Text(excelFilePath),
+                          //                             ],
+                          //                           ),
+                          //                         ),
+                          //                       ),
+                          //                       ElevatedButton(
+                          //                         style: ButtonStyle(
+                          //                           backgroundColor:
+                          //                               MaterialStateProperty.all(
+                          //                             Colors.white,
+                          //                           ),
+                          //                         ),
+                          //                         onPressed: () async {
+                          //                           FilePickerResult result =
+                          //                               await FilePicker.platform
+                          //                                   .pickFiles(
+                          //                                       type: FileType
+                          //                                           .custom,
+                          //                                       allowedExtensions: [
+                          //                                 'xls',
+                          //                                 'xlsx',
+                          //                                 'csv'
+                          //                               ]);
+                          //                           if (result != null) {
+                          //                             File excelFile = File(result
+                          //                                 .files.single.path);
+                          //                             setState(() {
+                          //                               excelFilePath =
+                          //                                   excelFile.path;
+                          //                             });
+                          //                           } else {
+                          //                             Toast.show(
+                          //                               "cannot proceed without file"
+                          //                                   .toLowerCase(),
+                          //                               context,
+                          //                               duration:
+                          //                                   Toast.LENGTH_LONG,
+                          //                               gravity: Toast.BOTTOM,
+                          //                               textColor: Colors.red,
+                          //                             );
+                          //                           }
+                          //                         },
+                          //                         child: Text(
+                          //                           'Browse',
+                          //                           style: TextStyle(
+                          //                             color: Colors.black,
+                          //                           ),
+                          //                         ),
+                          //                       ),
+                          //                     ],
+                          //                   ),
+                          //                   Container(
+                          //                     child: BlueButton(
+                          //                       label: 'Upload Excel',
+                          //                       onPressed: () async {
+                          //                         if (excelFilePath.isNotEmpty) {
+                          //                           var jsonString =
+                          //                               await excelToJson();
+                          //                           // dev.log(json.toString(),
+                          //                           //     name: 'In Upload');
+                          //                           // await uploadExcelAsBytes();
+                          //                           // context.visitAncestorElements(
+                          //                           //                           (element) {
+                          //                           //                         dev.log(
+                          //                           // element.widget
+                          //                           //   if (element.widget
+                          //                           //       .toString()
+                          //                           //       .contains('Builder')) {
+                          //                           //     return false;
+                          //                           //   }
+                          //                           //   return true;
+                          //                           // });
+                          //                           Navigator.of(context,
+                          //                               rootNavigator: true)
+                          //                             ..pop(json
+                          //                                 .decode(jsonString));
+                          //                         } else {
+                          //                           Toast.show(
+                          //                             "cannot proceed without file"
+                          //                                 .toLowerCase(),
+                          //                             context,
+                          //                             duration: Toast.LENGTH_LONG,
+                          //                             gravity: Toast.BOTTOM,
+                          //                             textColor: Colors.red,
+                          //                           );
+                          //                         }
+                          //                       },
+                          //                     ),
+                          //                   ),
+                          //                   SizedBox(
+                          //                     width: mediaQuery.size.width - 52,
+                          //                     child: Divider(
+                          //                       thickness: 1.0,
+                          //                     ),
+                          //                   ),
+                          //                   Container(
+                          //                     child: BlueButton(
+                          //                       label: 'Download Excel',
+                          //                       onPressed: () async {
+                          //                         // dev.debugger();
 
-                        //     return StatefulBuilder(
-                        //         builder: (context, setState) {
-                        //       return Center(
-                        //         child: Card(
-                        //           child: Container(
-                        //             padding: EdgeInsets.fromLTRB(
-                        //               0,
-                        //               8.0,
-                        //               0,
-                        //               8.0,
-                        //             ),
-                        //             width: mediaQuery.size.width - 36,
-                        //             child: SingleChildScrollView(
-                        //               child: Column(
-                        //                 mainAxisAlignment:
-                        //                     MainAxisAlignment.center,
-                        //                 children: [
-                        //                   Row(
-                        //                     mainAxisAlignment:
-                        //                         MainAxisAlignment.center,
-                        //                     children: [
-                        //                       Container(
-                        //                         height: 50,
-                        //                         width: 150,
-                        //                         margin: EdgeInsets.fromLTRB(
-                        //                           5,
-                        //                           10.0,
-                        //                           5,
-                        //                           10.0,
-                        //                         ),
-                        //                         decoration: BoxDecoration(
-                        //                           color: Colors.grey[200],
-                        //                           borderRadius:
-                        //                               BorderRadius.circular(
-                        //                             10.0,
-                        //                           ),
-                        //                           boxShadow: [
-                        //                             BoxShadow(
-                        //                               color: Colors.blue[800],
-                        //                             ),
-                        //                             BoxShadow(
-                        //                               color: Colors.blue[800],
-                        //                               spreadRadius: -12.0,
-                        //                               blurRadius: 12.0,
-                        //                             ),
-                        //                           ],
-                        //                         ),
-                        //                         child: SingleChildScrollView(
-                        //                           child: Column(
-                        //                             children: [
-                        //                               Text(excelFilePath),
-                        //                             ],
-                        //                           ),
-                        //                         ),
-                        //                       ),
-                        //                       ElevatedButton(
-                        //                         style: ButtonStyle(
-                        //                           backgroundColor:
-                        //                               MaterialStateProperty.all(
-                        //                             Colors.white,
-                        //                           ),
-                        //                         ),
-                        //                         onPressed: () async {
-                        //                           FilePickerResult result =
-                        //                               await FilePicker.platform
-                        //                                   .pickFiles(
-                        //                                       type: FileType
-                        //                                           .custom,
-                        //                                       allowedExtensions: [
-                        //                                 'xls',
-                        //                                 'xlsx',
-                        //                                 'csv'
-                        //                               ]);
-                        //                           if (result != null) {
-                        //                             File excelFile = File(result
-                        //                                 .files.single.path);
-                        //                             setState(() {
-                        //                               excelFilePath =
-                        //                                   excelFile.path;
-                        //                             });
-                        //                           } else {
-                        //                             Toast.show(
-                        //                               "cannot proceed without file"
-                        //                                   .toLowerCase(),
-                        //                               context,
-                        //                               duration:
-                        //                                   Toast.LENGTH_LONG,
-                        //                               gravity: Toast.BOTTOM,
-                        //                               textColor: Colors.red,
-                        //                             );
-                        //                           }
-                        //                         },
-                        //                         child: Text(
-                        //                           'Browse',
-                        //                           style: TextStyle(
-                        //                             color: Colors.black,
-                        //                           ),
-                        //                         ),
-                        //                       ),
-                        //                     ],
-                        //                   ),
-                        //                   Container(
-                        //                     child: BlueButton(
-                        //                       label: 'Upload Excel',
-                        //                       onPressed: () async {
-                        //                         if (excelFilePath.isNotEmpty) {
-                        //                           var jsonString =
-                        //                               await excelToJson();
-                        //                           // dev.log(json.toString(),
-                        //                           //     name: 'In Upload');
-                        //                           // await uploadExcelAsBytes();
-                        //                           // context.visitAncestorElements(
-                        //                           //                           (element) {
-                        //                           //                         dev.log(
-                        //                           // element.widget
-                        //                           //   if (element.widget
-                        //                           //       .toString()
-                        //                           //       .contains('Builder')) {
-                        //                           //     return false;
-                        //                           //   }
-                        //                           //   return true;
-                        //                           // });
-                        //                           Navigator.of(context,
-                        //                               rootNavigator: true)
-                        //                             ..pop(json
-                        //                                 .decode(jsonString));
-                        //                         } else {
-                        //                           Toast.show(
-                        //                             "cannot proceed without file"
-                        //                                 .toLowerCase(),
-                        //                             context,
-                        //                             duration: Toast.LENGTH_LONG,
-                        //                             gravity: Toast.BOTTOM,
-                        //                             textColor: Colors.red,
-                        //                           );
-                        //                         }
-                        //                       },
-                        //                     ),
-                        //                   ),
-                        //                   SizedBox(
-                        //                     width: mediaQuery.size.width - 52,
-                        //                     child: Divider(
-                        //                       thickness: 1.0,
-                        //                     ),
-                        //                   ),
-                        //                   Container(
-                        //                     child: BlueButton(
-                        //                       label: 'Download Excel',
-                        //                       onPressed: () async {
-                        //                         // dev.debugger();
+                          //                         await _checkPermission();
+                          //                         await _prepare();
 
-                        //                         await _checkPermission();
-                        //                         await _prepare();
+                          //                         final taskId =
+                          //                             await FlutterDownloader.enqueue(
+                          //                                 url:
+                          //                                     "https://www.hajeri.in/empdetailsexcel/Add-Employee.xlsx",
+                          //                                 savedDir: _localPath,
+                          //                                 fileName:
+                          //                                     "Add - Employee.xlsx",
+                          //                                 showNotification: true,
+                          //                                 openFileFromNotification:
+                          //                                     true);
 
-                        //                         final taskId =
-                        //                             await FlutterDownloader.enqueue(
-                        //                                 url:
-                        //                                     "https://www.hajeri.in/empdetailsexcel/Add-Employee.xlsx",
-                        //                                 savedDir: _localPath,
-                        //                                 fileName:
-                        //                                     "Add - Employee.xlsx",
-                        //                                 showNotification: true,
-                        //                                 openFileFromNotification:
-                        //                                     true);
+                          //                         Toast.show(
+                          //                           "Downloaded Successfully"
+                          //                               .toLowerCase(),
+                          //                           context,
+                          //                           duration: Toast.LENGTH_LONG,
+                          //                           gravity: Toast.BOTTOM,
+                          //                           textColor: Colors.green,
+                          //                         );
+                          //                       },
+                          //                     ),
+                          //                   ),
+                          //                 ],
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       );
+                          //     });
+                          //   },
+                          // );
 
-                        //                         Toast.show(
-                        //                           "Downloaded Successfully"
-                        //                               .toLowerCase(),
-                        //                           context,
-                        //                           duration: Toast.LENGTH_LONG,
-                        //                           gravity: Toast.BOTTOM,
-                        //                           textColor: Colors.green,
-                        //                         );
-                        //                       },
-                        //                     ),
-                        //                   ),
-                        //                 ],
-                        //               ),
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       );
-                        //     });
-                        //   },
-                        // );
+                          // // dev.debugger();
+                          // // dev.log(
+                          // //     employeesData[0]["Name of employee"]
+                          // //         .toString(),
+                          // //     name: 'In upload ');
 
-                        // // dev.debugger();
-                        // // dev.log(
-                        // //     employeesData[0]["Name of employee"]
-                        // //         .toString(),
-                        // //     name: 'In upload ');
+                          // // employeesData.forEach((employee) {
 
-                        // // employeesData.forEach((employee) {
+                          // //   employees.add(
+                          // //     Employee(
+                          // //       name: employee["Name of employee"],
+                          // //       addressLine1:
+                          // //           employee["Address of employee"],
+                          // //       state: employee["MH"],
+                          // //       district: employee["District"],
+                          // //       number:
+                          // //           (employee["Mobile Number"] as double)
+                          // //               .toInt(),
+                          // //       city: employee["City"],
+                          // //       departmentName:
+                          // //           employee["Select Department"],
+                          // //     ),
+                          // //   );
+                          // // });
 
-                        // //   employees.add(
-                        // //     Employee(
-                        // //       name: employee["Name of employee"],
-                        // //       addressLine1:
-                        // //           employee["Address of employee"],
-                        // //       state: employee["MH"],
-                        // //       district: employee["District"],
-                        // //       number:
-                        // //           (employee["Mobile Number"] as double)
-                        // //               .toInt(),
-                        // //       city: employee["City"],
-                        // //       departmentName:
-                        // //           employee["Select Department"],
-                        // //     ),
-                        // //   );
-                        // // });
-
-                        // // dev.log('  employees ${employees.toString()}',
-                        // //     name: 'Employee');
-                        // setState(() {});
-                      },
+                          // // dev.log('  employees ${employees.toString()}',
+                          // //     name: 'Employee');
+                          // setState(() {});
+                        },
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Center(
-                child: Text(
-                  'In case of bulk employees,\n Kindly use upload excel option',
-                  textAlign: TextAlign.center,
-                  style: kTextStyleEmployeeDetail,
-                ),
-              ),
-            ),
+            // Expanded(
+            //   flex: 1,
+            //   child: Center(
+            //     child: Text(
+            //       'In case of bulk employees,\n Kindly use upload excel option',
+            //       textAlign: TextAlign.center,
+            //       style: kTextStyleEmployeeDetail,
+            //     ),
+            //   ),
+            // ),
 
             // Expanded(
             //   flex: 2,

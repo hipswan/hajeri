@@ -70,6 +70,12 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                 );
               },
               child: Container(
+                padding: EdgeInsets.fromLTRB(
+                  8.0,
+                  8.0,
+                  8.0,
+                  0.0,
+                ),
                 decoration: BoxDecoration(
                   gradient: kGradient,
                   borderRadius: BorderRadius.circular(
@@ -81,9 +87,11 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                     Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                            vertical: 8.0,
+                          padding: const EdgeInsets.fromLTRB(
+                            0.0,
+                            8.0,
+                            8.0,
+                            8.0,
                           ),
                           child: Container(
                             decoration: BoxDecoration(
@@ -114,32 +122,20 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                           ),
                         ),
                         Expanded(
-                          child: Row(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             textBaseline: TextBaseline.alphabetic,
                             children: [
                               MainQrDetail(
-                                name: 'Name:',
-                                mobile: 'Mobile:',
-                                latitude: 'Lat:',
-                                longitude: 'Long:',
-                                status: 'Status:',
+                                name: 'Name',
+                                text: qrCodePoint["nameofqrcodepoint"],
                               ),
                               SizedBox(
-                                width: 8.0,
+                                height: 5.0,
                               ),
-                              Expanded(
-                                child: MainQrDetail(
-                                  name: qrCodePoint["nameofqrcodepoint"],
-                                  mobile: qrCodePoint["mobile"],
-                                  latitude: qrCodePoint["latlong"]
-                                      .toString()
-                                      .split(',')[0],
-                                  longitude: qrCodePoint["latlong"]
-                                      .toString()
-                                      .split(',')[1],
-                                  status: qrCodePoint["status"],
-                                ),
+                              MainQrDetail(
+                                name: 'Mobile',
+                                text: qrCodePoint["mobile"],
                               ),
                             ],
                           ),
@@ -232,7 +228,7 @@ class _QrCodePointViewState extends State<QrCodePointView> {
           ),
           DraggableScrollableSheet(
             initialChildSize: 0.7,
-            minChildSize: 0.6,
+            minChildSize: 0.35,
             maxChildSize: 0.8,
             builder: (BuildContext context, ScrollController scrollController) {
               return Container(
@@ -456,71 +452,42 @@ class _QrCodePointViewState extends State<QrCodePointView> {
 
 class MainQrDetail extends StatelessWidget {
   final name;
-  final mobile;
-  final latitude;
-
-  final longitude;
-
-  final status;
+  final text;
 
   const MainQrDetail({
     Key key,
     this.name,
-    this.mobile,
-    this.latitude,
-    this.longitude,
-    this.status,
+    this.text,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 8.0,
+    return Container(
+      padding: EdgeInsets.symmetric(
+        vertical: 5.0,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(
+          10.0,
+        ),
+        border: Border.all(
+          color: Colors.white,
+        ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 8.0,
-            ),
-            child: Text(
-              name,
-              style: kMainQrPointTextStyle,
-            ),
+          Text(
+            name,
+            style: kMainBranchTextStyle,
           ),
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 8.0,
-            ),
-            child: Text(
-              mobile,
-              style: kMainQrPointTextStyle,
-            ),
+          Divider(
+            color: Colors.white,
           ),
-          // Padding(
-          //   padding: const EdgeInsets.only(
-          //     bottom: 8.0,
-          //   ),
-          //   child: Text(
-          //     latitude,
-          //     style: kMainQrPointTextStyle,
-          //   ),
-          // ),
-          // Padding(
-          //   padding: const EdgeInsets.only(
-          //     bottom: 8.0,
-          //   ),
-          //   child: Text(
-          //     longitude,
-          //     style: kMainQrPointTextStyle,
-          //   ),
-          // ),
-          // Text(
-          //   status,
-          //   style: kMainQrPointTextStyle,
-          // ),
+          Text(
+            text,
+            style: kMainBranchTextStyle,
+          ),
         ],
       ),
     );

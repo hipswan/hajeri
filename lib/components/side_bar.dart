@@ -48,14 +48,16 @@ class _SideBarState extends State<SideBar> {
       decoration: BoxDecoration(
         color: Colors.blue[800],
       ),
-      accountName: Text(
-        isOrg
-            ? '${prefs.getString('org_name').substring(0, 1).toUpperCase()}${prefs.getString('org_name').substring(1).toLowerCase()}'
-            : '${prefs.getString('emp_name').substring(0, 1).toUpperCase()}${prefs.getString('emp_name').substring(1).toLowerCase()}',
-        overflow: TextOverflow.fade,
-        style: TextStyle(
-          fontSize: 20,
-          letterSpacing: 0.5,
+      accountName: Container(
+        child: Text(
+          isOrg
+              ? '${prefs.getString('org_name').substring(0, 1).toUpperCase()}${prefs.getString('org_name').substring(1).toLowerCase()}'
+              : '${prefs.getString('emp_name').substring(0, 1).toUpperCase()}${prefs.getString('emp_name').substring(1).toLowerCase()}',
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 20,
+            letterSpacing: 0.5,
+          ),
         ),
       ),
       accountEmail: Text(

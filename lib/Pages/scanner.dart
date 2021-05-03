@@ -324,33 +324,70 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
       if (result != null) {
         await controller?.pauseCamera();
 
-        // await showDialog(
-        //     barrierDismissible: false,
-        //     context: context,
-        //     builder: (context) {
-        //       Future.delayed(Duration(seconds: 10), () {
-        //         Navigator.of(context).pop(true);
-        //       });
-        //       return WillPopScope(
-        //         onWillPop: () async => false,
-        //         child: AlertDialog(
-        //           title: Text('Scanner'),
-        //           content: Text(
-        //             'Scanning in progress',
-        //           ),
-        //         ),
-        //       );
-        //     });
+        showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) {
+              // Future.delayed(Duration(seconds: 10), () {
+              //   Navigator.of(context).pop(true);
+              // });
+              return WillPopScope(
+                onWillPop: () async => false,
+                child: AlertDialog(
+                  content: Row(
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(
+                        width: 10.0,
+                      ),
+                      Text(
+                        'Loading....',
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            });
 
-        if (result.code.split("_")[0].toLowerCase().contains("hajeri")) {
+        if (result.code.contains("Hajeri")) {
           status = await markAttendance();
-          await controller?.stopCamera();
 
-          dev.log('$status', name: 'In scanner result');
-          setState(() {
-            isQrScanned = true;
-          });
+          if (status.isNotEmpty &&
+              (status.contains('no internet') ||
+                  status.contains('connectivity issue') ||
+                  status.contains('error occured'))) {
+            Navigator.of(context).pop(true);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.white,
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  status ?? '',
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+                margin: EdgeInsets.fromLTRB(
+                  5.0,
+                  0.0,
+                  5.0,
+                  20.0,
+                ),
+              ),
+            );
+            await controller?.resumeCamera();
+          } else {
+            await controller?.stopCamera();
+            Navigator.of(context).pop(true);
+
+            dev.log('$status', name: 'In scanner result');
+            setState(() {
+              isQrScanned = true;
+            });
+          }
         } else {
+          Navigator.of(context).pop(true);
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               backgroundColor: Colors.white,
@@ -422,16 +459,28 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     if (userOrgId == orgId) {
       dev.log("the diff distance is ${distanceInMeters.toString()}");
       if (distanceInMeters < 3) {
-        var response =
-            await http.get("$kMarkAttendance$orgId/$userId/Employee", headers: {
-          'Content-Type': 'application/json',
-        });
-        if (response.statusCode == 200) {
-          dev.log(response.body.toString(),
-              name: 'In scanner didt within 3 meters');
-          return "success";
-        } else {
-          return "failed to connect to Internet";
+        try {
+          var response = await http
+              .get("$kMarkAttendance$orgId/$userId/Employee", headers: {
+            'Content-Type': 'application/json',
+          });
+
+          if (response.statusCode == 200) {
+            dev.log(response.body.toString(),
+                name: 'In scanner didt within 3 meters');
+            return "success";
+          } else {
+            return "failed to connect to Internet";
+          }
+        } on SocketException catch (e) {
+          dev.log(e.message);
+          return 'no internet';
+        } on IOException catch (e) {
+          dev.log(e.toString());
+          return 'connectivity issue';
+        } on Exception catch (e) {
+          dev.log(e.toString());
+          return 'error occured';
         }
       } else {
         Toast.show("Please be under 3 meters of Organization", context,
@@ -446,7 +495,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     // });
     else {
       var response =
-          await http.get("$kMarkAttendance$orgId/$userId/Employee", headers: {
+          await http.get("$kMarkAttendance$orgId/$userId/Visitor", headers: {
         'Content-Type': 'application/json',
       });
       if (response.statusCode == 200) {

@@ -61,8 +61,8 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                   ),
                 ),
                 padding: EdgeInsets.symmetric(
-                  horizontal: 10.0,
-                  vertical: 18.0,
+                  horizontal: 5.0,
+                  vertical: 8.0,
                 ),
                 child: Column(
                   children: [
@@ -98,27 +98,25 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                           ),
                         ),
                         SizedBox(
-                          width: 10.0,
+                          width: 8.0,
                         ),
                         Expanded(
-                          child: Row(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               MainBranchDetail(
-                                name: 'Branch ID:',
-                                text: 'Name:',
+                                name: 'Branch ID',
+                                text: prefs.getString(
+                                  'worker_id',
+                                ),
                               ),
                               SizedBox(
-                                width: 5.0,
+                                height: 5.0,
                               ),
-                              Expanded(
-                                child: MainBranchDetail(
-                                  name: prefs.getString(
-                                    'worker_id',
-                                  ),
-                                  text: prefs.getString(
-                                    'org_name',
-                                  ),
+                              MainBranchDetail(
+                                name: 'Name',
+                                text: prefs.getString(
+                                  'org_name',
                                 ),
                               ),
                             ],
@@ -204,7 +202,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
           ),
           DraggableScrollableSheet(
             initialChildSize: 0.6,
-            minChildSize: 0.5,
+            minChildSize: 0.35,
             maxChildSize: 0.8,
             builder: (BuildContext context, scrollController) {
               return Container(
@@ -420,24 +418,27 @@ class MainBranchDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 8.0,
+    return Container(
+      padding: EdgeInsets.symmetric(
+        vertical: 5.0,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(
+          10.0,
+        ),
+        border: Border.all(
+          color: Colors.white,
+        ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 8.0,
-            ),
-            child: Text(
-              name,
-              style: kMainBranchTextStyle,
-            ),
+          Text(
+            name,
+            style: kMainBranchTextStyle,
           ),
-          SizedBox(
-            width: 10.0,
+          Divider(
+            color: Colors.white,
           ),
           Text(
             text,

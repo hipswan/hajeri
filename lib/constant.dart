@@ -21,6 +21,21 @@ const List<String> kBusinessNatureMenuItems = <String>[
   'Industry',
   'Other',
 ];
+const kMaxOrganizationName = 15;
+const kMaxQrCodePointName = 12;
+
+const List<String> kDepartmentMenuItems = <String>[
+  'Accounting and Finance',
+  'Marketing',
+  'IT Department',
+  'Human Resource Management',
+  'Maintenance',
+  'Production',
+  'Admin Department',
+  'Stores & Purchasing',
+  'Research & Development',
+  'Other',
+];
 
 const List<String> kTypeSelectItems = <String>[
   'All Visitors',
@@ -34,7 +49,12 @@ const kQrPointTextStyle = TextStyle(
   color: Colors.white,
   fontSize: 16.0,
 );
-
+final kRegisterButtonStyle = TextStyle(
+  color: Colors.blue[800],
+);
+const kSignUpTextStyle = TextStyle(
+  fontSize: 16.0,
+);
 const kMonthsSelectItems = <String, String>{
   '1': 'January',
   '2': 'February',

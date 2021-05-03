@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1039596963419",
+    "firebase_url": "https://hajeri-ed9e1.firebaseio.com",
+    "project_id": "hajeri-ed9e1",
+    "storage_bucket": "hajeri-ed9e1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1039596963419:android:1b98a610afb19ed30ba17e",
+        "android_client_info": {
+          "package_name": "am.attendance.hajeri"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1039596963419-6lg2bi70d8md112881a67kl1au9n6r72.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "am.attendance.hajeri",
+            "certificate_hash": "79d9384683cb1d2380b3df49bef2705968563573"
+          }
+        },
+        {
+          "client_id": "1039596963419-fdqm6p2fismq0eu9mbks5speqimamhu6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApALhx3KQWrd6mxtRQ4h3cpPSbtLzUr4k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1039596963419-fdqm6p2fismq0eu9mbks5speqimamhu6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

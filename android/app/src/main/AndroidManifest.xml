@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="com.example.hajeri_demo">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="am.attendance.hajeri">
 
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -30,7 +30,7 @@
     </intent>
   </queries> -->
 
-  <application android:label="hajeri_demo" android:icon="@mipmap/ic_launcher" android:requestLegacyExternalStorage="true">
+  <application android:label="Hajeri" android:icon="@mipmap/ic_launcher" android:requestLegacyExternalStorage="true">
     <provider android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider" android:authorities="${applicationId}.flutter_downloader.provider" android:exported="false" android:grantUriPermissions="true">
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths" />
 
@@ -47,7 +47,7 @@
     <provider android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider" android:authorities="${applicationId}.flutter_downloader.provider" android:exported="false" android:grantUriPermissions="true">
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths" />
     </provider> -->
-    <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyARb3vu9o6VJ7zHvsp0bPKb8jmw3Ytg-G4" />
+    <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyApALhx3KQWrd6mxtRQ4h3cpPSbtLzUr4k" />
 
     <activity android:name=".MainActivity" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
 

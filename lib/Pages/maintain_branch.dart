@@ -45,7 +45,7 @@ class _MaintainBranchState extends State<MaintainBranch> {
 
   Future<String> getOrgBranch() async {
     String orgId = prefs.getString("worker_id");
-    log('$kBranchList$orgId');
+    // log('$kBranchList$orgId');
     try {
       var response = await http.get(
         '$kBranchList$orgId',
@@ -55,10 +55,10 @@ class _MaintainBranchState extends State<MaintainBranch> {
         List<dynamic> data = json.decode(response.body);
 
         branchList = data;
-        log(
-          branchList.toString(),
-          name: 'In branch list',
-        );
+        // log(
+        //   branchList.toString(),
+        //   name: 'In branch list',
+        // );
 
         return "success";
       } else {

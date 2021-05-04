@@ -19,7 +19,10 @@ class Landing extends StatefulWidget {
   _LandingState createState() => _LandingState();
 }
 
-class _LandingState extends State<Landing> with SingleTickerProviderStateMixin {
+class _LandingState extends State<Landing>
+    with
+        SingleTickerProviderStateMixin,
+        AutomaticKeepAliveClientMixin<Landing> {
   TargetPlatform platform;
   static List pageView;
   bool isOrg;
@@ -52,6 +55,8 @@ class _LandingState extends State<Landing> with SingleTickerProviderStateMixin {
     _checkPermission();
   }
 
+  @override
+  bool get wantKeepAlive => true;
   @override
   void dispose() {
     _pageController.dispose();

@@ -487,6 +487,9 @@ class MainQrDetail extends StatelessWidget {
           Text(
             text,
             style: kMainBranchTextStyle,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
           ),
         ],
       ),

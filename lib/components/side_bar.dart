@@ -61,7 +61,7 @@ class _SideBarState extends State<SideBar> {
         ),
       ),
       accountEmail: Text(
-        orgId ?? '-',
+        prefs.getString('mobile') ?? '-',
       ),
       currentAccountPicture: Container(
         height: 75,
@@ -152,13 +152,15 @@ class _SideBarState extends State<SideBar> {
                 onTap: () {
                   section.contains('dashboard')
                       ? Navigator.pop(context)
-                      : Navigator.push(
+                      : Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Landing(
+                            builder: (BuildContext context) => Landing(
                               initialPageIndex: 0,
                             ),
                           ),
+                          (Route<dynamic> route) => false,
+                          // ModalRoute.withName(SignUp.id),
                         );
                 },
               ),
@@ -207,13 +209,15 @@ class _SideBarState extends State<SideBar> {
                 onTap: () {
                   section.contains('scan_qr')
                       ? Navigator.pop(context)
-                      : Navigator.push(
+                      : Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Landing(
+                            builder: (BuildContext context) => Landing(
                               initialPageIndex: 1,
                             ),
                           ),
+                          (Route<dynamic> route) => false,
+                          // ModalRoute.withName(SignUp.id),
                         );
                 },
               ),
@@ -226,13 +230,15 @@ class _SideBarState extends State<SideBar> {
                 onTap: () {
                   section.contains('monthly_attendance')
                       ? Navigator.pop(context)
-                      : Navigator.push(
+                      : Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Landing(
+                            builder: (BuildContext context) => Landing(
                               initialPageIndex: 2,
                             ),
                           ),
+                          (Route<dynamic> route) => false,
+                          // ModalRoute.withName(SignUp.id),
                         );
                 },
               ),
@@ -335,13 +341,15 @@ class _SideBarState extends State<SideBar> {
               onTap: () {
                 section.contains('dashboard')
                     ? Navigator.pop(context)
-                    : Navigator.push(
+                    : Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Landing(
+                          builder: (BuildContext context) => Landing(
                             initialPageIndex: 0,
                           ),
                         ),
+                        (Route<dynamic> route) => false,
+                        // ModalRoute.withName(SignUp.id),
                       );
               },
             ),
@@ -354,13 +362,15 @@ class _SideBarState extends State<SideBar> {
               onTap: () {
                 section.contains('scan_qr')
                     ? Navigator.pop(context)
-                    : Navigator.push(
+                    : Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Landing(
+                          builder: (BuildContext context) => Landing(
                             initialPageIndex: 1,
                           ),
                         ),
+                        (Route<dynamic> route) => false,
+                        // ModalRoute.withName(SignUp.id),
                       );
               },
             ),
@@ -373,13 +383,15 @@ class _SideBarState extends State<SideBar> {
               onTap: () {
                 section.contains('profile')
                     ? Navigator.pop(context)
-                    : Navigator.push(
+                    : Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Landing(
+                          builder: (BuildContext context) => Landing(
                             initialPageIndex: 2,
                           ),
                         ),
+                        (Route<dynamic> route) => false,
+                        // ModalRoute.withName(SignUp.id),
                       );
               },
             ),

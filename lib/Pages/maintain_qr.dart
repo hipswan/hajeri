@@ -55,7 +55,7 @@ class _MaintainQrState extends State<MaintainQr> {
 
         qrCodePointList = data;
 
-        log(data.toString());
+        // log(data.toString());
 
         return "success";
       } else {

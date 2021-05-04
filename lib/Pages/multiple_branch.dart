@@ -28,7 +28,7 @@ class MultipleBranchView extends StatefulWidget {
 class _MultipleBranchViewState extends State<MultipleBranchView> {
   Future<String> deleteBranch({String id}) async {
     String orgId = prefs.getString('worker_id');
-    log('$kDeleteBranch$orgId/$id');
+    // log('$kDeleteBranch$orgId/$id');
     var response = await http.post('$kDeleteBranch$orgId/$id');
 
     if (response.statusCode == 200) {
@@ -105,18 +105,18 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               MainBranchDetail(
-                                name: 'Branch ID',
+                                name: 'Name',
                                 text: prefs.getString(
-                                  'worker_id',
+                                  'org_name',
                                 ),
                               ),
                               SizedBox(
                                 height: 5.0,
                               ),
                               MainBranchDetail(
-                                name: 'Name',
+                                name: 'Mobile',
                                 text: prefs.getString(
-                                  'org_name',
+                                  'mobile',
                                 ),
                               ),
                             ],
@@ -443,6 +443,9 @@ class MainBranchDetail extends StatelessWidget {
           Text(
             text,
             style: kMainBranchTextStyle,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
           ),
         ],
       ),

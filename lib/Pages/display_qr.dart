@@ -234,14 +234,26 @@ class _DisplayQrState extends State<DisplayQr> {
                               // },
                             ),
                           ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 8.0,
+                            ),
+                            child: Text(
+                              widget.pointName,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
                         ],
                       ),
                     ),
+                    SizedBox(
+                      height: 8.0,
+                    ),
                     Container(
-                      width: 300,
-                      padding: EdgeInsets.symmetric(
-                        vertical: 5.0,
-                      ),
+                      width: size.width * 0.75,
                       child: DropdownButtonFormField(
                         // disabledHint: const Text(
                         //     'Please Select State First'),

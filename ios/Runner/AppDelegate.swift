@@ -1,6 +1,8 @@
 import UIKit
 import Flutter
 import flutter_downloader
+import Firebase
+import GoogleMaps
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -10,6 +12,8 @@ import flutter_downloader
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
     FlutterDownloaderPlugin.setPluginRegistrantCallback(registerPlugins)
+    FirebaseApp.configure()
+    GMSServices.provideAPIKey("AIzaSyDdKz3jUPivLINAzYvRPtvEOMDNsGNTHhY")
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

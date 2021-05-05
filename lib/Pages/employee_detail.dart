@@ -309,14 +309,26 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
                           if (addedEmployee == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
+                                content:
+                                    const Text('no action taken while adding'),
+                              ),
+                            );
+                          } else if (addedEmployee.name.isNotEmpty) {
+                            setState(() {
+                              showShimmer = true;
+                            });
+                            _getEmployeeList().then((employeelist) {
+                              showShimmer = false;
+                              employees = employeelist;
+                              setState(() {});
+                            });
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
                                 content: const Text(
                                     'error has occured during add employee'),
                               ),
                             );
-                          } else if (addedEmployee.name.isNotEmpty) {
-                            employees.add(addedEmployee);
-
-                            setState(() {});
                           }
                         },
                       ),

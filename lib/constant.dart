@@ -22,12 +22,12 @@ const List<String> kBusinessNatureMenuItems = <String>[
   'Other',
 ];
 const kMaxOrganizationName = 15;
-const kMaxQrCodePointName = 12;
+const kMaxQrCodePointName = 15;
 
 const List<String> kDepartmentMenuItems = <String>[
   'Accounting and Finance',
   'Marketing',
-  'IT Department',
+  'IT-Department',
   'Human Resource Management',
   'Maintenance',
   'Production',

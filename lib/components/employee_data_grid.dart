@@ -320,6 +320,15 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                                                   .showSnackBar(
                                                 SnackBar(
                                                   content: const Text(
+                                                      'no action taken while editing'),
+                                                ),
+                                              );
+                                            } else if (selectedEmployeeWithEdit
+                                                .name.isEmpty) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: const Text(
                                                       'Error has occured during edit'),
                                                 ),
                                               );

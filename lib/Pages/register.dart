@@ -405,6 +405,7 @@ class RegisterState extends State<Register> {
                               value: department["personname"].toString(),
                               child: Text(
                                 department["personname"],
+                                overflow: TextOverflow.clip,
                               ),
                             ),
                           )

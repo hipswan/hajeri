@@ -451,44 +451,45 @@ class _GenerateQRState extends State<GenerateQR> {
                 ),
               ),
 
-              Align(
-                alignment: Alignment.topCenter,
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
                 child: _displayBanner
-                    ? Container(
-                        height: 74,
-                        child: MaterialBanner(
-                            padding: EdgeInsets.all(10.0),
-                            forceActionsBelow: false,
-                            backgroundColor: Colors.white,
-                            content: Text(
-                              'Hold & Drag the marker at the correct organization location.',
+                    ? MaterialBanner(
+                        padding: EdgeInsets.all(10.0),
+                        forceActionsBelow: false,
+                        backgroundColor: Colors.white,
+                        content: Text(
+                          'Hold & Drag the marker at the correct organization location.',
+                        ),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.amber,
+                          radius: 30,
+                          child: Center(
+                            child: Icon(
+                              Icons.warning_amber_rounded,
+                              color: Colors.black,
+                              size: 32,
                             ),
-                            leading: CircleAvatar(
-                              backgroundColor: Colors.amber,
-                              radius: 27,
-                              child: Icon(
-                                Icons.warning_amber_rounded,
-                                color: Colors.black,
-                                size: 32,
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _displayBanner = false;
-                                  });
-                                },
-                                child: Text(
-                                  'Dismiss',
-                                  style: TextStyle(
-                                    color: Colors.blue[800],
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          ),
+                        ),
+                        actions: [
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _displayBanner = false;
+                                });
+                              },
+                              child: Text(
+                                'Dismiss',
+                                style: TextStyle(
+                                  color: Colors.blue[800],
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              )
-                            ]),
-                      )
+                              ),
+                            )
+                          ])
                     : Container(),
               )
             ],

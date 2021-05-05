@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
-
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:hajeri_demo/components/employee_data_grid.dart';
 import 'package:hajeri_demo/components/box_tile.dart';
@@ -341,7 +341,7 @@ class _DashboardState extends State<Dashboard> {
                       BoxTile(
                         size: Size(
                           size.width * 0.5 * 0.75,
-                          size.height * 0.5 * 0.30,
+                          Platform.isIOS ? 64 : size.height * 0.5 * 0.30,
                         ),
                         color: Color(0xff17a2b8),
                         onPressed: () async {
@@ -368,6 +368,7 @@ class _DashboardState extends State<Dashboard> {
                           children: [
                             Text(
                               'Total Employee',
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,
                               ),
@@ -385,7 +386,7 @@ class _DashboardState extends State<Dashboard> {
                       BoxTile(
                         size: Size(
                           size.width * 0.5 * 0.75,
-                          size.height * 0.5 * 0.30,
+                          Platform.isIOS ? 64 : size.height * 0.5 * 0.30,
                         ),
                         color: Color(0xff28a745),
                         onPressed: () async {
@@ -439,7 +440,7 @@ class _DashboardState extends State<Dashboard> {
                       BoxTile(
                         size: Size(
                           size.width * 0.5 * 0.75,
-                          size.height * 0.5 * 0.30,
+                          Platform.isIOS ? 64 : size.height * 0.5 * 0.30,
                         ),
                         color: Color(0xffffc107),
                         onPressed: () async {
@@ -487,7 +488,7 @@ class _DashboardState extends State<Dashboard> {
                       BoxTile(
                         size: Size(
                           size.width * 0.5 * 0.75,
-                          size.height * 0.5 * 0.30,
+                          Platform.isIOS ? 64 : size.height * 0.5 * 0.30,
                         ),
                         color: Color(0xffdc3545),
                         selected: selected['4'],

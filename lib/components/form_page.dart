@@ -71,6 +71,7 @@ class _FormPageState extends State<FormPage> {
             value: department,
             child: Text(
               department,
+              overflow: TextOverflow.clip,
             ),
           ),
         )
@@ -585,13 +586,18 @@ class _FormPageState extends State<FormPage> {
                                     Navigator.of(context).pop(
                                       isEmployeeAddedSuccess.contains("success")
                                           ? Employee(
-                                              addressLine1: _cAddress.text,
-                                              idCardNumber: 0,
-                                              departmentName: _cDepartment.text,
-                                              number: int.parse(_cNumber.text),
-                                              name: _cName.text,
+                                              addressLine1:
+                                                  _cAddress.text.trim(),
+                                              idCardNumber: int.parse(
+                                                  _cIdentity.text.trim()),
+                                              departmentName:
+                                                  departmentDropDownValue,
+                                              number: int.parse(
+                                                  _cNumber.text.trim()),
+                                              name: _cName.text.trim(),
                                               state:
                                                   cityAndStateNewValue['state'],
+                                              district: _cDistrict.text.trim(),
                                               city:
                                                   cityAndStateNewValue['state'])
                                           : Employee.empty(),
@@ -603,15 +609,23 @@ class _FormPageState extends State<FormPage> {
                                       cityAndStateNewValue['city'],
                                     );
                                     Navigator.of(context).pop(
-                                        isEmployeeEditSuccess
-                                                .contains("success")
+                                        isEmployeeEditSuccess.contains(
+                                                "success")
                                             ? Employee(
-                                                addressLine1: _cAddress.text,
-                                                number:
-                                                    int.parse(_cNumber.text),
-                                                name: _cName.text,
+                                                addressLine1: _cAddress.text
+                                                    .trim(),
+                                                idCardNumber:
+                                                    int.parse(_cIdentity.text
+                                                        .trim()),
+                                                departmentName:
+                                                    departmentDropDownValue,
+                                                number: int.parse(
+                                                    _cNumber.text.trim()),
+                                                name: _cName.text.trim(),
                                                 state: cityAndStateNewValue[
                                                     'state'],
+                                                district:
+                                                    _cDistrict.text.trim(),
                                                 city: cityAndStateNewValue[
                                                     'state'])
                                             : Employee.empty());

@@ -309,6 +309,8 @@ class _BranchFormState extends State<BranchForm> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
@@ -411,24 +413,27 @@ class _BranchFormState extends State<BranchForm> {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: DropdownButtonFormField(
-                          value: departmentDropDownValue,
-                          onTap: () {
-                            FocusScope.of(context)
-                                .requestFocus(new FocusNode());
-                          },
-                          onChanged: (String newValue) async {
-                            departmentDropDownValue = newValue;
+                        child: Container(
+                          width: size.width - 32,
+                          child: DropdownButtonFormField(
+                            value: departmentDropDownValue,
+                            onTap: () {
+                              FocusScope.of(context)
+                                  .requestFocus(new FocusNode());
+                            },
+                            onChanged: (String newValue) async {
+                              departmentDropDownValue = newValue;
 
-                            setState(() {});
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Select Department',
-                            border: OutlineInputBorder(),
+                              setState(() {});
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Select Department',
+                              border: OutlineInputBorder(),
+                            ),
+                            items: _departmentDropDownMenuItems,
+                            // hint:
+                            //     const Text('Select Department'),
                           ),
-                          items: _departmentDropDownMenuItems,
-                          // hint:
-                          //     const Text('Select Department'),
                         ),
                       ),
                       //Mobile Number

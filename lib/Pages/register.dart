@@ -896,50 +896,55 @@ class RegisterState extends State<Register> {
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       vertical: 8.0),
-                                              child: DropdownButtonFormField(
-                                                value: departmentDropDownValue,
-                                                onTap: () {
-                                                  FocusScope.of(context)
-                                                      .requestFocus(
-                                                          new FocusNode());
-                                                },
-                                                onChanged:
-                                                    (String newValue) async {
-                                                  departmentDropDownValue =
-                                                      newValue;
-                                                  if (!stateSelected) {
-                                                    states =
-                                                        await getStateList();
-                                                    _stateDropDownMenuItems =
-                                                        states
-                                                            .map(
-                                                              (state) =>
-                                                                  DropdownMenuItem<
-                                                                      String>(
-                                                                value: state[
-                                                                        "id"]
-                                                                    .toString(),
-                                                                child: Text(
-                                                                  state["statename"]
+                                              child: Container(
+                                                width: size.width - 32,
+                                                child: DropdownButtonFormField(
+                                                  value:
+                                                      departmentDropDownValue,
+                                                  onTap: () {
+                                                    FocusScope.of(context)
+                                                        .requestFocus(
+                                                            new FocusNode());
+                                                  },
+                                                  onChanged:
+                                                      (String newValue) async {
+                                                    departmentDropDownValue =
+                                                        newValue;
+                                                    if (!stateSelected) {
+                                                      states =
+                                                          await getStateList();
+                                                      _stateDropDownMenuItems =
+                                                          states
+                                                              .map(
+                                                                (state) =>
+                                                                    DropdownMenuItem<
+                                                                        String>(
+                                                                  value: state[
+                                                                          "id"]
                                                                       .toString(),
+                                                                  child: Text(
+                                                                    state["statename"]
+                                                                        .toString(),
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                            )
-                                                            .toList();
-                                                  }
+                                                              )
+                                                              .toList();
+                                                    }
 
-                                                  departmentSelected = true;
-                                                  setState(() {});
-                                                },
-                                                decoration: InputDecoration(
-                                                  labelText:
-                                                      'Select Department',
-                                                  border: OutlineInputBorder(),
+                                                    departmentSelected = true;
+                                                    setState(() {});
+                                                  },
+                                                  decoration: InputDecoration(
+                                                    labelText:
+                                                        'Select Department',
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                  ),
+                                                  items:
+                                                      _departmentDropDownMenuItems,
+                                                  // hint:
+                                                  //     const Text('Select Department'),
                                                 ),
-                                                items:
-                                                    _departmentDropDownMenuItems,
-                                                // hint:
-                                                //     const Text('Select Department'),
                                               ),
                                             ),
                                             //State drop down

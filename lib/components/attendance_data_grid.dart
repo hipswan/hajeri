@@ -177,6 +177,7 @@ class _AttendanceDataGridState extends State<AttendanceDataGrid> {
         ),
       ),
       child: SfDataGrid(
+        gridLinesVisibility: GridLinesVisibility.both,
         rowHeight: 75.0,
         columnWidthMode: ColumnWidthMode.auto,
         // ignore: missing_return

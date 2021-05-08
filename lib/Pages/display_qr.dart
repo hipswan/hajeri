@@ -1,9 +1,7 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
+import 'dart:developer' as dev;
+import 'dart:io' as io;
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:hajeri_demo/Pages/about_us.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:hajeri_demo/Pages/generate_qr.dart';
@@ -12,9 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:toast/toast.dart';
 import '../constant.dart';
-import 'package:screenshot/screenshot.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart' as path;
 import 'dart:core';
 
 class DisplayQr extends StatefulWidget {
@@ -49,7 +45,7 @@ class _DisplayQrState extends State<DisplayQr> {
   void initState() {
     super.initState();
     _checkPermission();
-    _prepare().then((value) => log(value));
+    _prepare().then((value) => dev.log(value));
     _pdfSizeFormatDropDownItems = _pdfSizeFormatItems
         .map(
           (pdfSize) => DropdownMenuItem<String>(
@@ -73,39 +69,37 @@ class _DisplayQrState extends State<DisplayQr> {
   }
 
   Future<String> _prepare() async {
-    _localPath = (await _findLocalPath()) + Platform.pathSeparator + 'Download';
+    _localPath =
+        (await _findLocalPath()) + io.Platform.pathSeparator + 'Download';
 
-    final savedDir = Directory(_localPath);
+    final savedDir = io.Directory(_localPath);
     bool hasExisted = await savedDir.exists();
     if (!hasExisted) {
       savedDir.create();
     }
-    log(_localPath.toString());
+    dev.log(_localPath.toString());
     return "success";
   }
 
   Future<String> _findLocalPath() async {
-    final directory = platform == TargetPlatform.android
-        ? await getExternalStorageDirectory()
-        : await getApplicationDocumentsDirectory();
+    final directory = io.Platform.isAndroid
+        ? await path.getExternalStorageDirectory()
+        : await path.getApplicationDocumentsDirectory();
     return directory.path;
   }
 
   Future<bool> _checkPermission() async {
-    if (platform == TargetPlatform.android) {
-      final status = await Permission.storage.status;
-      if (status != PermissionStatus.granted) {
-        final result = await Permission.storage.request();
-        if (result == PermissionStatus.granted) {
-          return true;
-        }
-      } else {
+    final status = await Permission.storage.status;
+    if (status != PermissionStatus.granted) {
+      final result = await Permission.storage.request();
+      if (result == PermissionStatus.granted) {
         return true;
+      } else {
+        return false;
       }
     } else {
       return true;
     }
-    return false;
   }
 
   @override
@@ -294,23 +288,52 @@ class _DisplayQrState extends State<DisplayQr> {
                           String fileName =
                               '${prefs.getString('org_id')}_${widget.pointName}_$pdfSizeDropDownValue.pdf';
 
-                          log("https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
+                          dev.log(
+                              "https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
                               name: 'In display qr');
-                          final taskId = await FlutterDownloader.enqueue(
-                            url:
-                                "https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
-                            savedDir: '/storage/emulated/0/Download/',
-                            fileName: fileName,
-                            showNotification: true,
-                            openFileFromNotification: true,
-                          );
-                          Toast.show(
-                            "file download",
-                            context,
-                            duration: Toast.LENGTH_LONG,
-                            gravity: Toast.BOTTOM,
-                            textColor: Colors.green,
-                          );
+                          try {
+                            await FlutterDownloader.enqueue(
+                              url:
+                                  "https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
+                              savedDir: io.Platform.isAndroid
+                                  ? '/storage/emulated/0/Download/'
+                                  : (await path
+                                          .getApplicationDocumentsDirectory())
+                                      .path,
+                              headers: {'content-type': 'application/pdf'},
+                              fileName: fileName,
+                              showNotification: true,
+                              openFileFromNotification: true,
+                            );
+                            Toast.show(
+                              "file download",
+                              context,
+                              duration: Toast.LENGTH_LONG,
+                              gravity: Toast.BOTTOM,
+                              textColor: Colors.green,
+                            );
+                          } on path
+                              .MissingPlatformDirectoryException catch (e1) {
+                            dev.log(e1.message, name: 'In flutter downloader');
+                            Toast.show(
+                              "file not download",
+                              context,
+                              duration: Toast.LENGTH_LONG,
+                              gravity: Toast.BOTTOM,
+                              textColor: Colors.redAccent,
+                            );
+                          } catch (e2) {
+                            dev.log(e2.toString(),
+                                name: 'In flutter downloader');
+
+                            Toast.show(
+                              "file not download",
+                              context,
+                              duration: Toast.LENGTH_LONG,
+                              gravity: Toast.BOTTOM,
+                              textColor: Colors.redAccent,
+                            );
+                          }
                         },
                         child: Container(
                           width: 300,

@@ -202,7 +202,7 @@ class RegisterState extends State<Register> {
     var request = http.Request(
       'POST',
       Uri.parse(
-          '$kAddOrg?nameoforganization=${_cOrgName.text.trim()}&personaname=${_cName.text.trim()}&natureofbusiness=$businessNatureDropDownValue&contactpersondeparmentname=$departmentDropDownValue&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$stateDropDownValue&district=${_cDistrict.text.trim()}&city=$cityDropDownValue'),
+          '$kAddOrg?nameoforganization=${_cOrgName.text.trim()}&personaname=${_cName.text.trim()}&natureofbusiness=$businessNatureDropDownValue&contactpersondeparmentname=$departmentDropDownValue&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$orgState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue'),
     );
     // request.body = '''{
     //   "nameoforganization": "${_cOrgName.text.trim()}",
@@ -282,7 +282,7 @@ class RegisterState extends State<Register> {
     //   "city": "$cityDropDownValue",
     // }''');
     var response = await http.post(
-      '''$kAddUser?personaname: ${_cName.text.trim()}&address: ${_cAddress.text.trim()}&mobile: ${_cNumber.text.trim()}&state: $userState&district: ${_cDistrict.text.trim()}&city: $cityDropDownValue''',
+      '''$kAddUser?personaname=${_cName.text.trim()}&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state:=$userState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue''',
       // body: jsonEncode(body),
       // headers: {
       //   'Content-Type': 'application/json',

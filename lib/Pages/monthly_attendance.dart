@@ -940,8 +940,9 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
     //Dispose the document.
     workbook.dispose();
     //Save and launch file.
-
-    File result = await File('/storage/emulated/0/Download/excel.xlsx')
+    String excelPath = Platform.isAndroid ? "/storage/emulated/0/Download/excel.xlsx"
+        : '$_localPath/excel.xls';
+    File result = await File(excelPath)
         .writeAsBytes(bytes);
     if (result != null) {
       var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
@@ -951,22 +952,52 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
       var platformChannelSpecifics = new NotificationDetails(
           android: androidPlatformChannelSpecifics,
           iOS: iOSPlatformChannelSpecifics);
-      await FlutterLocalNotificationsPlugin().show(
-        0,
-        'Excel sheet is downloaded',
-        'Tap To Open',
-        platformChannelSpecifics,
-        payload: "/storage/emulated/0/Download/excel.xlsx",
+
+
+try {
+  await FlutterLocalNotificationsPlugin().show(
+    0,
+    'Excel sheet is downloaded',
+    'Tap To Open',
+    platformChannelSpecifics,
+    payload: excelPath,
+  );
+  Platform.isIOS? OpenFile.open(result.path):null;
+}
+on Exception catch(e){
+  showDialog(
+    context: context,
+    builder: (context){
+      return AlertDialog(
+        title: Text(e.runtimeType.toString()),
+        content: Text(e.toString().substring(0,50),),
+        actions: <Widget>[
+          new GestureDetector(
+            onTap: () => Navigator.of(context).pop(true),
+            child: Text("Back"),
+          ),
+        ],
+
       );
-      // OpenFile.open(result.path);
     }
-    // debugger();
-    Toast.show(
-      "Excel Downloaded".toLowerCase(),
-      context,
-      duration: Toast.LENGTH_LONG,
-      gravity: Toast.BOTTOM,
-      textColor: Colors.green,
-    );
+  );
+}  // debugger();
+      Toast.show(
+        "Excel Downloaded".toLowerCase(),
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.green,
+      );
+    }else{
+      Toast.show(
+        "error occured during excel download".toLowerCase(),
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.redAccent,
+      );
+    }
+
   }
 }

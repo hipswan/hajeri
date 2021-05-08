@@ -86,10 +86,10 @@ class _GenerateQRState extends State<GenerateQR> {
     String orgId = prefs.getString("worker_id");
     String mobile = prefs.getString("mobile");
     log(
-      '$kGenerateQrCodePoint$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
+      '$kGenerateQrCodePoint/$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
     );
     var response = await http.post(
-      '$kGenerateQrCodePoint$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
+      '$kGenerateQrCodePoint/$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
     );
 
     if (response.statusCode == 200) {
@@ -108,11 +108,79 @@ class _GenerateQRState extends State<GenerateQR> {
         'Null in latitude',
         name: ' In set location',
       );
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+      try {
+        Position position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+        lat = position.latitude;
+        lng = position.longitude;
+      } on TimeoutException catch (e) {
+    //TODO: Display  the error in alert and give acions user can performs
+        showDialog(context: context, builder: (context){
+          return AlertDialog(
+            title:Text('TimeoutException',),
+            content: new Text(
+              e.message,
+            ),
+            actions: <Widget>[
+              new GestureDetector(
+                onTap: () => Navigator.of(context).pop(true),
+                child: Text("Back"),
+              ),
+            ],
+          );
+        });
+    } on PermissionDeniedException catch (e) {
+    //TODO: Display the error with reason permissiondenied in alert and give acions user can performs
+        showDialog(context: context, builder: (context){
+          return AlertDialog(
+            title:Text('PermissionDeniedException',),
+            content: new Text(
+              e.message,
+            ),
+            actions: <Widget>[
+              new GestureDetector(
+                onTap: () => Navigator.of(context).pop(true),
+                child: Text("Back"),
+              ),
+            ],
+          );
+        });
+    } on LocationServiceDisabledException catch (e) {
+    //TODO: Display the error with reason location sevice on in alert and give acions user can performs
+        showDialog(context: context, builder: (context){
+          return AlertDialog(
+            title:Text('LocationServiceDisabledException',),
+            content: new Text(
+              e.toString().substring(0,15),
+            ),
+            actions: <Widget>[
+              new GestureDetector(
+                onTap: () => Navigator.of(context).pop(true),
+                child: Text("Back"),
+              ),
+            ],
+          );
+        });
+    }on Exception catch(e){
+        showDialog(context: context, builder: (context){
+          return AlertDialog(
+            title:Text('Exception',),
+            content: new Text(
+              e.toString().substring(0,15),
+
+            ),
+            actions: <Widget>[
+              new GestureDetector(
+                onTap: () => Navigator.of(context).pop(true),
+                child: Text("Back"),
+              ),
+            ],
+          );
+        });
+        log(e.toString(),name:'In set location');
+      }
       // print(position);
-      lat = position.latitude;
-      lng = position.longitude;
+
     } else {
       lat = double.parse(
         widget.latitude,
@@ -164,9 +232,9 @@ class _GenerateQRState extends State<GenerateQR> {
   addQrCodePoint() async {
     String orgId = prefs.getString("worker_id");
     String mobile = prefs.getString("mobile");
-    log('$kGenerateQrCodePoint$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes');
+    log('$kGenerateQrCodePoint/$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes');
     var response = await http.post(
-        '$kGenerateQrCodePoint$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes');
+        '$kGenerateQrCodePoint/$orgId/$mobile?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes');
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       log(data.toString(), name: 'In add qr code point');

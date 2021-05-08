@@ -30,12 +30,12 @@ void main() async {
     debug: true,
   );
   prefs = await SharedPreferences.getInstance();
-  SharedPreferences.setMockInitialValues({
+  /*SharedPreferences.setMockInitialValues({
     'login': false,
     'name': '',
     'number': '',
   });
-
+*/
   runApp(
     MyApp(),
   );

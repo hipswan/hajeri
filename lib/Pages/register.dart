@@ -899,6 +899,8 @@ class RegisterState extends State<Register> {
                                               child: Container(
                                                 width: size.width - 32,
                                                 child: DropdownButtonFormField(
+                                                  isExpanded: true,
+
                                                   value:
                                                       departmentDropDownValue,
                                                   onTap: () {

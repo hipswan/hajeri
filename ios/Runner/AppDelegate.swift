@@ -10,10 +10,13 @@ import GoogleMaps
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    GeneratedPluginRegistrant.register(with: self)
-    FlutterDownloaderPlugin.setPluginRegistrantCallback(registerPlugins)
+  if #available(iOS 10.0, *) {
+    UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+  }
     FirebaseApp.configure()
     GMSServices.provideAPIKey("AIzaSyDdKz3jUPivLINAzYvRPtvEOMDNsGNTHhY")
+    GeneratedPluginRegistrant.register(with: self)
+    FlutterDownloaderPlugin.setPluginRegistrantCallback(registerPlugins)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

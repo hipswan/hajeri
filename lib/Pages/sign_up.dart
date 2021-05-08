@@ -60,8 +60,8 @@ class _SignUpState extends State<SignUp> {
                     heightFactor: 1,
                     child: Card(
                       child: Image(
-                        color: Colors.blue[50],
-                        colorBlendMode: BlendMode.hue,
+                        // color: Colors.blue[50],
+                        // colorBlendMode: BlendMode.hue,
                         image: AssetImage(
                           'assets/images/hajeri_login.jpg',
                         ),

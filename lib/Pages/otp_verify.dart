@@ -174,7 +174,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                               Navigator.of(context).pop();
                             },
                             child: Text(
-                              'Change',
+                              'Change $verificationCode',
                             ),
                           ),
                         ],

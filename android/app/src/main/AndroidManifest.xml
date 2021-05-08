@@ -31,6 +31,8 @@
   </queries> -->
 
   <application android:label="Hajeri" android:icon="@mipmap/ic_launcher" android:requestLegacyExternalStorage="true">
+    <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyAHclva_YtimUjaG7triSn15ZB6BRCl2Gk" />
+
     <provider android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider" android:authorities="${applicationId}.flutter_downloader.provider" android:exported="false" android:grantUriPermissions="true">
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths" />
 
@@ -47,7 +49,6 @@
     <provider android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider" android:authorities="${applicationId}.flutter_downloader.provider" android:exported="false" android:grantUriPermissions="true">
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths" />
     </provider> -->
-    <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyApALhx3KQWrd6mxtRQ4h3cpPSbtLzUr4k" />
 
     <activity android:name=".MainActivity" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
 

@@ -283,7 +283,6 @@ class _FormPageState extends State<FormPage> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
-        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.blue[800],
           title: Text(widget.title),
@@ -394,6 +393,7 @@ class _FormPageState extends State<FormPage> {
                               child: Container(
                                 width: size.width - 32,
                                 child: DropdownButtonFormField(
+                                  isExpanded: true,
                                   value: departmentDropDownValue,
                                   onTap: () {
                                     FocusScope.of(context)

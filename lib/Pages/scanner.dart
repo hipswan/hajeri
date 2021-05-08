@@ -254,12 +254,13 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                         child: Center(
                           child: Column(
                             children: [
-                              Image.asset('assets/images/hajeri_login.jpg'),
+                              Image.asset('assets/images/hajerilogo.png'),
+                              SizedBox(height:10.0,),
                               Shimmer.fromColors(
-                                baseColor: Colors.black,
-                                highlightColor: Colors.black26,
+                                baseColor: Colors.blue[800],
+                                highlightColor: Colors.blue[100],
                                 enabled: true,
-                                child: Text('Scanning in progress'),
+                                child: Text('Scanning in progress',style: TextStyle(color:Colors.blue[800], fontSize:22.0,),),
                               ),
                             ],
                           ),
@@ -359,7 +360,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
           if (status.isNotEmpty &&
               (status.contains('no internet') ||
                   status.contains('connectivity issue') ||
-                  status.contains('error occured'))) {
+                  status.contains('error occurred'))) {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -418,20 +419,31 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
 
   Future<String> markAttendance() async {
     LocationPermission _locationpermission = await Geolocator.checkPermission();
+    dev.log(_locationpermission.toString(),
+        name: 'In the scanner mark attendance');
     if (_locationpermission == LocationPermission.denied) {
       try {
         Geolocator.requestPermission();
       } on PermissionDefinitionsNotFoundException catch (e) {
         dev.log(e.toString(),
             name: 'In scanner mark attendance permission definition exception');
+        return 'error occurred : perimission denied';
+      }on Exception catch(e){
+        dev.log(_locationpermission.toString(),
+            name: 'In the scanner mark attendance');
+        return 'error occurred : ${e.toString().substring(0,30)}';
+
       }
     }
-    dev.log(_locationpermission.toString(),
-        name: 'In the scanner mark attendance');
 
-    _currrentUserLocation = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+try {
+  _currrentUserLocation = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
+}on Exception catch(e){
 
+  return 'error occurred : ${e.toString().substring(0,30)}';
+
+}
     var qrCodeResult = result.code.toString().split("_");
 
     var orgId = qrCodeResult[1];
@@ -462,7 +474,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     print("org id from user $userOrgId");
     if (userOrgId == orgId) {
       dev.log("the diff distance is ${distanceInMeters.toString()}");
-      if (distanceInMeters < 3) {
+      if (distanceInMeters < 10) {
         try {
           var response = await http
               .get("$kMarkAttendance$orgId/$userId/Employee", headers: {
@@ -484,7 +496,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
           return 'connectivity issue';
         } on Exception catch (e) {
           dev.log(e.toString());
-          return 'error occured';
+          return 'error occurred';
         }
       } else {
         Toast.show("Please be under 3 meters of Organization", context,
@@ -498,16 +510,23 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     //   'Content-Type': 'application/json',
     // });
     else {
-      var response =
-          await http.get("$kMarkAttendance$orgId/$userId/Visitor", headers: {
-        'Content-Type': 'application/json',
-      });
-      if (response.statusCode == 200) {
-        dev.log(response.body.toString(), name: 'In scanner ');
+      try {
+        var response =
+        await http.get("$kMarkAttendance$orgId/$userId/Visitor", headers: {
+          'Content-Type': 'application/json',
+        });
 
-        return "success";
-      } else {
-        return "failed to connect to Internet";
+        if (response.statusCode == 200) {
+          dev.log(response.body.toString(), name: 'In scanner ');
+
+          return "success";
+        } else {
+          return "failed to connect to Internet";
+        }
+      }on Exception catch(e){
+
+        return 'error occurred : ${e.toString().substring(0,30)}';
+
       }
     }
   }
@@ -536,10 +555,10 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               ),
               Container(
                 child: Text(
-                  "Hajeri Lag Gayi",
+                  "हजेरी लग गयी....!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.blue,
                     fontWeight: FontWeight.bold,
                     fontSize: 22,
                   ),
@@ -597,10 +616,10 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               ),
               Container(
                 child: Text(
-                  "Youre not at right place go to qr code location",
+                  "You are not at Workplace...!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.red,
                     fontWeight: FontWeight.bold,
                     fontSize: 22,
                   ),

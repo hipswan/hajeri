@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "1039596963419-6lg2bi70d8md112881a67kl1au9n6r72.apps.googleusercontent.com",
+          "client_id": "1039596963419-iok61pimg2517m7t4277mtjp5hkkuefc.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "am.attendance.hajeri",
-            "certificate_hash": "79d9384683cb1d2380b3df49bef2705968563573"
+            "certificate_hash": "dd2d0037ecc8ad3c9503f954fa98b0b7b5633fb4"
           }
         },
         {
@@ -38,6 +38,13 @@
             {
               "client_id": "1039596963419-fdqm6p2fismq0eu9mbks5speqimamhu6.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1039596963419-27dqr7fqn7t4jv3jinc4npau69lb44pf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.amventures.hajeri"
+              }
             }
           ]
         }

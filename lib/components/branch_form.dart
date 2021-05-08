@@ -311,255 +311,257 @@ class _BranchFormState extends State<BranchForm> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        backgroundColor: Colors.blue[800],
-        title: Text(widget.title),
-        centerTitle: true,
-      ),
-      body: Container(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Form(
-                key: _formState,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      //Person Name
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8.0,
-                        ),
-                        child: TextFormField(
-                          keyboardType: TextInputType.emailAddress,
-                          textAlign: TextAlign.left,
-                          controller: _cName,
-                          validator: (value) {
-                            if (value.trim().isEmpty) {
-                              return 'Please Enter Your Name';
-                            }
-                            if (value.trim().contains(new RegExp(r'[.@_-]'))) {
-                              return 'Please Enter Valid Name';
-                            }
-                            return null;
-                          },
-                          onChanged: (value) {},
-                          decoration: InputDecoration(
-                            // errorText: null,
-                            hintText: 'Enter Contact',
-                            labelText: 'Person Name',
-                            border: OutlineInputBorder(),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.blue[800],
+          title: Text(widget.title),
+          centerTitle: true,
+        ),
+        body: Container(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Form(
+                  key: _formState,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        //Person Name
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8.0,
                           ),
-                        ),
-                      ),
-
-                      //Organization Name
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8.0,
-                        ),
-                        child: TextFormField(
-                          keyboardType: TextInputType.emailAddress,
-                          textAlign: TextAlign.left,
-                          controller: _cOrgName,
-                          validator: (value) {
-                            if (value.trim().isEmpty) {
-                              return 'Please Enter Your Name';
-                            }
-                            if (value.trim().contains(new RegExp(r'[.@_-]'))) {
-                              return 'Please Enter Valid Name';
-                            }
-                            return null;
-                          },
-                          onChanged: (value) {},
-                          decoration: InputDecoration(
-                            // errorText: null,
-                            hintText: 'Enter Org Name',
-                            labelText: 'Organization Name',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-
-                      //Address
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8.0,
-                        ),
-                        child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          textAlign: TextAlign.left,
-                          controller: _cAddress,
-                          validator: (value) {
-                            if (value.trim().isEmpty) {
-                              return 'Please Enter Your Address';
-                            }
-
-                            return null;
-                          },
-                          onChanged: (value) {},
-                          decoration: InputDecoration(
-                            // errorText: null,
-                            hintText: 'Enter Address',
-                            labelText: 'Address',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Container(
-                          width: size.width - 32,
-                          child: DropdownButtonFormField(
-                            value: departmentDropDownValue,
-                            onTap: () {
-                              FocusScope.of(context)
-                                  .requestFocus(new FocusNode());
+                          child: TextFormField(
+                            keyboardType: TextInputType.emailAddress,
+                            textAlign: TextAlign.left,
+                            controller: _cName,
+                            validator: (value) {
+                              if (value.trim().isEmpty) {
+                                return 'Please Enter Your Name';
+                              }
+                              if (value.trim().contains(new RegExp(r'[.@_-]'))) {
+                                return 'Please Enter Valid Name';
+                              }
+                              return null;
                             },
-                            onChanged: (String newValue) async {
-                              departmentDropDownValue = newValue;
-
-                              setState(() {});
-                            },
+                            onChanged: (value) {},
                             decoration: InputDecoration(
-                              labelText: 'Select Department',
+                              // errorText: null,
+                              hintText: 'Enter Contact',
+                              labelText: 'Person Name',
                               border: OutlineInputBorder(),
                             ),
-                            items: _departmentDropDownMenuItems,
-                            // hint:
-                            //     const Text('Select Department'),
                           ),
                         ),
-                      ),
-                      //Mobile Number
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8.0,
-                        ),
-                        child: TextFormField(
-                          keyboardType: TextInputType.numberWithOptions(
-                            decimal: false,
-                            signed: false,
-                          ),
-                          textAlign: TextAlign.left,
-                          controller: _cNumber,
-                          validator: (value) {
-                            if (value.trim().isEmpty) {
-                              return 'Please Enter Your Mobile Number';
-                            }
-                            if (value.trim().length > 10 ||
-                                value
-                                    .trim()
-                                    .contains(new RegExp(r'[A-Za-z]'))) {
-                              return 'Please Enter Valid Number';
-                            }
-                            return null;
-                          },
-                          onChanged: (value) {},
-                          decoration: InputDecoration(
-                            // errorText: null,
-                            hintText: 'Enter Contact Detail',
-                            labelText: 'Mobile Number',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                      //state drop down
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8.0,
-                        ),
-                        child: DropdownButtonFormField(
-                          value: stateDropDownValue,
-                          onChanged: (String newValue) async {
-                            stateDropDownValue = newValue;
 
-                            if (cityDropDownValue != null &&
-                                cityDropDownValue.isNotEmpty) {
-                              cityDropDownValue = null;
-                            }
-
-                            cities = await getCityList(stateDropDownValue);
-                            _cityDropDownMenuItems = cities
-                                .map(
-                                  (city) => DropdownMenuItem<String>(
-                                    value: city["id"].toString(),
-                                    child: Text(
-                                      city["cityname"],
-                                    ),
-                                  ),
-                                )
-                                .toList();
-                            stateSelected = true;
-                            setState(() {});
-                          },
-                          items: _stateDropDownMenuItems,
-
-                          decoration: InputDecoration(
-                            labelText: 'Select State',
-                            border: OutlineInputBorder(),
+                        //Organization Name
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8.0,
                           ),
-                          // hint: const Text('Select State'),
+                          child: TextFormField(
+                            keyboardType: TextInputType.emailAddress,
+                            textAlign: TextAlign.left,
+                            controller: _cOrgName,
+                            validator: (value) {
+                              if (value.trim().isEmpty) {
+                                return 'Please Enter Your Name';
+                              }
+                              if (value.trim().contains(new RegExp(r'[.@_-]'))) {
+                                return 'Please Enter Valid Name';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {},
+                            decoration: InputDecoration(
+                              // errorText: null,
+                              hintText: 'Enter Org Name',
+                              labelText: 'Organization Name',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
                         ),
-                      ),
-                      //city drop down
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8.0,
+
+                        //Address
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8.0,
+                          ),
+                          child: TextFormField(
+                            keyboardType: TextInputType.text,
+                            textAlign: TextAlign.left,
+                            controller: _cAddress,
+                            validator: (value) {
+                              if (value.trim().isEmpty) {
+                                return 'Please Enter Your Address';
+                              }
+
+                              return null;
+                            },
+                            onChanged: (value) {},
+                            decoration: InputDecoration(
+                              // errorText: null,
+                              hintText: 'Enter Address',
+                              labelText: 'Address',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
                         ),
-                        child: DropdownButtonFormField(
-                          // disabledHint: const Text(
-                          //     'Please Select State First'),
-                          value: cityDropDownValue,
-                          onChanged: (String newValue) {
-                            setState(
-                              () {
-                                cityDropDownValue = newValue;
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Container(
+                            width: size.width - 32,
+                            child: DropdownButtonFormField(
+                              isExpanded: true,
+                              value: departmentDropDownValue,
+                              onTap: () {
+                                FocusScope.of(context)
+                                    .requestFocus(new FocusNode());
                               },
-                            );
-                          },
-                          items: _cityDropDownMenuItems,
-                          // hint: const Text(
-                          //   'Select City',
-                          // ),
-                          decoration: InputDecoration(
-                            errorText: !stateSelected
-                                ? 'Please Select State First'
-                                : null,
-                            labelText: 'Select City',
-                            border: OutlineInputBorder(),
+                              onChanged: (String newValue) async {
+                                departmentDropDownValue = newValue;
+
+                                setState(() {});
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Select Department',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: _departmentDropDownMenuItems,
+                              // hint:
+                              //     const Text('Select Department'),
+                            ),
                           ),
                         ),
-                      ),
-                      //Submit Button User
-                      BlueButton(
-                        onPressed: () async {
-                          if (_formState.currentState.validate()) {
-                            if (widget.action.contains('add')) {
-                              var isBranchAddedSuccess = await addSubBranch();
-                              Navigator.pushNamed(context, MaintainBranch.id);
+                        //Mobile Number
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8.0,
+                          ),
+                          child: TextFormField(
+                            keyboardType: TextInputType.numberWithOptions(
+                              decimal: false,
+                              signed: false,
+                            ),
+                            textAlign: TextAlign.left,
+                            controller: _cNumber,
+                            validator: (value) {
+                              if (value.trim().isEmpty) {
+                                return 'Please Enter Your Mobile Number';
+                              }
+                              if (value.trim().length > 10 ||
+                                  value
+                                      .trim()
+                                      .contains(new RegExp(r'[A-Za-z]'))) {
+                                return 'Please Enter Valid Number';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {},
+                            decoration: InputDecoration(
+                              // errorText: null,
+                              hintText: 'Enter Contact Detail',
+                              labelText: 'Mobile Number',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        //state drop down
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8.0,
+                          ),
+                          child: DropdownButtonFormField(
+                            value: stateDropDownValue,
+                            onChanged: (String newValue) async {
+                              stateDropDownValue = newValue;
+
+                              if (cityDropDownValue != null &&
+                                  cityDropDownValue.isNotEmpty) {
+                                cityDropDownValue = null;
+                              }
+
+                              cities = await getCityList(stateDropDownValue);
+                              _cityDropDownMenuItems = cities
+                                  .map(
+                                    (city) => DropdownMenuItem<String>(
+                                      value: city["id"].toString(),
+                                      child: Text(
+                                        city["cityname"],
+                                      ),
+                                    ),
+                                  )
+                                  .toList();
+                              stateSelected = true;
+                              setState(() {});
+                            },
+                            items: _stateDropDownMenuItems,
+
+                            decoration: InputDecoration(
+                              labelText: 'Select State',
+                              border: OutlineInputBorder(),
+                            ),
+                            // hint: const Text('Select State'),
+                          ),
+                        ),
+                        //city drop down
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8.0,
+                          ),
+                          child: DropdownButtonFormField(
+                            // disabledHint: const Text(
+                            //     'Please Select State First'),
+                            value: cityDropDownValue,
+                            onChanged: (String newValue) {
+                              setState(
+                                () {
+                                  cityDropDownValue = newValue;
+                                },
+                              );
+                            },
+                            items: _cityDropDownMenuItems,
+                            // hint: const Text(
+                            //   'Select City',
+                            // ),
+                            decoration: InputDecoration(
+                              errorText: !stateSelected
+                                  ? 'Please Select State First'
+                                  : null,
+                              labelText: 'Select City',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        //Submit Button User
+                        BlueButton(
+                          onPressed: () async {
+                            if (_formState.currentState.validate()) {
+                              if (widget.action.contains('add')) {
+                                var isBranchAddedSuccess = await addSubBranch();
+                                Navigator.pushNamed(context, MaintainBranch.id);
+                              } else {
+                                var isBranchEditSuccess = await updateBranch();
+                                Navigator.pushNamed(context, MaintainBranch.id);
+                              }
                             } else {
-                              var isBranchEditSuccess = await updateBranch();
-                              Navigator.pushNamed(context, MaintainBranch.id);
+                              Toast.show(
+                                "Some details are missing",
+                                context,
+                                duration: Toast.LENGTH_LONG,
+                                gravity: Toast.BOTTOM,
+                                textColor: Colors.redAccent,
+                              );
                             }
-                          } else {
-                            Toast.show(
-                              "Some details are missing",
-                              context,
-                              duration: Toast.LENGTH_LONG,
-                              gravity: Toast.BOTTOM,
-                              textColor: Colors.redAccent,
-                            );
-                          }
-                        },
-                        label: 'Submit',
-                      ),
-                    ],
+                          },
+                          label: 'Submit',
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

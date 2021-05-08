@@ -64,7 +64,7 @@ class _MaintainQrState extends State<MaintainQr> {
     } on SocketException catch (e) {
       return 'no internet';
     } on Exception catch (e) {
-      return 'error occured';
+      return 'error';
     }
   }
 
@@ -129,7 +129,10 @@ class _MaintainQrState extends State<MaintainQr> {
         );
         break;
       case "absent":
-        return GenerateQR();
+        return GenerateQR(
+          action: 'add',
+          title: 'Generate Qr',
+        );
         break;
       case "error":
         return Center(

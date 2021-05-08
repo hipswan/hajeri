@@ -307,77 +307,79 @@ class _GenerateQRState extends State<GenerateQR> {
                     if (!isLocationUpdated) {
                       return Center(child: CircularProgressIndicator());
                     } else {
-                      return Stack(children: [
-                        GoogleMap(
-                          // liteModeEnabled: true,
-                          // myLocationEnabled: true,
-                          // myLocationButtonEnabled: true,
-                          zoomControlsEnabled: false,
-                          mapType: MapType.terrain,
-                          onMapCreated: _onMapCreated,
-                          initialCameraPosition: CameraPosition(
-                            target: LatLng(
-                              currentPosition.latitude,
-                              currentPosition.longitude,
+                      return Stack(
+                        children: [
+                          GoogleMap(
+                            // liteModeEnabled: true,
+                            // myLocationEnabled: true,
+                            // myLocationButtonEnabled: true,
+                            zoomControlsEnabled: false,
+                            mapType: MapType.terrain,
+                            onMapCreated: _onMapCreated,
+                            initialCameraPosition: CameraPosition(
+                              target: LatLng(
+                                currentPosition.latitude,
+                                currentPosition.longitude,
+                              ),
+                              zoom: 15.0,
                             ),
-                            zoom: 15.0,
+                            markers: _markers.values.toSet(),
                           ),
-                          markers: _markers.values.toSet(),
-                        ),
-                        Positioned(
-                          right: 18,
-                          bottom: 18,
-                          child: FloatingActionButton(
-                            onPressed: () async {
-                              Position center = await getUserLocation();
-                              mapController.moveCamera(
-                                CameraUpdate.newCameraPosition(
-                                  CameraPosition(
-                                    target: LatLng(
-                                      center.latitude,
-                                      center.longitude,
+                          Positioned(
+                            right: 18,
+                            bottom: 18,
+                            child: FloatingActionButton(
+                              onPressed: () async {
+                                Position center = await getUserLocation();
+                                mapController.moveCamera(
+                                  CameraUpdate.newCameraPosition(
+                                    CameraPosition(
+                                      target: LatLng(
+                                        center.latitude,
+                                        center.longitude,
+                                      ),
+                                      zoom: 15.0,
                                     ),
-                                    zoom: 15.0,
                                   ),
-                                ),
-                              );
-                              setState(() {
-                                currentPosition =
-                                    LatLng(center.latitude, center.longitude);
-                                _markers['position'] = Marker(
-                                    consumeTapEvents: true,
-                                    draggable: true,
-                                    markerId: MarkerId('Marker Id'),
-                                    position: LatLng(
-                                      center.latitude,
-                                      center.longitude,
-                                    ),
-                                    infoWindow: InfoWindow(
-                                      title: 'Info title',
-                                      snippet: 'Info snippet',
-                                    ),
-                                    onDragEnd: (value) {
-                                      setState(() {
-                                        currentPosition = LatLng(
-                                            value.latitude, value.longitude);
-                                        log(value.toString());
+                                );
+                                setState(() {
+                                  currentPosition =
+                                      LatLng(center.latitude, center.longitude);
+                                  _markers['position'] = Marker(
+                                      consumeTapEvents: true,
+                                      draggable: true,
+                                      markerId: MarkerId('Marker Id'),
+                                      position: LatLng(
+                                        center.latitude,
+                                        center.longitude,
+                                      ),
+                                      infoWindow: InfoWindow(
+                                        title: 'Info title',
+                                        snippet: 'Info snippet',
+                                      ),
+                                      onDragEnd: (value) {
+                                        setState(() {
+                                          currentPosition = LatLng(
+                                              value.latitude, value.longitude);
+                                          log(value.toString());
+                                        });
                                       });
-                                    });
 
-                                isRecenterFinished = true;
-                              });
-                            },
-                            tooltip: 'Center',
-                            backgroundColor: Colors.white,
-                            child: isRecenterFinished
-                                ? Icon(
-                                    Icons.gps_fixed_outlined,
-                                    color: Colors.blue,
-                                  )
-                                : CircularProgressIndicator(),
+                                  isRecenterFinished = true;
+                                });
+                              },
+                              tooltip: 'Center',
+                              backgroundColor: Colors.white,
+                              child: isRecenterFinished
+                                  ? Icon(
+                                      Icons.gps_fixed_outlined,
+                                      color: Colors.blue,
+                                    )
+                                  : CircularProgressIndicator(),
+                            ),
                           ),
-                        ),
-                      ]);
+                        ],
+                      );
                     }
                   },
                 ),

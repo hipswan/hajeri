@@ -11,6 +11,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hajeri_demo/Pages/employee_detail.dart';
 import 'package:hajeri_demo/components/side_bar.dart';
 import 'package:hajeri_demo/main.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shimmer/shimmer.dart';
@@ -72,6 +73,21 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     //     milliseconds: 450,
     //   ),
     // );
+    _checkPermission();
+  }
+
+  Future<bool> _checkPermission() async {
+    final status = await Permission.locationWhenInUse.status;
+    if (status != PermissionStatus.granted) {
+      final result = await Permission.locationWhenInUse.request();
+      if (result == PermissionStatus.granted) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
   }
 
   // In order to get hot reload to work we need to pause the camera if the platform
@@ -255,12 +271,20 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                           child: Column(
                             children: [
                               Image.asset('assets/images/hajerilogo.png'),
-                              SizedBox(height:10.0,),
+                              SizedBox(
+                                height: 10.0,
+                              ),
                               Shimmer.fromColors(
                                 baseColor: Colors.blue[800],
                                 highlightColor: Colors.blue[100],
                                 enabled: true,
-                                child: Text('Scanning in progress',style: TextStyle(color:Colors.blue[800], fontSize:22.0,),),
+                                child: Text(
+                                  'Scanning in progress',
+                                  style: TextStyle(
+                                    color: Colors.blue[800],
+                                    fontSize: 22.0,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -428,22 +452,19 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
         dev.log(e.toString(),
             name: 'In scanner mark attendance permission definition exception');
         return 'error occurred : perimission denied';
-      }on Exception catch(e){
+      } on Exception catch (e) {
         dev.log(_locationpermission.toString(),
             name: 'In the scanner mark attendance');
-        return 'error occurred : ${e.toString().substring(0,30)}';
-
+        return 'error occurred : ${e.toString().substring(0, 30)}';
       }
     }
 
-try {
-  _currrentUserLocation = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high);
-}on Exception catch(e){
-
-  return 'error occurred : ${e.toString().substring(0,30)}';
-
-}
+    try {
+      _currrentUserLocation = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+    } on Exception catch (e) {
+      return 'error occurred : ${e.toString().substring(0, 30)}';
+    }
     var qrCodeResult = result.code.toString().split("_");
 
     var orgId = qrCodeResult[1];
@@ -512,7 +533,7 @@ try {
     else {
       try {
         var response =
-        await http.get("$kMarkAttendance$orgId/$userId/Visitor", headers: {
+            await http.get("$kMarkAttendance$orgId/$userId/Visitor", headers: {
           'Content-Type': 'application/json',
         });
 
@@ -523,10 +544,8 @@ try {
         } else {
           return "failed to connect to Internet";
         }
-      }on Exception catch(e){
-
-        return 'error occurred : ${e.toString().substring(0,30)}';
-
+      } on Exception catch (e) {
+        return 'error occurred : ${e.toString().substring(0, 30)}';
       }
     }
   }

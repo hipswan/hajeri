@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../constant.dart';
-
 class BoxTile extends StatelessWidget {
   final Widget child;
   final Function onPressed;

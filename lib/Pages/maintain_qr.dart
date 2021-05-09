@@ -48,7 +48,7 @@ class _MaintainQrState extends State<MaintainQr> {
     String mobile = prefs.getString("mobile");
     log('$kQRPointList$orgId/$mobile');
     try {
-      var response = await http.get('$kQRPointList$orgId/$mobile');
+      var response = await http.get(Uri.parse('$kQRPointList$orgId/$mobile'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);

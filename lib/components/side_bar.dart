@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:developer' as dev;
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hajeri_demo/Pages/about_us.dart';
@@ -30,7 +29,6 @@ class SideBar extends StatefulWidget {
 
 class _SideBarState extends State<SideBar> {
   bool isOrg;
-  FilePickerResult result;
   // ignore: avoid_init_to_null
   File imageFile;
   var orgId = prefs.getString('worker_id');

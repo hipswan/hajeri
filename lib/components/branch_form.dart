@@ -87,7 +87,7 @@ class _BranchFormState extends State<BranchForm> {
     ];
     print('In get states');
     dev.log(kStates);
-    http.Response response = await http.get(kStates);
+    http.Response response = await http.get(Uri.parse(kStates));
 
     if (response.statusCode == 200) {
       data = json.decode(response.body);
@@ -107,7 +107,7 @@ class _BranchFormState extends State<BranchForm> {
       {'': ''}
     ];
     dev.log('$kCity/$stateId', name: 'In get city');
-    http.Response response = await http.get('$kCity/$stateId');
+    http.Response response = await http.get(Uri.parse('$kCity/$stateId'));
 
     if (response.statusCode == 200) {
       data = json.decode(response.body);
@@ -230,9 +230,10 @@ class _BranchFormState extends State<BranchForm> {
     });
     dev.log(
         '$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity');
-    var response = await http.post(
-      '$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity',
-    );
+    var response = await http.post(Uri(
+      path:
+          '$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity',
+    ));
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
@@ -284,9 +285,10 @@ class _BranchFormState extends State<BranchForm> {
       }
     });
 
-    var response = await http.post(
-      '$kUpdateBranch$orgId/${_cId.text}?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity',
-    );
+    var response = await http.post(Uri(
+      path:
+          '$kUpdateBranch$orgId/${_cId.text}?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity',
+    ));
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
@@ -343,7 +345,9 @@ class _BranchFormState extends State<BranchForm> {
                               if (value.trim().isEmpty) {
                                 return 'Please Enter Your Name';
                               }
-                              if (value.trim().contains(new RegExp(r'[.@_-]'))) {
+                              if (value
+                                  .trim()
+                                  .contains(new RegExp(r'[.@_-]'))) {
                                 return 'Please Enter Valid Name';
                               }
                               return null;
@@ -371,7 +375,9 @@ class _BranchFormState extends State<BranchForm> {
                               if (value.trim().isEmpty) {
                                 return 'Please Enter Your Name';
                               }
-                              if (value.trim().contains(new RegExp(r'[.@_-]'))) {
+                              if (value
+                                  .trim()
+                                  .contains(new RegExp(r'[.@_-]'))) {
                                 return 'Please Enter Valid Name';
                               }
                               return null;

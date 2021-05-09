@@ -48,7 +48,9 @@ class _MaintainBranchState extends State<MaintainBranch> {
     // log('$kBranchList$orgId');
     try {
       var response = await http.get(
-        '$kBranchList$orgId',
+        Uri.parse(
+          '$kBranchList$orgId',
+        ),
       );
 
       if (response.statusCode == 200) {

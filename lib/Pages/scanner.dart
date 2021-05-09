@@ -15,6 +15,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:toast/toast.dart';
 import 'dart:io';
 
@@ -66,6 +68,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     dev.log('In  Init $mounted', name: 'Scanner');
+
     // dev.debugger();
     // _animationController = AnimationController(
     //   vsync: this,
@@ -77,6 +80,16 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
   }
 
   Future<bool> _checkPermission() async {
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    dev.log('User granted permission: ${settings.authorizationStatus}');
     final status = await Permission.locationWhenInUse.status;
     if (status != PermissionStatus.granted) {
       final result = await Permission.locationWhenInUse.request();
@@ -497,10 +510,11 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
       dev.log("the diff distance is ${distanceInMeters.toString()}");
       if (distanceInMeters < 10) {
         try {
-          var response = await http
-              .get("$kMarkAttendance$orgId/$userId/Employee", headers: {
-            'Content-Type': 'application/json',
-          });
+          var response = await http.get(
+              Uri.parse("$kMarkAttendance$orgId/$userId/Employee"),
+              headers: {
+                'Content-Type': 'application/json',
+              });
 
           if (response.statusCode == 200) {
             dev.log(response.body.toString(),
@@ -532,8 +546,8 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     // });
     else {
       try {
-        var response =
-            await http.get("$kMarkAttendance$orgId/$userId/Visitor", headers: {
+        var response = await http
+            .get(Uri.parse("$kMarkAttendance$orgId/$userId/Visitor"), headers: {
           'Content-Type': 'application/json',
         });
 

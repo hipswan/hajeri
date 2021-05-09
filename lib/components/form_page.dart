@@ -85,7 +85,7 @@ class _FormPageState extends State<FormPage> {
     ];
     // print('In get states');
     // dev.log(kStates);
-    http.Response response = await http.get(kStates);
+    http.Response response = await http.get(Uri.parse(kStates));
 
     if (response.statusCode == 200) {
       data = json.decode(response.body);
@@ -105,7 +105,7 @@ class _FormPageState extends State<FormPage> {
       {'': ''}
     ];
     // dev.log('$kCity/$stateId', name: 'In get city');
-    http.Response response = await http.get('$kCity/$stateId');
+    http.Response response = await http.get(Uri.parse('$kCity/$stateId'));
 
     if (response.statusCode == 200) {
       data = json.decode(response.body);
@@ -218,8 +218,8 @@ class _FormPageState extends State<FormPage> {
       '$kUpdateEmp${_cNumber.text} $body',
       name: 'In update employee',
     );
-    var response =
-        await http.post('$kUpdateEmp${_cNumber.text}', body: body, headers: {
+    var response = await http
+        .post(Uri.parse('$kUpdateEmp${_cNumber.text}'), body: body, headers: {
       'Content-Type': 'application/json',
     });
 
@@ -255,7 +255,8 @@ class _FormPageState extends State<FormPage> {
 
     // String orgId = prefs.getString("worker_id");
     dev.log('$kAddEmp$orgId  $body', name: 'In add employee');
-    var response = await http.post('$kAddEmp$orgId', body: body, headers: {
+    var response =
+        await http.post(Uri.parse('$kAddEmp$orgId'), body: body, headers: {
       'Content-Type': 'application/json',
     });
 

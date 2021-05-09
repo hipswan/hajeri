@@ -54,7 +54,7 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
     ];
     print('In get states');
     log(kStates);
-    http.Response response = await http.get(kStates);
+    http.Response response = await http.get(Uri.parse(kStates));
 
     if (response.statusCode == 200) {
       data = json.decode(response.body);
@@ -74,7 +74,7 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
     ];
     print('In get city');
     log('$kCity/$stateId');
-    http.Response response = await http.get('$kCity/$stateId');
+    http.Response response = await http.get(Uri.parse('$kCity/$stateId'));
     print(
       response.body,
     );
@@ -93,7 +93,7 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
   Future<String> deleteEmployee({Employee employee}) async {
     try {
       log('$kDeleteEmp${employee.number}');
-      var response = await http.post('$kDeleteEmp${employee.number}',
+      var response = await http.post(Uri.parse('$kDeleteEmp${employee.number}'),
           headers: {'Content-Type': 'application/json'},
           body:
               '{nameofworker: ${employee.name},departmentname: ${employee.departmentName},addressline1: ${employee.addressLine1},state: ${employee.state},district: ${employee.district},city: ${employee.city}}');

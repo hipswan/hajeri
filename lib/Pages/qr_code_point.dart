@@ -28,7 +28,7 @@ class _QrCodePointViewState extends State<QrCodePointView> {
     String orgId = prefs.getString('worker_id');
     dev.log('$kDeleteQRCodePoint$orgId/$mobile/$point');
     var response = await http.get(
-      '$kDeleteQRCodePoint$orgId/$mobile/$point',
+      Uri.parse('$kDeleteQRCodePoint$orgId/$mobile/$point'),
     );
 
     if (response.statusCode == 200) {

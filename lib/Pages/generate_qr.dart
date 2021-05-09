@@ -88,9 +88,9 @@ class _GenerateQRState extends State<GenerateQR> {
     log(
       '$kGenerateQrCodePoint?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
     );
-    var response = await http.post(
+    var response = await http.get(Uri.parse(
       '$kGenerateQrCodePoint?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
-    );
+    ));
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
@@ -248,8 +248,11 @@ class _GenerateQRState extends State<GenerateQR> {
     String orgId = prefs.getString("worker_id");
     String mobile = prefs.getString("mobile");
     log('$kGenerateQrCodePoint?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes');
-    var response = await http.post(
-        '$kGenerateQrCodePoint?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes');
+    var response = await http.get(
+      Uri.parse(
+        '$kGenerateQrCodePoint?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
+      ),
+    );
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       log(data.toString(), name: 'In add qr code point');

@@ -29,7 +29,7 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   Future<void> sendCode(String number) async {
     try {
-      var response = await http.get('$kSendOtp$number', headers: {
+      var response = await http.get(Uri.parse('$kSendOtp$number'), headers: {
         'Content-Type': 'application/json',
       });
       if (response.statusCode == 200) {

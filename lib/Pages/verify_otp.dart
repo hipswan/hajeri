@@ -33,7 +33,7 @@ class _VerifyOtpState extends State<VerifyOtp> with CodeAutoFill {
     // number = '7030515696';
 
     print("phone no is " + number);
-    var response = await http.get('$kSendOtp$number', headers: {
+    var response = await http.get(Uri.parse('$kSendOtp$number'), headers: {
       'Content-Type': 'application/json',
     });
     if (response.statusCode == 200) {

@@ -29,7 +29,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
   Future<String> deleteBranch({String id}) async {
     String orgId = prefs.getString('worker_id');
     // log('$kDeleteBranch$orgId/$id');
-    var response = await http.post('$kDeleteBranch$orgId/$id');
+    var response = await http.post(Uri.parse('$kDeleteBranch$orgId/$id'));
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);

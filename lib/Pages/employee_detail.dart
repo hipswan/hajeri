@@ -164,8 +164,8 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
     // String orgId = prefs.getString("worker_id");
     var body = await excelToJson();
 
-    var response =
-        await http.post('$kUploadEmpExcel /$orgId', body: body, headers: {
+    var response = await http
+        .post(Uri.parse('$kUploadEmpExcel /$orgId'), body: body, headers: {
       'Content-Type': 'application/json',
     });
 
@@ -194,7 +194,7 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
     // String orgId = prefs.getString("worker_id");
     List<Employee> employeeList = [];
 
-    var response = await http.get("$kEmployeeList$orgId");
+    var response = await http.get(Uri.parse("$kEmployeeList$orgId"));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       print("the _getEmployeeList data is " + data.toString());

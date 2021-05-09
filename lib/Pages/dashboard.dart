@@ -42,8 +42,9 @@ class _DashboardState extends State<Dashboard> {
 
   Future<void> _getData() async {
     // String orgId = prefs.getString("worker_id");
-    var response =
-        await http.get("https://www.hajeri.in/apidev/org/dashboard/$orgId");
+    var response = await http.get(
+      Uri.parse("https://www.hajeri.in/apidev/org/dashboard/$orgId"),
+    );
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
@@ -93,7 +94,7 @@ class _DashboardState extends State<Dashboard> {
     // String orgId = prefs.getString("worker_id");
     List<Employee> employeeList = [];
     log("$kEmployeeList$orgId");
-    var response = await http.get("$kEmployeeList$orgId");
+    var response = await http.get(Uri.parse("$kEmployeeList$orgId"));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       log("the _getEmployeeList data is " + data.toString());
@@ -122,7 +123,7 @@ class _DashboardState extends State<Dashboard> {
     // String orgId = prefs.getString("worker_id");
     List<Employee> employeeList = [];
     log("$kTodayVisitor$orgId");
-    var response = await http.get("$kTodayPresentEmpList$orgId");
+    var response = await http.get(Uri.parse("$kTodayPresentEmpList$orgId"));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       print("the _getTodayPresentEmployeeList data is " + data.toString());
@@ -156,7 +157,7 @@ class _DashboardState extends State<Dashboard> {
     // String orgId = prefs.getString("worker_id");
     List<Employee> employeeList = [];
     log("$kTodayVisitor$orgId");
-    var response = await http.get("$kTodayVisitor$orgId");
+    var response = await http.get(Uri.parse("$kTodayVisitor$orgId"));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       print("the _getTodayVisitorList data is " + data.toString());
@@ -190,7 +191,9 @@ class _DashboardState extends State<Dashboard> {
     // String orgId = prefs.getString("worker_id");
     List<Employee> employeeList = [];
     log("$kVisitorOneMonthList$orgId");
-    var response = await http.get("$kVisitorOneMonthList$orgId");
+    var response = await http.get(
+      Uri.parse("$kVisitorOneMonthList$orgId"),
+    );
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       print("the _getTodayOneMonthVisitorList data is " + data.toString());

@@ -57,7 +57,7 @@ class RegisterState extends State<Register> {
       {'': ''}
     ];
     try {
-      http.Response response = await http.get(kStates);
+      http.Response response = await http.get(Uri.parse(kStates));
 
       if (response.statusCode == 200) {
         data = json.decode(response.body);
@@ -87,7 +87,7 @@ class RegisterState extends State<Register> {
       {'': ''}
     ];
     try {
-      http.Response response = await http.get(kDepartment);
+      http.Response response = await http.get(Uri.parse(kDepartment));
       print(
         response.body,
       );
@@ -118,7 +118,7 @@ class RegisterState extends State<Register> {
       {'': ''}
     ];
     dev.log('$kCity/$stateId');
-    http.Response response = await http.get('$kCity/$stateId');
+    http.Response response = await http.get(Uri.parse('$kCity/$stateId'));
     print(
       response.body,
     );
@@ -281,13 +281,14 @@ class RegisterState extends State<Register> {
     //   "district": "${_cDistrict.text}",
     //   "city": "$cityDropDownValue",
     // }''');
-    var response = await http.post(
-      '''$kAddUser?personaname=${_cName.text.trim()}&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state:=$userState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue''',
-      // body: jsonEncode(body),
-      // headers: {
-      //   'Content-Type': 'application/json',
-      // },
-    );
+    var response = await http.post(Uri(
+      path:
+          '''$kAddUser?personaname=${_cName.text.trim()}&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state:=$userState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue''',
+    ) // body: jsonEncode(body),
+        // headers: {
+        //   'Content-Type': 'application/json',
+        // },
+        );
 
     if (response.statusCode == 200) {
       dev.log(response.body.toString());

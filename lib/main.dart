@@ -1,7 +1,11 @@
+import 'dart:developer';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hajeri_demo/Pages/about_us.dart';
 import 'package:hajeri_demo/Pages/contact_us.dart';
 import 'package:hajeri_demo/Pages/dashboard.dart';
@@ -23,19 +27,103 @@ import 'Pages/display_qr.dart';
 import 'Pages/employee_detail.dart';
 
 SharedPreferences prefs;
+FirebaseMessaging messaging;
 
+Future<void> saveTokenToSharedPreferences(String token) async {
+  // Assume user is logged in for this example
+  prefs.setString('token', token);
+}
+
+Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
+  print('Got a message whilst in the foreground!');
+  print('Message data: ${message.data}');
+  if (message.notification != null) {
+    print('Message also contained a notification: ${message.notification}');
+  }
+  RemoteNotification notification = message.notification;
+  AndroidNotification android = message.notification?.android;
+  if (notification != null && android != null) {
+    log('In foreground');
+    flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channel.description,
+            importance: Importance.max,
+            priority: Priority.high,
+            playSound: true,
+            tag: 'hajeri',
+            visibility: NotificationVisibility.public,
+            // TODO add a proper drawable resource to android, for now using
+            //      one that already exists in example app.
+            icon: '@drawable/ic_stat_hajeri',
+          ),
+        ));
+  }
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+
+  print('Got a message whilst in the background or terminated!');
+  print('Message data: ${message.data}');
+  if (message.notification != null) {
+    print('Message also contained a notification: ${message.notification}');
+  }
+  print("Handling a background message: ${message.messageId}");
+}
+
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'high_importance_channel', // id
+  'High Importance Notifications', // title
+  'This channel is used for important notifications.', // description
+  importance: Importance.high,
+);
+
+/// Initialize the [FlutterLocalNotificationsPlugin] package.
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterDownloader.initialize(
-    debug: true,
+    debug: false,
   );
+  FirebaseApp app = await Firebase.initializeApp();
+
   prefs = await SharedPreferences.getInstance();
+  messaging = FirebaseMessaging.instance;
+  FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  String token = await messaging.getToken();
+  log(token, name: 'Firebase notification');
+  await saveTokenToSharedPreferences(token);
+  // Any time the token refreshes, store this in the database too.
+  messaging.onTokenRefresh.listen(saveTokenToSharedPreferences);
+
   /*SharedPreferences.setMockInitialValues({
     'login': false,
     'name': '',
     'number': '',
   });
 */
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+  /// Update the iOS foreground notification presentation options to allow
+  /// heads up notifications.
+  await messaging.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
   runApp(
     MyApp(),
   );
@@ -86,6 +174,7 @@ class MyApp extends StatelessWidget {
       },
       theme: ThemeData(
         //TODO:Learn Card clip behaviour function
+        fontFamily: 'Comfortaa',
         cardTheme: CardTheme(
           clipBehavior: Clip.hardEdge,
           shape: RoundedRectangleBorder(
@@ -111,8 +200,6 @@ class MyApp extends StatelessWidget {
         ),
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        textTheme: GoogleFonts.comfortaaTextTheme(),
-        // rubikTextTheme()
         //confortaaTextTheme()
       ),
       home: SafeArea(

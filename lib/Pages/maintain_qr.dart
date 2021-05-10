@@ -84,6 +84,7 @@ class _MaintainQrState extends State<MaintainQr> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
+          heroTag: 'mainQR',
           backgroundColor: Colors.blue[700],
           onPressed: () {
             // debugger();

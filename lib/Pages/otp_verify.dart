@@ -11,6 +11,7 @@ import 'package:sms_autofill/sms_autofill.dart';
 import 'package:http/http.dart' as http;
 import 'package:toast/toast.dart';
 
+import '../url.dart';
 import 'landing.dart';
 
 class OtpVerify extends StatefulWidget {
@@ -93,6 +94,8 @@ class _OtpVerifyState extends State<OtpVerify> {
     }
   }
 
+  String userTokenStatus;
+
   @override
   void initState() {
     super.initState();
@@ -105,6 +108,25 @@ class _OtpVerifyState extends State<OtpVerify> {
   void dispose() {
     SmsAutoFill().unregisterListener();
     super.dispose();
+  }
+
+  setUserToken() async {
+    try {
+      var response = await http.get(Uri.parse(
+          '$kSaveToken${prefs.getString('worker_id')}/${prefs.getString('mobile')}?userfirebasetoken=${prefs.getString('token')}'));
+
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        dev.log('token ${data.toString()}');
+        return "success";
+      } else {
+        return "server issue";
+      }
+    } on SocketException catch (e) {
+      return "no internet";
+    } catch (e) {
+      return "error occurred";
+    }
   }
 
   @override
@@ -310,7 +332,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                         Colors.blue[800],
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       dev.log('Code is $_code');
                       if (_code.length == 4) {
                         if (_code.compareTo(verificationCode) == 0) {
@@ -326,20 +348,29 @@ class _OtpVerifyState extends State<OtpVerify> {
                                   .trim()
                                   .toLowerCase()
                                   .contains('role_organization'));
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (BuildContext context) => Landing(
-                                initialPageIndex: 1,
+                          userTokenStatus = await setUserToken();
+
+                          if (userTokenStatus.contains('success')) {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => Landing(
+                                  initialPageIndex: 1,
+                                ),
                               ),
-                            ),
-                            (Route<dynamic> route) => false,
-                            // ModalRoute.withName(SignUp.id),
-                          );
-                          // Navigator.pushNamed(
-                          //   context,
-                          //   Landing.id,
-                          // );
+                              (Route<dynamic> route) => false,
+                              // ModalRoute.withName(SignUp.id),
+                            );
+                          } else {
+                            Toast.show(
+                              userTokenStatus.toLowerCase(),
+                              context,
+                              duration: Toast.LENGTH_LONG,
+                              gravity: Toast.BOTTOM,
+                              textColor: Colors.redAccent,
+                            );
+                            Navigator.pop(context);
+                          }
                         } else {
                           Toast.show(
                             "Not the proper code".toLowerCase(),

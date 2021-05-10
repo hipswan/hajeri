@@ -1,4 +1,6 @@
-import 'dart:developer';
+import 'dart:convert';
+import 'dart:developer' as dev;
+import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hajeri_demo/Pages/about_us.dart';
 import 'package:hajeri_demo/Pages/contact_us.dart';
 import 'package:hajeri_demo/Pages/dashboard.dart';
@@ -25,6 +28,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'Pages/register.dart';
 import 'Pages/display_qr.dart';
 import 'Pages/employee_detail.dart';
+import 'package:http/http.dart' as http;
+
+import 'url.dart';
 
 SharedPreferences prefs;
 FirebaseMessaging messaging;
@@ -43,7 +49,7 @@ Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
   RemoteNotification notification = message.notification;
   AndroidNotification android = message.notification?.android;
   if (notification != null && android != null) {
-    log('In foreground');
+    dev.log('In foreground');
     flutterLocalNotificationsPlugin.show(
         notification.hashCode,
         notification.title,
@@ -58,8 +64,6 @@ Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
             playSound: true,
             tag: 'hajeri',
             visibility: NotificationVisibility.public,
-            // TODO add a proper drawable resource to android, for now using
-            //      one that already exists in example app.
             icon: '@drawable/ic_stat_hajeri',
           ),
         ));
@@ -101,17 +105,16 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   String token = await messaging.getToken();
-  log(token, name: 'Firebase notification');
+  dev.log(token, name: 'Firebase notification');
   await saveTokenToSharedPreferences(token);
   // Any time the token refreshes, store this in the database too.
   messaging.onTokenRefresh.listen(saveTokenToSharedPreferences);
 
-  /*SharedPreferences.setMockInitialValues({
+  SharedPreferences.setMockInitialValues({
     'login': false,
     'name': '',
     'number': '',
   });
-*/
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
@@ -173,7 +176,6 @@ class MyApp extends StatelessWidget {
         MaintainBranch.id: (_) => MaintainBranch(),
       },
       theme: ThemeData(
-        //TODO:Learn Card clip behaviour function
         fontFamily: 'Comfortaa',
         cardTheme: CardTheme(
           clipBehavior: Clip.hardEdge,
@@ -202,22 +204,160 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         //confortaaTextTheme()
       ),
-      home: SafeArea(
-        child: Builder(
-          builder: (context) {
-            // ignore: null_aware_in_logical_operator
-            if (prefs != null &&
-                prefs.containsKey('login') &&
-                prefs.get('login') != null &&
-                prefs.get('login')) {
-              return Landing(
-                initialPageIndex: 1,
-              );
-            } else {
-              return SignUp();
-            }
-          },
+      home: Home(),
+    );
+  }
+
+  // ignore: missing_return
+
+}
+
+class Home extends StatefulWidget {
+  const Home({Key key}) : super(key: key);
+
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  String userStatusCheck = "no result";
+  Future<String> checkUserRole() async {
+    try {
+      var response = await http.get(
+        Uri.parse(
+          '$kUserDetails${prefs.getString('mobile')}',
         ),
+      );
+      // dev.debugger();
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        // dev.log(data.toString());
+        prefs.setBool("is_org",
+            data['roles'].trim().toLowerCase().contains('role_organization'));
+        return "success";
+      } else {
+        return "server issue";
+      }
+    } on SocketException catch (e) {
+      return "no internet";
+    } catch (e) {
+      return "error occurred";
+    }
+  }
+
+  // ignore: missing_return
+  Widget getAfterRegisterPage() {
+    switch (userStatusCheck) {
+      case "no result":
+        return Container(
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+        break;
+      case "success":
+        return Landing(
+          initialPageIndex: 1,
+        );
+        break;
+
+      case "error occurred":
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/notify.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Error has occured',
+              ),
+            ],
+          ),
+        );
+        break;
+      case "no internet":
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/no_signal.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Device not connected to internet',
+              ),
+            ],
+          ),
+        );
+        break;
+      case "server issue":
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/server_down.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Server error',
+              ),
+            ],
+          ),
+        );
+        break;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (prefs != null &&
+        prefs.containsKey('login') &&
+        prefs.get('login') != null &&
+        prefs.get('login')) {
+      checkUserRole().then((value) {
+        setState(() {
+          userStatusCheck = value;
+        });
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Builder(
+        builder: (context) {
+          // ignore: null_aware_in_logical_operator
+          if (prefs != null &&
+              prefs.containsKey('login') &&
+              prefs.get('login') != null &&
+              prefs.get('login')) {
+            // dev.debugger();
+
+            return Material(
+              child: getAfterRegisterPage(),
+            );
+          } else {
+            return SignUp();
+          }
+        },
       ),
     );
   }

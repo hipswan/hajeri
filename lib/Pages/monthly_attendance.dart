@@ -13,15 +13,12 @@ import 'package:syncfusion_flutter_xlsio/xlsio.dart' as excel;
 import 'package:hajeri_demo/components/attendance_data_grid.dart';
 import 'package:hajeri_demo/components/visitor_data_grid.dart';
 
-import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hajeri_demo/components/side_bar.dart';
 import 'package:hajeri_demo/constant.dart';
 import 'package:hajeri_demo/url.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shimmer/shimmer.dart';
 import '../main.dart';
 
@@ -88,27 +85,27 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
 
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectNotification);
-    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-      'excel_download',
-      'excel_download',
-      'download excel',
-      importance: Importance.max,
-      priority: Priority.high,
-      playSound: true,
-      tag: 'Hajeri',
-      icon: '@drawable/ic_stat_hajeri',
-    );
-    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-    var platformChannelSpecifics = new NotificationDetails(
-        android: androidPlatformChannelSpecifics,
-        iOS: iOSPlatformChannelSpecifics);
+    // var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+    //   'excel_download',
+    //   'excel_download',
+    //   'download excel',
+    //   importance: Importance.max,
+    //   priority: Priority.high,
+    //   playSound: true,
+    //   tag: 'Hajeri',
+    //   icon: '@drawable/ic_stat_hajeri',
+    // );
+    // var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    // var platformChannelSpecifics = new NotificationDetails(
+    //     android: androidPlatformChannelSpecifics,
+    //     iOS: iOSPlatformChannelSpecifics);
 
-    flutterLocalNotificationsPlugin.show(
-      0,
-      'Excel sheet is downloaded',
-      'Tap To Open',
-      platformChannelSpecifics,
-    );
+    // flutterLocalNotificationsPlugin.show(
+    //   0,
+    //   'Excel sheet is downloaded',
+    //   'Tap To Open',
+    //   platformChannelSpecifics,
+    // );
   }
 
   Future onSelectNotification(String payload) async {

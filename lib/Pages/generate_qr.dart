@@ -1,17 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as dev;
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hajeri_demo/Pages/display_qr.dart';
 import 'package:hajeri_demo/Pages/maintain_qr.dart';
-import 'package:hajeri_demo/components/side_bar.dart';
 import 'package:hajeri_demo/main.dart';
 import 'package:hajeri_demo/url.dart';
+import 'package:toast/toast.dart';
 
 import '../constant.dart';
 
@@ -55,37 +53,78 @@ class _GenerateQRState extends State<GenerateQR> {
     super.initState();
 
     setUserLocationAndMarker();
-    log('${widget.pointName}');
+    dev.log('${widget.pointName}');
     _cqrPointController = TextEditingController(
       text: widget.pointName ?? '',
     );
   }
 
-  Future<Position> getUserLocation() async {
+  Future<LatLng> getUserLocation() async {
     setState(() {
       isRecenterFinished = false;
     });
     try {
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-      print(position);
-
-      return position;
+      return LatLng(
+        position.latitude,
+        position.longitude,
+      );
     } on TimeoutException catch (e) {
-      //TODO: Display  the error in alert and give acions user can performs
+      Toast.show(
+        "timeout exception",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.redAccent,
+      );
+      return LatLng(
+        currentPosition.latitude,
+        currentPosition.longitude,
+      );
     } on PermissionDeniedException catch (e) {
-      //TODO: Display the error with reason permissiondenied in alert and give acions user can performs
-
+      Toast.show(
+        "permission denied exception",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.redAccent,
+      );
+      return LatLng(
+        currentPosition.latitude,
+        currentPosition.longitude,
+      );
     } on LocationServiceDisabledException catch (e) {
-      //TODO: Display the error with reason location sevice on in alert and give acions user can performs
-
+      Toast.show(
+        "location service disabled",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.redAccent,
+      );
+      return LatLng(
+        currentPosition.latitude,
+        currentPosition.longitude,
+      );
+    } catch (e) {
+      Toast.show(
+        "error occured",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.redAccent,
+      );
+      return LatLng(
+        currentPosition.latitude,
+        currentPosition.longitude,
+      );
     }
   }
 
-  updateQrCodePoint() async {
+  Future<void> updateQrCodePoint() async {
     String orgId = prefs.getString("worker_id");
     String mobile = prefs.getString("mobile");
-    log(
+    dev.log(
       '$kGenerateQrCodePoint?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
     );
     var response = await http.get(Uri.parse(
@@ -93,8 +132,8 @@ class _GenerateQRState extends State<GenerateQR> {
     ));
 
     if (response.statusCode == 200) {
-      var data = json.decode(response.body);
-      log(
+      var data = response.body;
+      dev.log(
         data.toString(),
       );
     }
@@ -104,7 +143,7 @@ class _GenerateQRState extends State<GenerateQR> {
     double lat;
     double lng;
     if (widget.latitude == null) {
-      log(
+      dev.log(
         'Null in latitude',
         name: ' In set location',
       );
@@ -114,7 +153,6 @@ class _GenerateQRState extends State<GenerateQR> {
         lat = position.latitude;
         lng = position.longitude;
       } on TimeoutException catch (e) {
-        //TODO: Display  the error in alert and give acions user can performs
         showDialog(
             context: context,
             builder: (context) {
@@ -134,7 +172,6 @@ class _GenerateQRState extends State<GenerateQR> {
               );
             });
       } on PermissionDeniedException catch (e) {
-        //TODO: Display the error with reason permissiondenied in alert and give acions user can performs
         showDialog(
             context: context,
             builder: (context) {
@@ -154,7 +191,6 @@ class _GenerateQRState extends State<GenerateQR> {
               );
             });
       } on LocationServiceDisabledException catch (e) {
-        //TODO: Display the error with reason location sevice on in alert and give acions user can performs
         showDialog(
             context: context,
             builder: (context) {
@@ -192,7 +228,7 @@ class _GenerateQRState extends State<GenerateQR> {
                 ],
               );
             });
-        log(e.toString(), name: 'In set location');
+        dev.log(e.toString(), name: 'In set location');
       }
       // print(position);
 
@@ -228,7 +264,7 @@ class _GenerateQRState extends State<GenerateQR> {
             setState(() {
               currentPosition = LatLng(value.latitude, value.longitude);
             });
-            log(value.toString());
+            dev.log(value.toString());
           });
 
       currentPosition = LatLng(lat, lng);
@@ -247,15 +283,16 @@ class _GenerateQRState extends State<GenerateQR> {
   addQrCodePoint() async {
     String orgId = prefs.getString("worker_id");
     String mobile = prefs.getString("mobile");
-    log('$kGenerateQrCodePoint?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes');
+    dev.log(
+        '$kGenerateQrCodePoint?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes');
     var response = await http.get(
       Uri.parse(
         '$kGenerateQrCodePoint?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
       ),
     );
     if (response.statusCode == 200) {
-      var data = json.decode(response.body);
-      log(data.toString(), name: 'In add qr code point');
+      var data = response.body;
+      dev.log(data.toString(), name: 'In add qr code point');
     }
   }
 
@@ -284,7 +321,7 @@ class _GenerateQRState extends State<GenerateQR> {
           color: Colors.white,
           child: Stack(
             children: [
-              //TODO:Why google map  bottom  border shape doesnt change?
+              //Google Map
               Container(
                 height: deviceSize.height * 0.55,
                 width: deviceSize.width,
@@ -312,6 +349,7 @@ class _GenerateQRState extends State<GenerateQR> {
                     } else {
                       return Stack(
                         children: [
+                          //googlemap
                           GoogleMap(
                             // liteModeEnabled: true,
                             // myLocationEnabled: true,
@@ -328,12 +366,14 @@ class _GenerateQRState extends State<GenerateQR> {
                             ),
                             markers: _markers.values.toSet(),
                           ),
+                          //recenter button
                           Positioned(
                             right: 18,
                             bottom: 18,
                             child: FloatingActionButton(
+                              heroTag: null,
                               onPressed: () async {
-                                Position center = await getUserLocation();
+                                LatLng center = await getUserLocation();
                                 mapController.moveCamera(
                                   CameraUpdate.newCameraPosition(
                                     CameraPosition(
@@ -364,7 +404,7 @@ class _GenerateQRState extends State<GenerateQR> {
                                         setState(() {
                                           currentPosition = LatLng(
                                               value.latitude, value.longitude);
-                                          log(value.toString());
+                                          dev.log(value.toString());
                                         });
                                       });
 
@@ -387,6 +427,7 @@ class _GenerateQRState extends State<GenerateQR> {
                   },
                 ),
               ),
+
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
@@ -497,13 +538,13 @@ class _GenerateQRState extends State<GenerateQR> {
                             // );
                             if (_qrName.currentState.validate()) {
                               if (widget.action.contains('edit')) {
-                                log(
+                                dev.log(
                                   'edit',
                                   name: 'update() generate qr code',
                                 );
                                 await updateQrCodePoint();
                               } else {
-                                log(
+                                dev.log(
                                   'add',
                                   name: 'add() generate qr code',
                                 );
@@ -538,7 +579,6 @@ class _GenerateQRState extends State<GenerateQR> {
                   ]),
                 ),
               ),
-
               Positioned(
                 top: 0,
                 left: 0,

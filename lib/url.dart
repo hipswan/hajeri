@@ -46,3 +46,7 @@ String kPrivacyPolicy = "https://www.hajeri.in/privacypolicy";
 String kTermsAndConditions = "https://www.hajeri.in/termsandconditions";
 String kFaq = "https://www.hajeri.in/about";
 String kContactUs = "https://www.hajeri.in/contact";
+
+
+String kSaveToken = kRootApi + "/userfirebasetoken/";
+String kUserDetails = kRootApi + "/userdetails/";

@@ -105,17 +105,17 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
 
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
-  // @override
-  // void reassemble() {
-  //   super.reassemble();
-  //   dev.debugger();
-  //   if (Platform.isAndroid) {
-  //     print('Camera resume');
-  //     controller.stopCamera();
-  //     // controller.pauseCamera();
-  //   }
-  //   controller.pauseCamera();
-  // }
+  @override
+  void reassemble() {
+    super.reassemble();
+    // dev.debugger();
+    if (Platform.isAndroid) {
+      print('Camera resume');
+      // controller.stopCamera();
+      controller.pauseCamera();
+    }
+    controller.resumeCamera();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -363,9 +363,9 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     _streamQrSubscription =
         controller.scannedDataStream.listen((scanData) async {
       result = scanData;
-      if (result != null) {
-        // await controller?.pauseCamera();
+      dev.log(scanData.toString());
 
+      if (result != null) {
         showDialog(
             barrierDismissible: false,
             context: context,
@@ -392,6 +392,8 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
             });
         // dev.debugger();
         if (result.code.contains("Hajeri")) {
+          await controller?.pauseCamera();
+
           status = await markAttendance();
 
           if (status.isNotEmpty &&
@@ -417,7 +419,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                 ),
               ),
             );
-            // await controller?.resumeCamera();
+            await controller?.resumeCamera();
           } else {
             Navigator.pop(context);
             // await controller?.stopCamera();
@@ -427,28 +429,37 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               isQrScanned = true;
             });
           }
-        } else {
-          Navigator.pop(context);
+        } else if (result.code.isNotEmpty && !result.code.contains("Hajeri")) {
+          status = "no hajeri";
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.white,
-              behavior: SnackBarBehavior.floating,
-              content: Text(
-                'Not a Hajeri QR Code Scan Again',
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-              margin: EdgeInsets.fromLTRB(
-                5.0,
-                0.0,
-                5.0,
-                20.0,
-              ),
-            ),
-          );
-          // await controller?.resumeCamera();
+          Navigator.pop(context);
+          //         await controller.pauseCamera();
+          //         await controller.resumeCamera();
+          // dev.debugger();
+          //         ScaffoldMessenger.of(context).showSnackBar(
+          //           SnackBar(
+          //             backgroundColor: Colors.white,
+          //             behavior: SnackBarBehavior.floating,
+          //             content: Text(
+          //               'Not a Hajeri QR Code Scan Again',
+          //               style: TextStyle(
+          //                 color: Colors.black,
+          //               ),
+          //             ),
+          //             margin: EdgeInsets.fromLTRB(
+          //               5.0,
+          //               0.0,
+          //               5.0,
+          //               20.0,
+          //             ),
+          //           ),
+          //         );
+
+          dev.log('$status', name: 'In scanner result');
+          setState(() {
+            isQrScanned = true;
+          });
+          //await controller.resumeCamera();
         }
       }
     });
@@ -703,6 +714,40 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
           ),
         );
         break;
+      case "no hajeri":
+        return Container(
+          padding: EdgeInsets.fromLTRB(
+            10.0,
+            8.0,
+            10.0,
+            8.0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                height: constraints.maxHeight * 0.4,
+                child: Image.asset(
+                  "assets/images/fail.gif",
+                  height: 150.0,
+                  width: 150.0,
+                ),
+              ),
+              Container(
+                child: Text(
+                  "Not a Hajeri QR code...!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+        break;
       default:
     }
   }
@@ -752,24 +797,68 @@ class _ViewLocationState extends State<ViewLocation> {
     mapController = controller;
   }
 
-  Future<Position> getUserLocation() async {
+  Future<LatLng> getUserLocation() async {
     setState(() {
       isRecenterFinished = false;
     });
     try {
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-      print(position);
 
-      return position;
+      return LatLng(
+        position.latitude,
+        position.longitude,
+      );
     } on TimeoutException catch (e) {
-      //TODO: Display  the error in alert and give acions user can performs
+      Toast.show(
+        "timeout exception",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.redAccent,
+      );
+
+      return LatLng(
+        _currrentUserLocation.latitude,
+        _currrentUserLocation.longitude,
+      );
     } on PermissionDeniedException catch (e) {
-      //TODO: Display the error with reason permissiondenied in alert and give acions user can performs
-
+      Toast.show(
+        "permission denied exception",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.redAccent,
+      );
+      return LatLng(
+        _currrentUserLocation.latitude,
+        _currrentUserLocation.longitude,
+      );
     } on LocationServiceDisabledException catch (e) {
-      //TODO: Display the error with reason location sevice on in alert and give acions user can performs
+      Toast.show(
+        "location service disabled",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.redAccent,
+      );
 
+      return LatLng(
+        _currrentUserLocation.latitude,
+        _currrentUserLocation.longitude,
+      );
+    } catch (e) {
+      Toast.show(
+        "error occured",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.redAccent,
+      );
+      return LatLng(
+        _currrentUserLocation.latitude,
+        _currrentUserLocation.longitude,
+      );
     }
   }
 
@@ -880,8 +969,9 @@ class _ViewLocationState extends State<ViewLocation> {
               bottom: 30.0,
               right: 10.0,
               child: FloatingActionButton(
+                heroTag: null,
                 onPressed: () async {
-                  Position center = await getUserLocation();
+                  LatLng center = await getUserLocation();
                   mapController.moveCamera(
                     CameraUpdate.newCameraPosition(
                       CameraPosition(
@@ -910,8 +1000,9 @@ class _ViewLocationState extends State<ViewLocation> {
                   //         setState(() {});
                   //       });
 
-                  //   isRecenterFinished = true;
-                  // });
+                  setState(() {
+                    isRecenterFinished = true;
+                  });
                 },
                 tooltip: 'Center',
                 backgroundColor: Colors.white,

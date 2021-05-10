@@ -34,10 +34,11 @@ class _BranchFormState extends State<BranchForm> {
       _cNumber,
       _cAddress,
       _cId,
+      _cDistrict,
       _cDepartment;
-  String stateDropDownValue, cityDropDownValue, departmentDropDownValue;
+  String stateDropDownValue, cityDropDownValue,businessNatureDropDownValue, departmentDropDownValue;
   List<DropdownMenuItem<String>> _cityDropDownMenuItems,
-      _departmentDropDownMenuItems,
+      _departmentDropDownMenuItems,_businessNatureDropDownMenuItems,
       _stateDropDownMenuItems;
   bool stateSelected = false;
   List<dynamic> states;
@@ -48,15 +49,25 @@ class _BranchFormState extends State<BranchForm> {
     super.initState();
 
     _formState = GlobalKey<FormState>();
-
+    _businessNatureDropDownMenuItems = kBusinessNatureMenuItems
+        .map(
+          (business) => DropdownMenuItem<String>(
+        value: business,
+        child: Text(
+          business,
+        ),
+      ),
+    )
+        .toList();
     Map branch = widget.branch;
     _cName = TextEditingController(
         text: branch.isEmpty ? '' : branch["personaname"]);
     _cOrgName = TextEditingController(
         text: branch.isEmpty ? '' : branch["nameoforganization"]);
-
-    _cBusiness = TextEditingController(
-        text: branch.isEmpty ? '' : branch["natureofbusiness"]);
+    _cDistrict =TextEditingController(
+        text: branch.isEmpty ? '' : branch["district"]);
+    businessNatureDropDownValue =
+        branch.isEmpty ? null : branch["natureofbusiness"];
     _cNumber = TextEditingController(
       text: branch.isEmpty ? '' : branch["mobile"],
     );
@@ -228,12 +239,16 @@ class _BranchFormState extends State<BranchForm> {
         currentCity = city["cityname"];
       }
     });
-    dev.log(
-        '$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity');
-    var response = await http.post(Uri(
-      path:
-          '$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity',
+    dev.log('$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=${_cDistrict.text}&city=$currentCity',
+    );
+
+        var response = await http.post(Uri.parse('$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=${_cDistrict.text}&city=$currentCity',
     ));
+
+
+    //        '$kGenerateQrCodePoint?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
+
+    //https://www.hajeri.in/apidev/branch/addsubbranch/925?nameoforganization=abdbranch2&personaname=siddya&natureofbusiness=Manager&contactpersondepartmentname=Manager&address=Bhakti Shakti Chowk&mobile=1237891010&state=maharashtra&district=aurangabad&city=aurangabad
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
@@ -285,9 +300,7 @@ class _BranchFormState extends State<BranchForm> {
       }
     });
 
-    var response = await http.post(Uri(
-      path:
-          '$kUpdateBranch$orgId/${_cId.text}?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=${_cBusiness.text}&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=$currentCity&city=$currentCity',
+    var response = await http.post(Uri.parse('$kUpdateBranch$orgId/${_cId.text}?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=${_cDistrict.text}&city=$currentCity',
     ));
 
     if (response.statusCode == 200) {
@@ -391,6 +404,36 @@ class _BranchFormState extends State<BranchForm> {
                             ),
                           ),
                         ),
+//Business Nature
+                        Padding(
+                          padding:
+                          const EdgeInsets.symmetric(
+                              vertical: 8.0),
+                          child: DropdownButtonFormField(
+                            value:
+                            businessNatureDropDownValue,
+                            onTap: () {
+                              FocusScope.of(context)
+                                  .requestFocus(
+                                  new FocusNode());
+                            },
+                            onChanged: (String newValue) {
+                              dev.log('$newValue');
+                              businessNatureDropDownValue =
+                                  newValue;
+                              setState(() {});
+                            },
+                            decoration: InputDecoration(
+                              labelText:
+                              'Select Nature of Business',
+                              border: OutlineInputBorder(),
+                            ),
+                            items:
+                            _businessNatureDropDownMenuItems,
+                            // hint:
+                            //     const Text('Select Department'),
+                          ),
+                        ),
 
                         //Address
                         Padding(
@@ -417,6 +460,8 @@ class _BranchFormState extends State<BranchForm> {
                             ),
                           ),
                         ),
+
+
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Container(
@@ -514,6 +559,37 @@ class _BranchFormState extends State<BranchForm> {
                             // hint: const Text('Select State'),
                           ),
                         ),
+                        Padding(
+                          padding: const EdgeInsets
+                              .symmetric(
+                            vertical: 8.0,
+                          ),
+                          child: TextFormField(
+                            keyboardType:
+                            TextInputType.text,
+                            textAlign: TextAlign.left,
+                            controller: _cDistrict,
+                            validator: (value) {
+                              if (value
+                                  .trim()
+                                  .isEmpty) {
+                                return 'Please Enter District';
+                              }
+
+                              return null;
+                            },
+                            onChanged: (value) {},
+                            decoration: InputDecoration(
+                              // errorText: null,
+                              hintText:
+                              'Enter District',
+                              labelText: 'District',
+                              border:
+                              OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+
                         //city drop down
                         Padding(
                           padding: const EdgeInsets.symmetric(

@@ -64,32 +64,6 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-//   Future<String> _get_one_month_Visitors() async {
-//     setState(() {
-//       _case = 0;
-//     });
-//     SharedPreferences pref = await SharedPreferences.getInstance();
-//     String worker_id = pref.getString("worker_id");
-
-//     var response = await http.get("$one_month_visitor_url$worker_id");
-
-//     List<dynamic> data = json.decode(response.body);
-//     print("the data is " + data.toString());
-
-// //      print(data);
-//     setState(() {
-//       employees = data.map((e) => Employee(name:e["nameofworker"], number:e["nameofworker"], idCardNumber, organizationName, city, area, district, state));
-//       if (dashboard_data.length >= 1)
-//         _case = 1;
-//       else
-//         _case = 2;
-//       length = dashboard_data.length;
-//       shim = false;
-//       print("the emp details are " + dashboard_data.toString());
-//       //state_id=data['id'];
-//     });
-//   }
-
   Future<List<Employee>> _getEmployeeList() async {
     // String orgId = prefs.getString("worker_id");
     List<Employee> employeeList = [];
@@ -97,7 +71,7 @@ class _DashboardState extends State<Dashboard> {
     var response = await http.get(Uri.parse("$kEmployeeList$orgId"));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      log("the _getEmployeeList data is " + data.toString());
+      // log("the _getEmployeeList data is " + data.toString());
       employeeList = data
           .map<Employee>(
             (e) => Employee(
@@ -126,7 +100,7 @@ class _DashboardState extends State<Dashboard> {
     var response = await http.get(Uri.parse("$kTodayPresentEmpList$orgId"));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      print("the _getTodayPresentEmployeeList data is " + data.toString());
+      // print("the _getTodayPresentEmployeeList data is " + data.toString());
       bool emptyData = data.isEmpty;
 
       if (!emptyData) {
@@ -160,7 +134,7 @@ class _DashboardState extends State<Dashboard> {
     var response = await http.get(Uri.parse("$kTodayVisitor$orgId"));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      print("the _getTodayVisitorList data is " + data.toString());
+      // print("the _getTodayVisitorList data is " + data.toString());
       bool emptyData = data.isEmpty;
 
       if (!emptyData) {
@@ -224,58 +198,6 @@ class _DashboardState extends State<Dashboard> {
 
     return employeeList;
   }
-
-//   Future<String> _getTodaysEmployeeList() async {
-//     setState(() {
-//       _case = 0;
-//     });
-//     SharedPreferences pref = await SharedPreferences.getInstance();
-//     String worker_id = pref.getString("worker_id");
-
-//     var response = await http.get("$todays_present_emp_url$worker_id");
-
-//     if (response.statusCode == 200) {
-//       var data = json.decode(response.body);
-//       print("the data is " + data.toString());
-
-// //      print(data);
-//       setState(() {
-//         dashboard_data = data;
-//         if (dashboard_data.length >= 1)
-//           _case = 1;
-//         else
-//           _case = 2;
-//         length = dashboard_data.length;
-//         shim = false;
-//         print("the emp details are " + dashboard_data.toString());
-//         //state_id=data['id'];
-//       });
-//     }
-//   }
-
-//   Future<String> _getTodaysVisitors() async {
-//     SharedPreferences pref = await SharedPreferences.getInstance();
-//     String worker_id = pref.getString("worker_id");
-
-//     var response = await http.get("$kTodayVisitor$worker_id");
-//     if (response.statusCode == 200) {
-//       var data = json.decode(response.body);
-//       print("the data is " + data.toString());
-
-// //      print(data);
-//       setState(() {
-//         dashboard_data = data;
-//         if (dashboard_data.length >= 1)
-//           _case = 1;
-//         else
-//           _case = 2;
-//         length = dashboard_data.length;
-//         shim = false;
-//         print("the emp details are " + dashboard_data.toString());
-//         //state_id=data['id'];
-//       });
-//     }
-//   }
 
   @override
   void initState() {

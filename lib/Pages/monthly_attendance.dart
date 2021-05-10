@@ -12,13 +12,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart' as excel;
 import 'package:hajeri_demo/components/attendance_data_grid.dart';
 import 'package:hajeri_demo/components/visitor_data_grid.dart';
-import 'package:downloads_path_provider_28/downloads_path_provider_28.dart'
-    as download_path;
+
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/components/attendance.dart';
 import 'package:hajeri_demo/components/side_bar.dart';
 import 'package:hajeri_demo/constant.dart';
 import 'package:hajeri_demo/url.dart';

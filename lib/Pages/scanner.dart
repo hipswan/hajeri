@@ -364,7 +364,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
         controller.scannedDataStream.listen((scanData) async {
       result = scanData;
       if (result != null) {
-        await controller?.pauseCamera();
+        // await controller?.pauseCamera();
 
         showDialog(
             barrierDismissible: false,
@@ -390,7 +390,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                 ),
               );
             });
-
+        // dev.debugger();
         if (result.code.contains("Hajeri")) {
           status = await markAttendance();
 
@@ -417,10 +417,10 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                 ),
               ),
             );
-            await controller?.resumeCamera();
+            // await controller?.resumeCamera();
           } else {
-            await controller?.stopCamera();
             Navigator.pop(context);
+            // await controller?.stopCamera();
 
             dev.log('$status', name: 'In scanner result');
             setState(() {
@@ -448,7 +448,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               ),
             ),
           );
-          await controller?.resumeCamera();
+          // await controller?.resumeCamera();
         }
       }
     });
@@ -465,7 +465,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
         dev.log(e.toString(),
             name: 'In scanner mark attendance permission definition exception');
         return 'error occurred : perimission denied';
-      } on Exception catch (e) {
+      } catch (e) {
         dev.log(_locationpermission.toString(),
             name: 'In the scanner mark attendance');
         return 'error occurred : ${e.toString().substring(0, 30)}';
@@ -475,7 +475,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     try {
       _currrentUserLocation = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-    } on Exception catch (e) {
+    } catch (e) {
       return 'error occurred : ${e.toString().substring(0, 30)}';
     }
     var qrCodeResult = result.code.toString().split("_");

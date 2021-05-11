@@ -1,4 +1,5 @@
-# Hajeri
+
+# Hajeri  <html><img src="/assets/images/hajerilogo.png" width="25"/> </html>
 
 A contact-less attendance system.
 

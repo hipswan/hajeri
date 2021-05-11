@@ -110,11 +110,11 @@ void main() async {
   // Any time the token refreshes, store this in the database too.
   messaging.onTokenRefresh.listen(saveTokenToSharedPreferences);
 
-  SharedPreferences.setMockInitialValues({
-    'login': false,
-    'name': '',
-    'number': '',
-  });
+  // SharedPreferences.setMockInitialValues({
+  //   'login': false,
+  //   'name': '',
+  //   'number': '',
+  // });
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()

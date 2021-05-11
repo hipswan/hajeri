@@ -196,7 +196,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                               Navigator.of(context).pop();
                             },
                             child: Text(
-                              'Change $verificationCode',
+                              'Change',
                             ),
                           ),
                         ],
@@ -341,7 +341,6 @@ class _OtpVerifyState extends State<OtpVerify> {
                           prefs.setString("org_id", orgId);
                           prefs.setString("org_name", orgName);
                           prefs.setString("emp_name", empName);
-                          prefs.setBool("login", true);
                           prefs.setBool(
                               "is_org",
                               role
@@ -350,7 +349,9 @@ class _OtpVerifyState extends State<OtpVerify> {
                                   .contains('role_organization'));
                           userTokenStatus = await setUserToken();
 
-                          if (userTokenStatus.contains('success')) {
+                          if (!userTokenStatus.contains('success')) {
+                            prefs.setBool("login", true);
+
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(

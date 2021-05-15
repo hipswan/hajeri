@@ -112,7 +112,7 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   setUserToken() async {
     try {
-      var response = await http.get(Uri.parse(
+      var response = await http.post(Uri.parse(
           '$kSaveToken${prefs.getString('worker_id')}/${prefs.getString('mobile')}?userfirebasetoken=${prefs.getString('token')}'));
 
       if (response.statusCode == 200) {
@@ -349,9 +349,8 @@ class _OtpVerifyState extends State<OtpVerify> {
                                   .contains('role_organization'));
                           userTokenStatus = await setUserToken();
 
-                          if (!userTokenStatus.contains('success')) {
+                          if (userTokenStatus.contains('success')) {
                             prefs.setBool("login", true);
-
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(

@@ -1,4 +1,10 @@
-String kRootApi = "https://www.hajeri.in/apidev";
+
+//String kRootApi = "https://www.hajeri.in/apidev";
+String kRootApi = "https://84c3d78c1dd9.ngrok.io/apidev";
+//String kMainDomain = "https://www.hajeri.in";
+String kMainDomain = "https://84c3d78c1dd9.ngrok.io";
+
+String kGenerateQrCodePoint =kMainDomain + "/organization/generatenewqrcode";
 
 String kStates = kRootApi + "/states";
 String kAddOrg = kRootApi + "/mobileaddorganization";
@@ -31,8 +37,6 @@ String kDeleteQRCodePoint = kRootApi + "/org/deleteqrcodepoint/";
 String kQRPointList = kRootApi + "/org/qrpointlist/";
 String kUpdateQRCodePoint = kRootApi + "/org/updateqrcodepoint/";
 String kQRCodePoint = kRootApi + "/org/qrcodepoint/";
-String kGenerateQrCodePoint =
-    "https://hajeri.in/organization/generatenewqrcode";
 
 String kBranchList = kRootApi + "/branch/listofbranch/";
 String kDeleteBranch = kRootApi + "/branch/deletebranch/";
@@ -41,12 +45,14 @@ String kAddBranch = kRootApi + "/branch/addsubbranch/";
 
 String kMarkAttendance = kRootApi + "/employee/scanning/";
 
-String kAboutUs = "https://www.hajeri.in/about";
-String kPrivacyPolicy = "https://www.hajeri.in/privacypolicy";
-String kTermsAndConditions = "https://www.hajeri.in/termsandconditions";
-String kFaq = "https://www.hajeri.in/about";
-String kContactUs = "https://www.hajeri.in/contact";
+String kAboutUs = kMainDomain + "/about";
+String kPrivacyPolicy = kMainDomain + "/privacypolicy";
+String kTermsAndConditions = kMainDomain + "/termsandconditions";
+String kFaq = kMainDomain + "/about";
+String kContactUs = kMainDomain + "/contact";
 
 
 String kSaveToken = kRootApi + "/userfirebasetoken/";
 String kUserDetails = kRootApi + "/userdetails/";
+String kAllowDistance = kRootApi + "/hajeridistance";
+String kDesktopLogin = kRootApi + "/updateqrcodevalueforlogin";

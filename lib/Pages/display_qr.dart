@@ -217,7 +217,7 @@ class _DisplayQrState extends State<DisplayQr> {
                                 10.0,
                               ),
                               data:
-                                  'Hajeri_${prefs.getString("worker_id")}_${widget.latitude}_${widget.longitude}',
+                                  'Hajeri_${prefs.getString("worker_id")}_${widget.latitude}_${widget.longitude}_${prefs.getString("main_bank_id")}',
 
                               // onError: (ex) {
                               //   print("[QR] ERROR - $ex");

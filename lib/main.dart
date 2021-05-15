@@ -91,7 +91,7 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 
 /// Initialize the [FlutterLocalNotificationsPlugin] package.
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterDownloader.initialize(
@@ -110,14 +110,14 @@ void main() async {
   // Any time the token refreshes, store this in the database too.
   messaging.onTokenRefresh.listen(saveTokenToSharedPreferences);
 
-  // SharedPreferences.setMockInitialValues({
-  //   'login': false,
-  //   'name': '',
-  //   'number': '',
-  // });
+ /*  SharedPreferences.setMockInitialValues({
+    'login': false,
+    'name': '',
+    'number': '',
+  });*/
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+      AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
   /// Update the iOS foreground notification presentation options to allow
@@ -131,6 +131,7 @@ void main() async {
     MyApp(),
   );
 }
+
 
 class App extends StatelessWidget {
   @override
@@ -159,13 +160,13 @@ class MyApp extends StatelessWidget {
         MonthlyAttendance.id: (_) => MonthlyAttendance(),
         Scanner.id: (_) => Scanner(),
         VerifyOtp.id: (_) => VerifyOtp(
-              number: '',
-            ),
+          number: '',
+        ),
         GenerateQR.id: (_) => GenerateQR(),
         SignUp.id: (_) => SignUp(),
         Landing.id: (_) => Landing(
-              initialPageIndex: 0,
-            ),
+          initialPageIndex: 0,
+        ),
         Register.id: (_) => Register(),
         DisplayQr.id: (_) => DisplayQr(),
         AboutUsPage.id: (_) => AboutUsPage(),
@@ -190,14 +191,14 @@ class MyApp extends StatelessWidget {
         dataTableTheme: DataTableThemeData(
           //Change state<color> of the row depending on the action perform on it
           dataRowColor: MaterialStateProperty.resolveWith<Color>(
-              (Set<MaterialState> states) {
-            if (states.contains(MaterialState.selected))
-              return Theme.of(context).colorScheme.primary.withOpacity(0.08);
-            if (states.contains(MaterialState.pressed))
-              return Colors.purpleAccent.withOpacity(0.08);
+                  (Set<MaterialState> states) {
+                if (states.contains(MaterialState.selected))
+                  return Theme.of(context).colorScheme.primary.withOpacity(0.08);
+                if (states.contains(MaterialState.pressed))
+                  return Colors.purpleAccent.withOpacity(0.08);
 
-            return null; // Use the default value.
-          }),
+                return null; // Use the default value.
+              }),
           dividerThickness: 1.5,
         ),
         primarySwatch: Colors.blue,
@@ -208,7 +209,7 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  // ignore: missing_return
+// ignore: missing_return
 
 }
 
@@ -221,8 +222,11 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   String userStatusCheck = "no result";
+  String hajeriLevel;
+  int mainBankId;
   Future<String> checkUserRole() async {
     try {
+      dev.log("$kUserDetails${prefs.getString('mobile')}");
       var response = await http.get(
         Uri.parse(
           '$kUserDetails${prefs.getString('mobile')}',
@@ -231,9 +235,21 @@ class _HomeState extends State<Home> {
       // dev.debugger();
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
+        dev.log("$data");
+        if (data['hajerilevel'] == null)
+          hajeriLevel = "No Data";
+        else
+          hajeriLevel = data['hajerilevel'];
+        if (data['mainbankid'] == null && data['hajerilevel'] == "Hajeri-Head")
+          mainBankId = data['id'];
+        else
+          mainBankId = data['mainbankid'];
         // dev.log(data.toString());
-        prefs.setBool("is_org",
-            data['roles'].trim().toLowerCase().contains('role_organization'));
+        prefs.setString("hajeri_level", hajeriLevel);
+        prefs.setString("main_bank_id", mainBankId.toString());
+        String mainBankIdfromPrefs = prefs.getString("main_bank_id");
+        dev.log("main_bank_idfromprefs: $mainBankIdfromPrefs, main_bank_id: $mainBankId");
+        prefs.setBool("is_org", data['roles'].trim().toLowerCase().contains('role_organization'));
         return "success";
       } else {
         return "server issue";
@@ -241,6 +257,7 @@ class _HomeState extends State<Home> {
     } on SocketException catch (e) {
       return "no internet";
     } catch (e) {
+      dev.log('error occurred: $e');
       return "error occurred";
     }
   }
@@ -275,7 +292,7 @@ class _HomeState extends State<Home> {
                 height: 10.0,
               ),
               Text(
-                'Error has occured',
+                'Error has occurred',
               ),
             ],
           ),

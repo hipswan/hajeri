@@ -191,18 +191,19 @@ class RegisterState extends State<Register> {
   Future<String> createOrgAccount() async {
     String orgState;
     states.forEach((state) {
-      if (state['id']
+      if (int.parse(state['id']
           .toString()
-          .trim()
-          .contains(stateDropDownValue.toString().trim())) {
+          .trim())
+          ==int.parse(stateDropDownValue.toString().trim())) {
         orgState = state["statename"].toString();
       }
     });
     // var headers = {'Content-Type': 'application/json'};
+    dev.log('$kAddOrg?nameoforganization=${_cOrgName.text.trim()}&personaname=${_cName.text.trim()}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$orgState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue');
     var request = http.Request(
       'POST',
       Uri.parse(
-          '$kAddOrg?nameoforganization=${_cOrgName.text.trim()}&personaname=${_cName.text.trim()}&natureofbusiness=$businessNatureDropDownValue&contactpersondeparmentname=$departmentDropDownValue&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$orgState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue'),
+          '$kAddOrg?nameoforganization=${_cOrgName.text.trim()}&personaname=${_cName.text.trim()}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$orgState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue'),
     );
     // request.body = '''{
     //   "nameoforganization": "${_cOrgName.text.trim()}",
@@ -256,11 +257,10 @@ class RegisterState extends State<Register> {
   Future<dynamic> addUser() async {
     String userState;
     states.forEach((state) {
-      if (state['id']
+      if  (int.parse(state['id']
           .toString()
-          .trim()
-          .toLowerCase()
-          .contains(stateDropDownValue.toString().trim().toLowerCase())) {
+          .trim())
+          ==int.parse(stateDropDownValue.toString().trim())) {
         userState = state["statename"].toString();
       }
     });
@@ -281,17 +281,24 @@ class RegisterState extends State<Register> {
     //   "district": "${_cDistrict.text}",
     //   "city": "$cityDropDownValue",
     // }''');
-    var response = await http.post(Uri(
+   /* var response = await http.post(Uri(
       path:
-          '''$kAddUser?personaname=${_cName.text.trim()}&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state:=$userState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue''',
+          '''$kAddUser?personaname=${_cName.text.trim()}&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$userState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue''',
     ) // body: jsonEncode(body),
         // headers: {
         //   'Content-Type': 'application/json',
         // },
-        );
+        );*/
+    var request = http.Request(
+      'POST',
+      Uri.parse(
+          '$kAddUser?personaname=${_cName.text.trim()}&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$userState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue'),
+    );
+
+    http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      dev.log(response.body.toString());
+      dev.log(response.stream.toString());
       Toast.show(
         "Your account has been sucessfully created",
         context,

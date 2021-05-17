@@ -24,6 +24,7 @@ import 'package:hajeri_demo/Pages/profile.dart';
 import 'package:hajeri_demo/Pages/scanner.dart';
 import 'package:hajeri_demo/Pages/sign_up.dart';
 import 'package:hajeri_demo/Pages/monthly_attendance.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Pages/register.dart';
 import 'Pages/display_qr.dart';
@@ -92,12 +93,12 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 /// Initialize the [FlutterLocalNotificationsPlugin] package.
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+
+Future<bool> loadResources() async {
   await FlutterDownloader.initialize(
     debug: false,
   );
-  FirebaseApp app = await Firebase.initializeApp();
+  await Firebase.initializeApp();
 
   prefs = await SharedPreferences.getInstance();
   messaging = FirebaseMessaging.instance;
@@ -127,6 +128,12 @@ void main() async {
     badge: true,
     sound: true,
   );
+  return false;
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(
     MyApp(),
   );
@@ -220,6 +227,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  bool isWait = true;
   String userStatusCheck = "no result";
   String hajeriLevel;
   int mainBankId;
@@ -345,6 +353,12 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    loadResources().then((value) {
+      dev.log(value.toString());
+      setState(() {
+        isWait = value;
+      });
+    });
     if (prefs != null &&
         prefs.containsKey('login') &&
         prefs.get('login') != null &&
@@ -360,22 +374,25 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Builder(
-        builder: (context) {
-          // ignore: null_aware_in_logical_operator
-          if (prefs != null &&
-              prefs.containsKey('login') &&
-              prefs.get('login') != null &&
-              prefs.get('login')) {
-            // dev.debugger();
+      child: ModalProgressHUD(
+        inAsyncCall: isWait,
+        child: Builder(
+          builder: (context) {
+            // ignore: null_aware_in_logical_operator
+            if (prefs != null &&
+                prefs.containsKey('login') &&
+                prefs.get('login') != null &&
+                prefs.get('login')) {
+              // dev.debugger();
 
-            return Material(
-              child: getAfterRegisterPage(),
-            );
-          } else {
-            return SignUp();
-          }
-        },
+              return Material(
+                child: getAfterRegisterPage(),
+              );
+            } else {
+              return SignUp();
+            }
+          },
+        ),
       ),
     );
   }

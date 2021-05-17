@@ -13,30 +13,26 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:http/http.dart' as http;
 import 'package:toast/toast.dart';
 
-List<dynamic> _visitors = [];
-VisitorDataSource _visitorDataSource;
+List<dynamic> _history = [];
+LogDataSource _logDataSource;
 
-class VisitorDataGrid extends StatefulWidget {
-  final List<dynamic> attendanceSheet;
-  final String type;
+class HistoryLog extends StatefulWidget {
+  final List<dynamic> data;
 
-  VisitorDataGrid({
-    @required this.attendanceSheet,
-    this.type,
-  });
+  HistoryLog({@required this.data});
   @override
-  _VisitorDataGridState createState() => _VisitorDataGridState();
+  _HistoryLogState createState() => _HistoryLogState();
 }
 
-class _VisitorDataGridState extends State<VisitorDataGrid> {
+class _HistoryLogState extends State<HistoryLog> {
   Map referenceMap;
   final DataGridController _dataGridController = DataGridController();
 
   List<GridColumn> _gridColumn = [
     GridTextColumn(
       // columnWidthMode: ColumnWidthMode.auto,
-      mappingName: 'nameofworker',
-      headerText: 'Name',
+      mappingName: 'suborgname',
+      headerText: 'Organization',
       width: 175.0,
       softWrap: true,
       headerTextSoftWrap: true,
@@ -44,8 +40,6 @@ class _VisitorDataGridState extends State<VisitorDataGrid> {
         sortIconColor: Colors.redAccent,
       ),
     ),
-
-    //change maping name as per api field
     GridTextColumn(
       // columnWidthMode: ColumnWidthMode.auto,
       mappingName: 'clientmobno',
@@ -81,9 +75,9 @@ class _VisitorDataGridState extends State<VisitorDataGrid> {
   @override
   void initState() {
     super.initState();
-    _visitors = widget.attendanceSheet;
+    _history = widget.data;
     // log(_visitors.toString(), name: 'In visitor init');
-    _visitorDataSource = VisitorDataSource(visitors: _visitors);
+    _logDataSource = LogDataSource(log: _history);
     // // debugger();
     // referenceMap = json.decode(json.encode(_visitors.first));
     // referenceMap.remove('nameofworker');
@@ -119,64 +113,66 @@ class _VisitorDataGridState extends State<VisitorDataGrid> {
 
   @override
   Widget build(BuildContext context) {
-    return SfDataGridTheme(
-      data: SfDataGridThemeData(
-        gridLineColor: Colors.grey,
-        gridLineStrokeWidth: 0.5,
-        headerStyle: DataGridHeaderCellStyle(
-          textStyle: TextStyle(
-            // fontWeight: FontWeight.bold,
-            color: Colors.white,
+    return Card(
+      child: SfDataGridTheme(
+        data: SfDataGridThemeData(
+          gridLineColor: Colors.grey,
+          gridLineStrokeWidth: 0.5,
+          headerStyle: DataGridHeaderCellStyle(
+            textStyle: TextStyle(
+              // fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            backgroundColor: Colors.blue[800],
           ),
-          backgroundColor: Colors.blue[800],
-        ),
-        selectionStyle: DataGridCellStyle(
-          backgroundColor: Colors.redAccent,
-          textStyle: TextStyle(
-            fontWeight: FontWeight.w300,
-            color: Colors.white,
+          selectionStyle: DataGridCellStyle(
+            backgroundColor: Colors.redAccent,
+            textStyle: TextStyle(
+              fontWeight: FontWeight.w300,
+              color: Colors.white,
+            ),
+          ),
+          currentCellStyle: DataGridCurrentCellStyle(
+            borderWidth: 2,
+            borderColor: Colors.pinkAccent,
           ),
         ),
-        currentCellStyle: DataGridCurrentCellStyle(
-          borderWidth: 2,
-          borderColor: Colors.pinkAccent,
-        ),
-      ),
-      child: SfDataGrid(
-        columnWidthMode: ColumnWidthMode.auto,
+        child: SfDataGrid(
+          columnWidthMode: ColumnWidthMode.auto,
 
-        allowSorting: true,
-        headerGridLinesVisibility: GridLinesVisibility.horizontal,
-        controller: _dataGridController,
-        source: _visitorDataSource,
+          allowSorting: true,
+          headerGridLinesVisibility: GridLinesVisibility.horizontal,
+          controller: _dataGridController,
+          source: _logDataSource,
 
-        columns: _gridColumn,
-        frozenColumnsCount: 1,
-        selectionMode: SelectionMode.none,
+          columns: _gridColumn,
+          frozenColumnsCount: 1,
+          selectionMode: SelectionMode.none,
 
-        navigationMode: GridNavigationMode.row,
-        onSelectionChanging:
-            (List<Object> addedRows, List<Object> removedRows) {
-          if (addedRows.isNotEmpty &&
-              (addedRows.last as Employee).name == 'Manager') {
-            return false;
-          }
+          navigationMode: GridNavigationMode.row,
+          onSelectionChanging:
+              (List<Object> addedRows, List<Object> removedRows) {
+            if (addedRows.isNotEmpty &&
+                (addedRows.last as Employee).name == 'Manager') {
+              return false;
+            }
 
-          return true;
-        },
+            return true;
+          },
 
 //
+        ),
       ),
     );
   }
 }
 
-class VisitorDataSource extends DataGridSource {
-  VisitorDataSource({this.visitors});
-  final List<dynamic> visitors;
+class LogDataSource extends DataGridSource {
+  LogDataSource({this.log});
+  final List<dynamic> log;
 
   @override
-  List<dynamic> get dataSource => visitors;
+  List<dynamic> get dataSource => log;
 
   @override
   getValue(Object visitor, String columnName) {
@@ -198,7 +194,7 @@ class VisitorDataSource extends DataGridSource {
   }
 
   @override
-  int get rowCount => visitors.length;
+  int get rowCount => log.length;
 
   void updateDataGridSource() {
     notifyListeners();

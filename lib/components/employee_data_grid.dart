@@ -120,292 +120,267 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: _employees.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    'assets/vectors/notify.svg',
-                    width: 150,
-                    height: 150,
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  Text(
-                    'No employee data found',
-                  ),
-                ],
+      child: SfDataGridTheme(
+        data: SfDataGridThemeData(
+          gridLineColor: Colors.grey,
+          gridLineStrokeWidth: 0.5,
+          headerStyle: DataGridHeaderCellStyle(
+            textStyle: TextStyle(
+              // fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            backgroundColor: Colors.blue[800],
+          ),
+          selectionStyle: DataGridCellStyle(
+            backgroundColor: Colors.redAccent,
+            textStyle: TextStyle(
+              fontWeight: FontWeight.w300,
+              color: Colors.white,
+            ),
+          ),
+          currentCellStyle: DataGridCurrentCellStyle(
+            borderWidth: 2,
+            borderColor: Colors.pinkAccent,
+          ),
+        ),
+        child: SfDataGrid(
+          columnWidthMode: ColumnWidthMode.auto,
+
+          allowSorting: true,
+          headerGridLinesVisibility: GridLinesVisibility.horizontal,
+          controller: _dataGridController,
+          source: _employeeDataSource,
+          // headerCellBuilder:
+          //     (BuildContext context, GridColumn column) {
+          //   if (column.mappingName == 'number')
+          //     return Row(
+          //       children: <Widget>[
+          //         Icon(Icons.phone_android),
+          //         SizedBox(width: 5),
+          //         Flexible(
+          //             child: Text(
+          //           column.headerText,
+          //           style: TextStyle(fontWeight: FontWeight.bold),
+          //         ))
+          //       ],
+          //     );
+          //   else
+          //     return null;
+          // },
+          columns: [
+            GridTextColumn(
+              // columnWidthMode: ColumnWidthMode.auto,
+              mappingName: 'name',
+              headerText: 'Name',
+              width: 175.0,
+              columnWidthMode: ColumnWidthMode.cells,
+
+              softWrap: true,
+              headerTextSoftWrap: true,
+              headerStyle: DataGridHeaderCellStyle(
+                sortIconColor: Colors.redAccent,
               ),
-            )
-          : SfDataGridTheme(
-              data: SfDataGridThemeData(
-                gridLineColor: Colors.grey,
-                gridLineStrokeWidth: 0.5,
-                headerStyle: DataGridHeaderCellStyle(
-                  textStyle: TextStyle(
-                    // fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  backgroundColor: Colors.blue[800],
-                ),
-                selectionStyle: DataGridCellStyle(
-                  backgroundColor: Colors.redAccent,
-                  textStyle: TextStyle(
-                    fontWeight: FontWeight.w300,
-                    color: Colors.white,
-                  ),
-                ),
-                currentCellStyle: DataGridCurrentCellStyle(
-                  borderWidth: 2,
-                  borderColor: Colors.pinkAccent,
-                ),
-              ),
-              child: SfDataGrid(
-                columnWidthMode: ColumnWidthMode.auto,
+            ),
+            GridNumericColumn(
+              columnWidthMode: ColumnWidthMode.cells,
+              mappingName: 'number',
+              headerText: 'Mobile',
+              allowSorting: false,
+            ),
+            GridTextColumn(
+              mappingName: 'city',
+              headerText: 'City',
+              allowSorting: false,
+            ),
+            GridNumericColumn(
+              mappingName: 'idCard',
+              headerText: 'ID',
+              allowSorting: false,
+              columnWidthMode: ColumnWidthMode.cells,
+            ),
+            GridTextColumn(
+              mappingName: 'area',
+              headerText: 'Area',
+              allowSorting: false,
+            ),
+            GridTextColumn(
+              mappingName: 'department',
+              headerText: 'Department',
+              allowSorting: false,
+            ),
+            GridTextColumn(
+              mappingName: 'district',
+              headerText: 'District',
+              allowSorting: false,
+            ),
+            GridTextColumn(
+              mappingName: 'state',
+              headerText: 'State',
+              allowSorting: false,
+            ),
+          ],
+          frozenColumnsCount: 1,
+          selectionMode: widget.selectionModeDisabled
+              ? SelectionMode.none
+              : SelectionMode.singleDeselect,
+          navigationMode: GridNavigationMode.row,
+          onSelectionChanging:
+              (List<Object> addedRows, List<Object> removedRows) {
+            if (addedRows.isNotEmpty &&
+                (addedRows.last as Employee).name == 'Manager') {
+              return false;
+            }
 
-                allowSorting: true,
-                headerGridLinesVisibility: GridLinesVisibility.horizontal,
-                controller: _dataGridController,
-                source: _employeeDataSource,
-                // headerCellBuilder:
-                //     (BuildContext context, GridColumn column) {
-                //   if (column.mappingName == 'number')
-                //     return Row(
-                //       children: <Widget>[
-                //         Icon(Icons.phone_android),
-                //         SizedBox(width: 5),
-                //         Flexible(
-                //             child: Text(
-                //           column.headerText,
-                //           style: TextStyle(fontWeight: FontWeight.bold),
-                //         ))
-                //       ],
-                //     );
-                //   else
-                //     return null;
-                // },
-                columns: [
-                  GridTextColumn(
-                    // columnWidthMode: ColumnWidthMode.auto,
-                    mappingName: 'name',
-                    headerText: 'Name',
-                    width: 175.0,
-                    columnWidthMode: ColumnWidthMode.cells,
-
-                    softWrap: true,
-                    headerTextSoftWrap: true,
-                    headerStyle: DataGridHeaderCellStyle(
-                      sortIconColor: Colors.redAccent,
-                    ),
-                  ),
-                  GridNumericColumn(
-                    columnWidthMode: ColumnWidthMode.cells,
-                    mappingName: 'number',
-                    headerText: 'Mobile',
-                    allowSorting: false,
-                  ),
-                  GridTextColumn(
-                    mappingName: 'city',
-                    headerText: 'City',
-                    allowSorting: false,
-                  ),
-                  GridNumericColumn(
-                    mappingName: 'idCard',
-                    headerText: 'ID',
-                    allowSorting: false,
-                    columnWidthMode: ColumnWidthMode.cells,
-                  ),
-                  GridTextColumn(
-                    mappingName: 'area',
-                    headerText: 'Area',
-                    allowSorting: false,
-                  ),
-                  GridTextColumn(
-                    mappingName: 'department',
-                    headerText: 'Department',
-                    allowSorting: false,
-                  ),
-                  GridTextColumn(
-                    mappingName: 'district',
-                    headerText: 'District',
-                    allowSorting: false,
-                  ),
-                  GridTextColumn(
-                    mappingName: 'state',
-                    headerText: 'State',
-                    allowSorting: false,
-                  ),
-                ],
-                frozenColumnsCount: 1,
-                selectionMode: widget.selectionModeDisabled
-                    ? SelectionMode.none
-                    : SelectionMode.singleDeselect,
-                navigationMode: GridNavigationMode.row,
-                onSelectionChanging:
-                    (List<Object> addedRows, List<Object> removedRows) {
-                  if (addedRows.isNotEmpty &&
-                      (addedRows.last as Employee).name == 'Manager') {
-                    return false;
-                  }
-
-                  return true;
-                },
-                onSelectionChanged:
-                    (List<Object> addedRows, List<Object> removedRows) {
-                  // // apply your logic
-                  // log((addedRows.last as Employee).name.toString());
-                  //After First or Subsequent Select
-                  if (addedRows.isNotEmpty) {
-                    setState(() {
-                      isRowSelected = true;
-                      currentEmployee = addedRows.last as Employee;
-                    });
-                  }
-                  //After Deselect
-                  if (addedRows.isEmpty && removedRows.isNotEmpty) {
-                    setState(() {
-                      isRowSelected = false;
-                    });
-                  }
-                },
-                stackedHeaderRows: <StackedHeaderRow>[
-                  StackedHeaderRow(
-                    cells: [
-                      StackedHeaderCell(
-                        columnNames: [
-                          'name',
-                          'idCard',
-                          'number',
-                          'city',
-                          'area',
-                          'department',
-                          'district',
-                          'state',
-                        ],
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              child: Text(widget.view ?? ''),
-                            ),
-                            isRowSelected
-                                ? Row(
-                                    children: [
-                                      IconButton(
-                                          icon: Icon(
-                                            Icons.edit,
-                                            color: Colors.blue,
+            return true;
+          },
+          onSelectionChanged:
+              (List<Object> addedRows, List<Object> removedRows) {
+            // // apply your logic
+            // log((addedRows.last as Employee).name.toString());
+            //After First or Subsequent Select
+            if (addedRows.isNotEmpty) {
+              setState(() {
+                isRowSelected = true;
+                currentEmployee = addedRows.last as Employee;
+              });
+            }
+            //After Deselect
+            if (addedRows.isEmpty && removedRows.isNotEmpty) {
+              setState(() {
+                isRowSelected = false;
+              });
+            }
+          },
+          stackedHeaderRows: <StackedHeaderRow>[
+            StackedHeaderRow(
+              cells: [
+                StackedHeaderCell(
+                  columnNames: [
+                    'name',
+                    'idCard',
+                    'number',
+                    'city',
+                    'area',
+                    'department',
+                    'district',
+                    'state',
+                  ],
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Text(widget.view ?? ''),
+                      ),
+                      isRowSelected
+                          ? Row(
+                              children: [
+                                IconButton(
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: Colors.blue,
+                                    ),
+                                    onPressed: () async {
+                                      Employee selectedEmployeeWithEdit =
+                                          await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) {
+                                          return FormPage(
+                                            orgId: widget.orgId,
+                                            currentEmployee: currentEmployee,
+                                            action: 'edit',
+                                            title:
+                                                'Edit ${currentEmployee.name} ',
+                                          );
+                                        }),
+                                      );
+                                      if (selectedEmployeeWithEdit == null) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: const Text(
+                                                'no action taken while editing'),
                                           ),
-                                          onPressed: () async {
-                                            Employee selectedEmployeeWithEdit =
-                                                await Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) {
-                                                return FormPage(
-                                                  orgId: widget.orgId,
-                                                  currentEmployee:
-                                                      currentEmployee,
-                                                  action: 'edit',
-                                                  title:
-                                                      'Edit ${currentEmployee.name} ',
-                                                );
-                                              }),
-                                            );
-                                            if (selectedEmployeeWithEdit ==
-                                                null) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: const Text(
-                                                      'no action taken while editing'),
-                                                ),
-                                              );
-                                            } else if (selectedEmployeeWithEdit
-                                                .name.isEmpty) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: const Text(
-                                                      'Error has occured during edit'),
-                                                ),
-                                              );
-                                            } else {
+                                        );
+                                      } else if (selectedEmployeeWithEdit
+                                          .name.isEmpty) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: const Text(
+                                                'Error has occured during edit'),
+                                          ),
+                                        );
+                                      } else {
 // / // ignore: unnecessary_statements
-                                              (_employees
-                                                      .remove(currentEmployee))
-                                                  ? _employees.add(
-                                                      selectedEmployeeWithEdit)
-                                                  : ScaffoldMessenger.of(
-                                                          context)
-                                                      .showSnackBar(
-                                                      SnackBar(
-                                                        content: const Text(
-                                                            'Error has occured during save'),
-                                                      ),
-                                                    );
-                                            }
+                                        (_employees.remove(currentEmployee))
+                                            ? _employees
+                                                .add(selectedEmployeeWithEdit)
+                                            : ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                                SnackBar(
+                                                  content: const Text(
+                                                      'Error has occured during save'),
+                                                ),
+                                              );
+                                      }
 
-                                            _employeeDataSource
-                                                .updateDataGridSource();
-                                          }),
-                                      IconButton(
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color: Colors.redAccent,
-                                          ),
-                                          onPressed: () async {
-                                            log('Delete');
-                                            log((_dataGridController.selectedRow
-                                                    as Employee)
-                                                .name
-                                                .toString());
+                                      _employeeDataSource
+                                          .updateDataGridSource();
+                                    }),
+                                IconButton(
+                                    icon: Icon(
+                                      Icons.delete,
+                                      color: Colors.redAccent,
+                                    ),
+                                    onPressed: () async {
+                                      log('Delete');
+                                      log((_dataGridController.selectedRow
+                                              as Employee)
+                                          .name
+                                          .toString());
 
-                                            var deleteStatus =
-                                                await deleteEmployee(
-                                                    employee: currentEmployee);
-                                            log(deleteStatus);
-                                            if (deleteStatus
-                                                ?.toLowerCase()
-                                                .contains('success')) {
-                                              if (_employees
-                                                  .remove(currentEmployee)) {
-                                                log('removed ${currentEmployee.name}');
-                                              } else {
-                                                log('not removed removed ${currentEmployee.name}');
-                                              }
-                                            } else {
-                                              log('Error while deleteing');
-                                            }
+                                      var deleteStatus = await deleteEmployee(
+                                          employee: currentEmployee);
+                                      log(deleteStatus);
+                                      if (deleteStatus
+                                          ?.toLowerCase()
+                                          .contains('success')) {
+                                        if (_employees
+                                            .remove(currentEmployee)) {
+                                          log('removed ${currentEmployee.name}');
+                                        } else {
+                                          log('not removed removed ${currentEmployee.name}');
+                                        }
+                                      } else {
+                                        log('Error while deleteing');
+                                      }
 
 // if(success)
 
-                                            //toast if error message
+                                      //toast if error message
 
-                                            // await getEmployeeList();
+                                      // await getEmployeeList();
 
-                                            _employeeDataSource
-                                                .updateDataGridSource();
-                                          }),
-                                    ],
-                                  )
-                                : Container(),
-                          ],
-                        ),
-                      ),
+                                      _employeeDataSource
+                                          .updateDataGridSource();
+                                    }),
+                              ],
+                            )
+                          : Container(),
                     ],
                   ),
-                  // StackedHeaderCell(
-                  //     columnNames: ['productId', 'product'],
-                  //     child: Container(
-                  //         color: const Color(0xFFF1F1F1),
-                  //         child:
-                  //             Center(child: Text('Product Details'))))
-                ],
-              ),
+                ),
+              ],
             ),
+            // StackedHeaderCell(
+            //     columnNames: ['productId', 'product'],
+            //     child: Container(
+            //         color: const Color(0xFFF1F1F1),
+            //         child:
+            //             Center(child: Text('Product Details'))))
+          ],
+        ),
+      ),
     );
   }
 }

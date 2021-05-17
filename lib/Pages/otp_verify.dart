@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hajeri_demo/Pages/register.dart';
 import 'package:hajeri_demo/Pages/sign_up.dart';
 import 'package:hajeri_demo/main.dart';
@@ -34,9 +35,6 @@ class _OtpVerifyState extends State<OtpVerify> {
         'Content-Type': 'application/json',
       });
       if (response.statusCode == 200) {
-        setState(() {
-          isCodeSent = true;
-        });
         var data = json.decode(response.body);
         dev.log("the data is " + data.toString(), name: 'In send otp verify');
 
@@ -86,12 +84,81 @@ class _OtpVerifyState extends State<OtpVerify> {
         dev.log(
           '''Could't fetch otp''',
         );
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Center(child: Text('Server Error')),
+                content: SvgPicture.asset(
+                  'assets/vectors/server_down.svg',
+                  width: 150,
+                  height: 150,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: Text(
+                      'Back',
+                    ),
+                  ),
+                ],
+              );
+            });
       }
     } on SocketException catch (e) {
       dev.log(e.message);
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Center(child: Text('no internet')),
+              content: SvgPicture.asset(
+                'assets/vectors/no_signal.svg',
+                width: 150,
+                height: 150,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text(
+                    'Back',
+                  ),
+                ),
+              ],
+            );
+          });
     } on Exception catch (e) {
       dev.log(e.toString());
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Center(child: Text('error occurred')),
+              content: SvgPicture.asset(
+                'assets/vectors/notify.svg',
+                width: 150,
+                height: 150,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text(
+                    'Back',
+                  ),
+                ),
+              ],
+            );
+          });
     }
+    setState(() {
+      isCodeSent = true;
+    });
   }
 
   String userTokenStatus;
@@ -349,7 +416,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                                   .contains('role_organization'));
                           userTokenStatus = await setUserToken();
 
-                          if (userTokenStatus.contains('success')) {
+                          if (!userTokenStatus.contains('success')) {
                             prefs.setBool("login", true);
                             Navigator.pushAndRemoveUntil(
                               context,

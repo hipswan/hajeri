@@ -3,13 +3,13 @@ import 'dart:developer';
 import 'dart:io' show Platform, SocketException;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hajeri_demo/components/employee_data_grid.dart';
-import 'package:hajeri_demo/components/box_tile.dart';
-import 'package:hajeri_demo/components/history_log.dart';
-import 'package:hajeri_demo/components/side_bar.dart';
-import 'package:hajeri_demo/components/visitor_data_grid.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/model/Employee.dart';
+import '../components/employee_data_grid.dart';
+import '../components/box_tile.dart';
+import '../components/history_log.dart';
+import '../components/side_bar.dart';
+import '../components/visitor_data_grid.dart';
+import '../main.dart';
+import '../model/Employee.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
 
@@ -183,7 +183,7 @@ class _DashboardState extends State<Dashboard> {
                 height: 10.0,
               ),
               Text(
-                'Error has occured',
+                'No Data Available',
               ),
             ],
           ),

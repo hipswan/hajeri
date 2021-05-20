@@ -4,12 +4,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hajeri_demo/components/blue_button.dart';
-import 'package:hajeri_demo/components/form_page.dart';
-import 'package:hajeri_demo/components/transition.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/model/Employee.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/employee_detail.dart';
+import '../components/blue_button.dart';
+import '../components/form_page.dart';
+import '../components/transition.dart';
+import '../main.dart';
+import '../model/Employee.dart';
+import '../url.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:http/http.dart' as http;
@@ -97,7 +98,7 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
           headers: {'Content-Type': 'application/json'},
           body:
               '{nameofworker: ${employee.name},departmentname: ${employee.departmentName},addressline1: ${employee.addressLine1},state: ${employee.state},district: ${employee.district},city: ${employee.city}}');
-      log(response.statusCode.toString());
+
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         log('the delete employee data is $data');
@@ -108,12 +109,15 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                 .toLowerCase()
                 .contains('success')
             ? 'success'
-            : '';
+            : 'failure';
       } else {
         return 'response not received with ${response.statusCode}';
       }
-    } on NoSuchMethodError catch (e) {
-      log(e.stackTrace.toString());
+    } on IOException catch (e) {
+      log(e.toString());
+      return 'internet isssue';
+    } catch (e) {
+      return 'failure';
     }
   }
 
@@ -343,7 +347,7 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                                           employee: currentEmployee);
                                       log(deleteStatus);
                                       if (deleteStatus
-                                          ?.toLowerCase()
+                                          .toLowerCase()
                                           .contains('success')) {
                                         if (_employees
                                             .remove(currentEmployee)) {
@@ -363,6 +367,25 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
 
                                       _employeeDataSource
                                           .updateDataGridSource();
+                                      showDialog(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: Text('back'),
+                                                )
+                                              ],
+                                              title: Text('Delete Employees'),
+                                              content: Text(
+                                                deleteStatus,
+                                              ),
+                                            );
+                                          });
                                     }),
                               ],
                             )

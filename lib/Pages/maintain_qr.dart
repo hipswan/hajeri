@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' as dev;
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
@@ -7,14 +7,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hajeri_demo/Pages/generate_qr.dart';
-import 'package:hajeri_demo/Pages/display_qr.dart';
-import 'package:hajeri_demo/Pages/qr_code_point.dart';
-import 'package:hajeri_demo/components/side_bar.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/url.dart';
+import 'package:showcaseview/showcaseview.dart';
+import '../Pages/generate_qr.dart';
+import '../Pages/display_qr.dart';
+import '../Pages/qr_code_point.dart';
+import '../components/side_bar.dart';
+import '../main.dart';
+import '../url.dart';
 import 'package:http/http.dart' as http;
 import '../constant.dart';
+
+class ShowCaseQr extends StatelessWidget {
+  const ShowCaseQr({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ShowCaseWidget(
+      onStart: (index, key) {
+        dev.log('onStart: $index, $key');
+      },
+      onComplete: (index, key) {
+        dev.log('onComplete: $index, $key');
+      },
+      builder: Builder(builder: (context) => MaintainQr()),
+      autoPlay: false,
+      autoPlayDelay: Duration(seconds: 3),
+      autoPlayLockEnable: false,
+    );
+  }
+}
 
 class MaintainQr extends StatefulWidget {
   static const id = 'maintain_qr';
@@ -27,10 +48,20 @@ class MaintainQr extends StatefulWidget {
 class _MaintainQrState extends State<MaintainQr> {
   String qrPointStatus = "no result";
   List qrCodePointList = [];
+  GlobalKey _addBranchKey = GlobalKey();
+
+  startShowCase() {
+    if (prefs.getBool('showcase') == null) {
+      dev.log('Inside showcase');
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        ShowCaseWidget.of(context).startShowCase([_addBranchKey]);
+      });
+    }
+  }
 
   @override
   void initState() {
-    super.initState();
+    startShowCase();
     isLatLngPresent().then((value) {
       if (value.contains("success")) {
         qrCodePointList.isEmpty
@@ -41,12 +72,14 @@ class _MaintainQrState extends State<MaintainQr> {
       }
       setState(() {});
     });
+
+    super.initState();
   }
 
   Future<String> isLatLngPresent() async {
     String orgId = prefs.getString("worker_id");
     String mobile = prefs.getString("mobile");
-    log('$kQRPointList$orgId/$mobile');
+    dev.log('$kQRPointList$orgId/$mobile');
     try {
       var response = await http.get(Uri.parse('$kQRPointList$orgId/$mobile'));
 
@@ -55,7 +88,7 @@ class _MaintainQrState extends State<MaintainQr> {
 
         qrCodePointList = data;
 
-        // log(data.toString());
+        dev.log(data.toString());
 
         return "success";
       } else {
@@ -70,6 +103,8 @@ class _MaintainQrState extends State<MaintainQr> {
 
   @override
   void dispose() {
+    dev.log('In dispose');
+    prefs.setBool('showcase', false);
     super.dispose();
   }
 
@@ -83,25 +118,35 @@ class _MaintainQrState extends State<MaintainQr> {
             section: 'maintain_qr',
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          heroTag: 'mainQR',
-          backgroundColor: Colors.blue[700],
-          onPressed: () {
-            // debugger();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return GenerateQR(
-                    action: 'add',
-                    title: 'Generate Qr',
-                  );
-                },
-              ),
-            );
-          },
-          child: Icon(
-            Icons.playlist_add,
+        floatingActionButton: Showcase(
+          key: _addBranchKey,
+          description: 'Click on add to generate new Qr code point',
+          shapeBorder: CircleBorder(),
+          showcaseBackgroundColor: Colors.blue,
+          textColor: Colors.white,
+          contentPadding: EdgeInsets.all(
+            8.0,
+          ),
+          child: FloatingActionButton(
+            heroTag: 'mainQR',
+            backgroundColor: Colors.blue[700],
+            onPressed: () {
+              // debugger();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return GenerateQR(
+                      action: 'add',
+                      title: 'Generate Qr',
+                    );
+                  },
+                ),
+              );
+            },
+            child: Icon(
+              Icons.playlist_add,
+            ),
           ),
         ),
         backgroundColor: Colors.blue[800],
@@ -112,7 +157,10 @@ class _MaintainQrState extends State<MaintainQr> {
           ),
           centerTitle: true,
         ),
-        body: Container(color: Colors.white, child: getQRCodeView()),
+        body: Container(
+          color: Colors.white,
+          child: getQRCodeView(),
+        ),
       ),
     );
   }

@@ -2,19 +2,19 @@ import 'dart:io';
 import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hajeri_demo/Pages/about_us.dart';
-import 'package:hajeri_demo/Pages/contact_us.dart';
-import 'package:hajeri_demo/Pages/dashboard.dart';
-import 'package:hajeri_demo/Pages/faq.dart';
-import 'package:hajeri_demo/Pages/generate_qr.dart';
-import 'package:hajeri_demo/Pages/landing.dart';
-import 'package:hajeri_demo/Pages/maintain_branch.dart';
-import 'package:hajeri_demo/Pages/maintain_qr.dart';
-import 'package:hajeri_demo/Pages/privacy_policy.dart';
-import 'package:hajeri_demo/Pages/scanner.dart';
-import 'package:hajeri_demo/Pages/terms_and_conditions.dart';
-import 'package:hajeri_demo/Pages/employee_detail.dart';
-import 'package:hajeri_demo/Pages/monthly_attendance.dart';
+import '../Pages/about_us.dart';
+import '../Pages/contact_us.dart';
+import '../Pages/dashboard.dart';
+import '../Pages/faq.dart';
+import '../Pages/generate_qr.dart';
+import '../Pages/landing.dart';
+import '../Pages/maintain_branch.dart';
+import '../Pages/maintain_qr.dart';
+import '../Pages/privacy_policy.dart';
+import '../Pages/scanner.dart';
+import '../Pages/terms_and_conditions.dart';
+import '../Pages/employee_detail.dart';
+import '../Pages/monthly_attendance.dart';
 
 import '../main.dart';
 
@@ -56,6 +56,7 @@ class _SideBarState extends State<SideBar> {
             fontSize: 20,
             letterSpacing: 0.5,
           ),
+          maxLines: 1,
         ),
       ),
       accountEmail: Text(
@@ -171,9 +172,9 @@ class _SideBarState extends State<SideBar> {
                 onTap: () {
                   section.contains('maintain_qr')
                       ? Navigator.pop(context)
-                      : Navigator.pushNamed(
+                      : Navigator.push(
                           context,
-                          MaintainQr.id,
+                          MaterialPageRoute(builder: (context) => ShowCaseQr()),
                         );
                 },
               ),
@@ -240,23 +241,27 @@ class _SideBarState extends State<SideBar> {
                         );
                 },
               ),
-              ListTile(
-                selected: section.contains('maintain_branch') ? true : false,
-                leading: Icon(
-                  Icons.people_outline,
-                ),
-                title: const Text('Maintain Branch'),
-                onTap: () {
-                  section.contains('maintain_branch')
-                      ? Navigator.pop(context)
-                      : Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MaintainBranch(),
-                          ),
-                        );
-                },
-              ),
+              // prefs.getBool('is_sub_org')
+              true
+                  ? Container()
+                  : ListTile(
+                      selected:
+                          section.contains('maintain_branch') ? true : false,
+                      leading: Icon(
+                        Icons.people_outline,
+                      ),
+                      title: const Text('Maintain Branch'),
+                      onTap: () {
+                        section.contains('maintain_branch')
+                            ? Navigator.pop(context)
+                            : Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MaintainBranch(),
+                                ),
+                              );
+                      },
+                    ),
               ListTile(
                 selected: section.contains('about_us') ? true : false,
                 leading: Icon(

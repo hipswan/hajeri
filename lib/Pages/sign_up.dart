@@ -3,12 +3,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hajeri_demo/Pages/landing.dart';
-import 'package:hajeri_demo/Pages/otp_verify.dart';
-import 'package:hajeri_demo/Pages/register.dart';
-import 'package:hajeri_demo/Pages/verify_otp.dart';
-import 'package:hajeri_demo/components/transition.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/landing.dart';
+import '../Pages/otp_verify.dart';
+import '../Pages/register.dart';
+import '../Pages/verify_otp.dart';
+import '../components/transition.dart';
+import '../url.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constant.dart';

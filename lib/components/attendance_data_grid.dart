@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 
-import 'package:hajeri_demo/model/Employee.dart';
-import 'package:hajeri_demo/url.dart';
+import '../model/Employee.dart';
+import '../url.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:http/http.dart' as http;

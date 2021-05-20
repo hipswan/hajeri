@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/components/side_bar.dart';
-import 'package:hajeri_demo/url.dart';
+import '../components/side_bar.dart';
+import '../url.dart';
 import 'dart:io';
 
 import 'package:webview_flutter/webview_flutter.dart';

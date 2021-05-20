@@ -10,14 +10,14 @@ import 'package:toast/toast.dart';
 import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart' as excel;
-import 'package:hajeri_demo/components/attendance_data_grid.dart';
-import 'package:hajeri_demo/components/visitor_data_grid.dart';
+import '../components/attendance_data_grid.dart';
+import '../components/visitor_data_grid.dart';
 
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/components/side_bar.dart';
-import 'package:hajeri_demo/constant.dart';
-import 'package:hajeri_demo/url.dart';
+import '../components/side_bar.dart';
+import '../constant.dart';
+import '../url.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 import '../main.dart';
@@ -39,6 +39,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
   bool isTypeSelected = false;
   bool isMonthSelected = false;
   bool showShimmer = true;
+  String attendanceStatus = "no result";
   String _localPath;
   TargetPlatform platform = TargetPlatform.android;
 
@@ -68,6 +69,8 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
         (value) => setState(
           () {
             isTypeSelected = true;
+            attendanceStatus = value;
+
             showShimmer = false;
           },
         ),
@@ -152,56 +155,91 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
     // log(
     //   '$kDropDownListForAttendance$orgId',
     // );
-    var response = await http.get(Uri.parse(
-      '$kDropDownListForAttendance$orgId',
-    ));
+    try {
+      var response = await http.get(Uri.parse(
+        '$kDropDownListForAttendance$orgId',
+      ));
 
-    if (response.statusCode == 200) {
-      data = json.decode(response.body);
-      // log('the data is ${data.toString()}');
-      List<dynamic> employee = data[1]['Employee List'];
-      if (employee.isNotEmpty) {
-        // log(employee.toString());
-        _dropDownTypeMenuItems.addAll(
-          employee
-              .map(
-                (e) => DropdownMenuItem<String>(
-                  value: e['mobileno'].toString(),
-                  child: Text(
-                    e['nameofworker'],
-                    overflow: TextOverflow.clip,
+      if (response.statusCode == 200) {
+        data = json.decode(response.body);
+        // log('the data is ${data.toString()}');
+        List<dynamic> employee = data[1]['Employee List'];
+        if (employee.isNotEmpty) {
+          // log(employee.toString());
+          _dropDownTypeMenuItems.addAll(
+            employee
+                .map(
+                  (e) => DropdownMenuItem<String>(
+                    value: e['mobileno'].toString(),
+                    child: Text(
+                      e['nameofworker'],
+                      overflow: TextOverflow.clip,
+                    ),
                   ),
-                ),
-              )
-              .toList(),
-        );
-        //emp_list.add({"nameofworker":"All Employee","mobileno":"All Employee"});
-        // empList = empList[1]['Employee List'];
-        // empList.insert(
-        //     0, {"nameofworker": "All Employee", "mobileno": "All Employee"});
-        // empList.insert(
-        //     1, {"nameofworker": "All Visitors", "mobileno": "All Visitors"});
+                )
+                .toList(),
+          );
+          //emp_list.add({"nameofworker":"All Employee","mobileno":"All Employee"});
+          // empList = empList[1]['Employee List'];
+          // empList.insert(
+          //     0, {"nameofworker": "All Employee", "mobileno": "All Employee"});
+          // empList.insert(
+          //     1, {"nameofworker": "All Visitors", "mobileno": "All Visitors"});
 
-        // print("the emp list is $empList");
-        //state_id=data['id'];
+          // print("the emp list is $empList");
+          //state_id=data['id'];
+
+        } else {
+          _dropDownTypeMenuItems.add(
+            DropdownMenuItem<String>(
+              value: "-1",
+              child: Text(
+                "No Employee",
+              ),
+            ),
+          );
+        }
+        setState(() {});
+//      print(data);
 
       } else {
         _dropDownTypeMenuItems.add(
           DropdownMenuItem<String>(
             value: "-1",
             child: Text(
-              "No Employee",
+              "Server issue",
             ),
           ),
         );
-      }
-      setState(() {});
-//      print(data);
 
-    } else {}
+        setState(() {});
+      }
+    } on IOException catch (e) {
+      _dropDownTypeMenuItems.add(
+        DropdownMenuItem<String>(
+          value: "-1",
+          child: Text(
+            "No Internet",
+          ),
+        ),
+      );
+
+      setState(() {});
+    } catch (e) {
+      _dropDownTypeMenuItems.add(
+        DropdownMenuItem<String>(
+          value: "-1",
+          child: Text(
+            "error occurred",
+          ),
+        ),
+      );
+
+      setState(() {});
+    }
   }
 
-  Future<List> _getAttendanceList() async {
+  Future<String> _getAttendanceList() async {
     var data;
     // String orgId = prefs.getString("worker_id");
     // await Future.delayed(
@@ -211,63 +249,35 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
     //   attendanceData = kAttendanceMockData;
     // });
     // log('$kMonthlyAttendance$orgId/$typeSelectValue/${_fromDate.toString().substring(0, 7)}');
-    var response = await http.get(Uri.parse(
-        '$kMonthlyAttendance$orgId/$typeSelectValue/${_fromDate.toString().substring(0, 7)}'));
+    try {
+      var response = await http.get(Uri.parse(
+          '$kMonthlyAttendance$orgId/$typeSelectValue/${_fromDate.toString().substring(0, 7)}'));
 
-    if (response.statusCode == 200) {
-      data = json.decode(response.body);
-      // print("the data is " + data.toString());
+      if (response.statusCode == 200) {
+        data = json.decode(response.body);
+        log("the data is " + data.toString());
 
 //      print(data);
-      if (data is List) {
-        attendanceData = data;
+        if (data is List) {
+          attendanceData = data;
+        } else {
+          attendanceData = data['Visitor List'];
+          // log(attendanceData.toString());
+        }
+        return "success";
       } else {
-        attendanceData = data['Visitor List'];
-        // log(attendanceData.toString());
+        attendanceData = null;
+        return "server issue";
       }
+    } on IOException catch (e) {
+      attendanceData = null;
 
-      // rows = data
-      //     .map<DataRow>((e) => DataRow(
-      //           cells: [
-      //             DataCell(
-      //               Text(
-      //                 '${e["name"]}',
-      //               ),
-      //             ),
-      //             DataCell(
-      //               Text(
-      //                 '${e["intime"]}',
-      //               ),
-      //             ),
-      //             DataCell(
-      //               Text(
-      //                 '${e["outtime"]}',
-      //               ),
-      //             ),
-      //             DataCell(
-      //               Text(
-      //                 '${e["visitingdatetime"]}',
-      //               ),
-      //             ),
-      //             DataCell(
-      //               Text(
-      //                 '${e["currentdate"]}',
-      //               ),
-      //             ),
-      //           ],
-      //         ))
-      //     .toList();
+      return "no internet";
+    } catch (e) {
+      attendanceData = null;
 
-      // if (attendanceData.length <= 0 || attendanceData == null)
-      //   _case = 2;
-      // else
-      //   _case = 1;
-
-      // print("the attendence list is $attendanceData");
-
-      //state_id=data['id'];
-      return attendanceData;
-    } else {}
+      return "error occurred";
+    }
   }
 
   //Drop Down Section
@@ -325,29 +335,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
       appBar: AppBar(
         automaticallyImplyLeading: true,
         backgroundColor: Colors.blue[800],
-        title:
-            //  !isAnimationFinished
-            //     ? RotateAnimatedTextKit(
-            //         totalRepeatCount: 1,
-            //         // repeatForever: true,
-            //         displayFullTextOnTap: true,
-            //         // stopPauseOnTap: true,
-            //         onTap: () {
-            //           print("Tap Event");
-            //         },
-            //         text: ["Monthly Attendance", "Hajeri", "हाजिरी"],
-            //         textStyle: TextStyle(
-            //           fontSize: 20,
-            //         ),
-            //         onFinished: () {
-            //           setState(() {
-            //             isAnimationFinished = true;
-            //           });
-            //         },
-            //         // textAlign: TextAlign.center,
-            //       )
-            //     :
-            Text(
+        title: Text(
           'Attendance',
           // 'हाजिरी',
         ),
@@ -400,7 +388,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
                                 typeSelectValue = newValue;
                                 showShimmer = true;
                               });
-                              attendanceData = await _getAttendanceList();
+                              attendanceStatus = await _getAttendanceList();
 
                               setState(() {
                                 isTypeSelected = true;
@@ -531,7 +519,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
                               ),
                             ),
                           )
-                        : getGridView()
+                        : getBottomView()
 
                     // AttendanceGridTable
                     )
@@ -600,6 +588,79 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
     );
   }
 
+  Widget getBottomView() {
+    switch (attendanceStatus) {
+      case "no result":
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+        break;
+      case "error occurred":
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/notify.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Error has occured',
+              ),
+            ],
+          ),
+        );
+        break;
+      case "no internet":
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/no_signal.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Device not connected to internet',
+              ),
+            ],
+          ),
+        );
+        break;
+      case "server issue":
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/server_down.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'Server error',
+              ),
+            ],
+          ),
+        );
+        break;
+      case "success":
+        return getGridView();
+        break;
+    }
+  }
+
   Widget getGridView() {
     switch (typeSelectValue) {
       case 'All Employee':
@@ -630,8 +691,21 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
       case 'All Visitors':
         return (attendanceData as List).isEmpty
             ? Center(
-                child: Text(
-                  'No Visitor',
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/vectors/notify.svg',
+                      width: 150,
+                      height: 150,
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Text(
+                      'No Visitor',
+                    ),
+                  ],
                 ),
               )
             : VisitorDataGrid(
@@ -708,7 +782,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
       case 'All Employee':
         return Row(
           children: [
-            OutlineButton(
+            OutlinedButton(
               onPressed: () async {
                 // await _showDatePicker();
                 await _showMonthPicker();
@@ -717,7 +791,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
 
                   showShimmer = true;
                 });
-                attendanceData = await _getAttendanceList();
+                attendanceStatus = await _getAttendanceList();
                 setState(() {
                   showShimmer = false;
                 });
@@ -736,7 +810,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
       case 'All Visitors':
         return Row(
           children: [
-            OutlineButton(
+            OutlinedButton(
               onPressed: () async {
                 // await _showDatePicker();
                 await _showMonthPicker();
@@ -745,7 +819,8 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
 
                   showShimmer = true;
                 });
-                attendanceData = await _getAttendanceList();
+                attendanceStatus = await _getAttendanceList();
+
                 setState(() {
                   showShimmer = false;
                 });
@@ -763,7 +838,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
       default:
         return isTypeSelected
             ? Row(children: [
-                OutlineButton(
+                OutlinedButton(
                   onPressed: () async {
                     // await _showDatePicker();
                     await _showMonthPicker();
@@ -772,7 +847,8 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
 
                       showShimmer = true;
                     });
-                    attendanceData = await _getAttendanceList();
+                    attendanceStatus = await _getAttendanceList();
+
                     setState(() {
                       showShimmer = false;
                     });
@@ -792,7 +868,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
   Future<void> _createExcel() async {
 //Create an Excel document.
     List attendance = attendanceData as List;
-    if (attendance != null || attendance.isNotEmpty) {
+    if (attendance != null && attendance.isNotEmpty) {
       //Creating a workbook.
       final excel.Workbook workbook = excel.Workbook();
       //Accessing via index

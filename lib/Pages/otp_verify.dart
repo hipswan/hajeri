@@ -3,10 +3,10 @@ import 'dart:developer' as dev;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hajeri_demo/Pages/register.dart';
-import 'package:hajeri_demo/Pages/sign_up.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/register.dart';
+import '../Pages/sign_up.dart';
+import '../main.dart';
+import '../url.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:http/http.dart' as http;
@@ -416,8 +416,10 @@ class _OtpVerifyState extends State<OtpVerify> {
                                   .contains('role_organization'));
                           userTokenStatus = await setUserToken();
 
-                          if (!userTokenStatus.contains('success')) {
+                          if (userTokenStatus.contains('success')) {
                             prefs.setBool("login", true);
+                            // prefs.setBool("is_sub_org", true);
+
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(

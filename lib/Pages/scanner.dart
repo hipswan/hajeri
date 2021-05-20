@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hajeri_demo/Pages/landing.dart';
-import 'package:hajeri_demo/components/blue_button.dart';
-import 'package:hajeri_demo/constant.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/landing.dart';
+import '../components/blue_button.dart';
+import '../constant.dart';
+import '../url.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hajeri_demo/Pages/employee_detail.dart';
-import 'package:hajeri_demo/components/side_bar.dart';
-import 'package:hajeri_demo/main.dart';
+import '../Pages/employee_detail.dart';
+import '../components/side_bar.dart';
+import '../main.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/foundation.dart';
@@ -429,39 +429,41 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               isQrScanned = true;
             });
           }
-        }
-        else if (result.code.split("_")[0].toLowerCase().contains("hjrwebqrcode")) {
+        } else if (result.code.toLowerCase().contains("hjrwebqrcode")) {
           status = await webLogin();
           dev.log('web scanning status is: $status');
 
           Navigator.of(context).pop(true);
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.white,
-              behavior: SnackBarBehavior.floating,
-              content: Text(
-                status,
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-              margin: EdgeInsets.fromLTRB(
-                5.0,
-                0.0,
-                5.0,
-                20.0,
-              ),
-            ),
-          );
-          await controller?.resumeCamera();
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     backgroundColor: Colors.white,
+          //     behavior: SnackBarBehavior.floating,
+          //     content: Text(
+          //       status,
+          //       style: TextStyle(
+          //         color: Colors.black,
+          //       ),
+          //     ),
+          //     margin: EdgeInsets.fromLTRB(
+          //       5.0,
+          //       0.0,
+          //       5.0,
+          //       20.0,
+          //     ),
+          //   ),
+          // );
+          // await controller?.resumeCamera();
           /* await controller?.stopCamera();
 
           dev.log('$status', name: 'In scanner result');
           setState(() {
             isQrScanned = true;
           });*/
-        }else if (result.code.isNotEmpty && !result.code.contains("Hajeri")) {
+          setState(() {
+            isQrScanned = true;
+          });
+        } else if (result.code.isNotEmpty && !result.code.contains("Hajeri")) {
           status = "no hajeri";
 
           Navigator.pop(context);
@@ -499,24 +501,32 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
 
   // weblogin code
   Future<String> webLogin() async {
-
     // var qrCodeResult = result.code.toString().split("_");
     var qrcodeValueforweb = result.code.toString();
     dev.log("allowdistance $qrcodeValueforweb");
     String orgidforweb = prefs.getString("worker_id");
 
-   /* var response =
+    /* var response =
     await http.get("$kDesktopLogin?qrcodeValue=$qrcodeValueforweb&orgid=$orgidforweb", headers: {
       'Content-Type': 'application/json',
     });*/
-    var response = await http.get(Uri.parse("$kDesktopLogin?qrcodeValue=$qrcodeValueforweb&orgid=$orgidforweb"), headers: {
-      'Content-Type': 'application/json',
-    });
-    if (response.statusCode == 200) {
-      dev.log(response.body.toString());
-      return response.body.toString();
-    } else {
-      return "failed to connect to Internet";
+    try {
+      var response = await http.get(
+          Uri.parse(
+              "$kDesktopLogin?qrcodeValue=$qrcodeValueforweb&orgid=$orgidforweb"),
+          headers: {
+            'Content-Type': 'application/json',
+          });
+      if (response.statusCode == 200) {
+        dev.log(response.body.toString());
+        return 'web success';
+      } else {
+        return "failed to connect to Internet";
+      }
+    } on IOException catch (e) {
+      return 'connectivity issue';
+    } catch (e) {
+      return 'error occurred';
     }
   }
 
@@ -573,23 +583,22 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     dev.log("main_bank_idfromprefs: $usermainBankId");
 
     // get allow distance from api
-    int allowdistance ;
+    int allowdistance;
 
     var response = await http.get(Uri.parse("$kAllowDistance"), headers: {
       'Content-Type': 'application/json',
     });
-    if(response.statusCode == 200){
-      String allowdist ;
+    if (response.statusCode == 200) {
+      String allowdist;
       allowdist = response.body.toString();
       dev.log(response.body.toString(),
           name: 'In scanner didt within 3 meters');
-      allowdistance = int.parse(allowdist) ;
-    }
-    else{
+      allowdistance = int.parse(allowdist);
+    } else {
       return "failed to connect to Internet";
     }
 
-  // String userMobileNumber = prefs.getString("mobile");
+    // String userMobileNumber = prefs.getString("mobile");
     dev.log("org id from qr is $orgId");
     dev.log("allowdistance is $allowdistance");
     print("org id of user $userOrgId");
@@ -678,6 +687,41 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               Container(
                 child: Text(
                   "हजेरी लग गयी....!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+        break;
+      case "web success":
+        return Container(
+          child: Column(
+            children: [
+              Container(
+                height: constraints.maxHeight * 0.4,
+                width: constraints.maxWidth * 0.4,
+                // decoration: BoxDecoration(
+                //   image: DecorationImage(
+                //     image: AssetImage(
+                //       "assets/images/success.gif",
+                //     ),
+                //   ),
+                // ),
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/success.gif',
+                  ),
+                ),
+              ),
+              Container(
+                child: Text(
+                  "Logged into Web",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.blue,
@@ -826,6 +870,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
           ),
         );
         break;
+
       default:
     }
   }

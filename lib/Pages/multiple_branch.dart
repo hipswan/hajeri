@@ -1,13 +1,13 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/Pages/branch_landing.dart';
-import 'package:hajeri_demo/Pages/display_qr.dart';
-import 'package:hajeri_demo/Pages/maintain_branch.dart';
-import 'package:hajeri_demo/components/branch_form.dart';
-import 'package:hajeri_demo/constant.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/branch_landing.dart';
+import '../Pages/display_qr.dart';
+import '../Pages/maintain_branch.dart';
+import '../components/branch_form.dart';
+import '../constant.dart';
+import '../main.dart';
+import '../url.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
@@ -182,6 +182,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                                             child: Text('back'),
                                           )
                                         ],
+                                        title: Text('Delete Branch'),
                                         content: Text(
                                           result,
                                         ),
@@ -201,7 +202,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
             ),
           ),
           DraggableScrollableSheet(
-            initialChildSize: 0.6,
+            initialChildSize: 0.4,
             minChildSize: 0.35,
             maxChildSize: 0.8,
             builder: (BuildContext context, scrollController) {
@@ -315,6 +316,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                                                   child: Text('back'),
                                                 )
                                               ],
+                                              title: Text('Delete Branch'),
                                               content: Text(
                                                 result,
                                               ),

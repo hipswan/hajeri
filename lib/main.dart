@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
-
+import 'package:showcaseview/showcaseview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -9,21 +9,21 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hajeri_demo/Pages/about_us.dart';
-import 'package:hajeri_demo/Pages/contact_us.dart';
-import 'package:hajeri_demo/Pages/dashboard.dart';
-import 'package:hajeri_demo/Pages/generate_qr.dart';
-import 'package:hajeri_demo/Pages/landing.dart';
-import 'package:hajeri_demo/Pages/maintain_branch.dart';
-import 'package:hajeri_demo/Pages/maintain_qr.dart';
-import 'package:hajeri_demo/Pages/privacy_policy.dart';
-import 'package:hajeri_demo/Pages/sign_up_update.dart';
-import 'package:hajeri_demo/Pages/terms_and_conditions.dart';
-import 'package:hajeri_demo/Pages/verify_otp.dart';
-import 'package:hajeri_demo/Pages/profile.dart';
-import 'package:hajeri_demo/Pages/scanner.dart';
-import 'package:hajeri_demo/Pages/sign_up.dart';
-import 'package:hajeri_demo/Pages/monthly_attendance.dart';
+import './Pages/about_us.dart';
+import './Pages/contact_us.dart';
+import './Pages/dashboard.dart';
+import './Pages/generate_qr.dart';
+import './Pages/landing.dart';
+import './Pages/maintain_branch.dart';
+import './Pages/maintain_qr.dart';
+import './Pages/privacy_policy.dart';
+import './Pages/sign_up_update.dart';
+import './Pages/terms_and_conditions.dart';
+import './Pages/verify_otp.dart';
+import './Pages/profile.dart';
+import './Pages/scanner.dart';
+import './Pages/sign_up.dart';
+import './Pages/monthly_attendance.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Pages/register.dart';
@@ -115,6 +115,7 @@ Future<bool> loadResources() async {
     'login': false,
     'name': '',
     'number': '',
+    'showcase': null,
   });
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
@@ -211,7 +212,9 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         //confortaaTextTheme()
       ),
-      home: Home(),
+      home: ShowCaseWidget(
+        builder: Builder(builder: (context) => Home()),
+      ),
     );
   }
 
@@ -231,6 +234,7 @@ class _HomeState extends State<Home> {
   String userStatusCheck = "no result";
   String hajeriLevel;
   int mainBankId;
+
   Future<String> checkUserRole() async {
     try {
       dev.log("$kUserDetails${prefs.getString('mobile')}");
@@ -252,6 +256,7 @@ class _HomeState extends State<Home> {
         else
           mainBankId = data['mainbankid'];
         // dev.log(data.toString());
+        // prefs.setBool("is_sub_org", true);
         prefs.setString("hajeri_level", hajeriLevel);
         prefs.setString("main_bank_id", mainBankId.toString());
         String mainBankIdfromPrefs = prefs.getString("main_bank_id");

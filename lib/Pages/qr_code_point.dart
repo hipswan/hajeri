@@ -3,12 +3,12 @@ import 'dart:developer' as dev;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:hajeri_demo/Pages/display_qr.dart';
-import 'package:hajeri_demo/Pages/generate_qr.dart';
-import 'package:hajeri_demo/Pages/maintain_qr.dart';
-import 'package:hajeri_demo/constant.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/display_qr.dart';
+import '../Pages/generate_qr.dart';
+import '../Pages/maintain_qr.dart';
+import '../constant.dart';
+import '../main.dart';
+import '../url.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:http/http.dart' as http;
 
@@ -208,6 +208,7 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                                             child: Text('back'),
                                           )
                                         ],
+                                        title: Text('Delete Qr'),
                                         content: Text(
                                           result,
                                         ),
@@ -227,7 +228,7 @@ class _QrCodePointViewState extends State<QrCodePointView> {
             ),
           ),
           DraggableScrollableSheet(
-            initialChildSize: 0.7,
+            initialChildSize: 0.4,
             minChildSize: 0.35,
             maxChildSize: 0.8,
             builder: (BuildContext context, ScrollController scrollController) {
@@ -349,6 +350,7 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                                                   child: Text('back'),
                                                 )
                                               ],
+                                              title: Text('Delete Qr'),
                                               content: Text(
                                                 result,
                                               ),

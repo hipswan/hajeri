@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/Pages/otp_verify.dart';
-import 'package:hajeri_demo/components/transition.dart';
+import '../Pages/otp_verify.dart';
+import '../components/transition.dart';
 import 'dart:developer' as dev;
 
 import 'package:sms_autofill/sms_autofill.dart';

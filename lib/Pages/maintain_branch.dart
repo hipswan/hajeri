@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' as dev;
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hajeri_demo/Pages/generate_qr.dart';
-import 'package:hajeri_demo/Pages/display_qr.dart';
-import 'package:hajeri_demo/Pages/multiple_branch.dart';
-import 'package:hajeri_demo/Pages/qr_code_point.dart';
-import 'package:hajeri_demo/components/branch_form.dart';
-import 'package:hajeri_demo/components/side_bar.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/generate_qr.dart';
+import '../Pages/display_qr.dart';
+import '../Pages/multiple_branch.dart';
+import '../Pages/qr_code_point.dart';
+import '../components/branch_form.dart';
+import '../components/side_bar.dart';
+import '../main.dart';
+import '../url.dart';
 import 'package:http/http.dart' as http;
 import '../constant.dart';
 
@@ -57,10 +57,10 @@ class _MaintainBranchState extends State<MaintainBranch> {
         List<dynamic> data = json.decode(response.body);
 
         branchList = data;
-        // log(
-        //   branchList.toString(),
-        //   name: 'In branch list',
-        // );
+        dev.log(
+          branchList.toString(),
+          name: 'In branch list',
+        );
 
         return "success";
       } else {
@@ -94,7 +94,7 @@ class _MaintainBranchState extends State<MaintainBranch> {
                 builder: (context) {
                   return BranchForm(
                     branch: {},
-                    title: 'Add Sub Branch',
+                    title: 'Add Branch',
                     action: 'add',
                   );
                 },
@@ -138,7 +138,7 @@ class _MaintainBranchState extends State<MaintainBranch> {
       case "absent":
         return BranchForm(
           branch: {},
-          title: 'Add Sub Branch',
+          title: 'Add Branch',
           action: 'add',
         );
         break;

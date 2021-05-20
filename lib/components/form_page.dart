@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hajeri_demo/constant.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/model/Employee.dart';
-import 'package:hajeri_demo/url.dart';
+import '../constant.dart';
+import '../main.dart';
+import '../model/Employee.dart';
+import '../url.dart';
 import 'dart:developer' as dev;
 import 'package:http/http.dart' as http;
 import 'package:toast/toast.dart';
@@ -181,12 +182,12 @@ class _FormPageState extends State<FormPage> {
                 .toLowerCase()
                 .compareTo(city["cityname"].toString().trim().toLowerCase()) ==
             0) {
-          cityDropDownValue = city["id"].toString();
+          cityDropDownValue = city["cityname"].toString();
           // dev.log(cityDropDownValue
           //     .toString());
         }
         return DropdownMenuItem<String>(
-          value: city["id"].toString(),
+          value: city["cityname"].toString(),
           child: Text(
             city["cityname"],
           ),
@@ -218,22 +219,37 @@ class _FormPageState extends State<FormPage> {
       '$kUpdateEmp${_cNumber.text} $body',
       name: 'In update employee',
     );
-    var response = await http
-        .post(Uri.parse('$kUpdateEmp${_cNumber.text}'), body: body, headers: {
-      'Content-Type': 'application/json',
-    });
+    try {
+      var response = await http
+          .post(Uri.parse('$kUpdateEmp${_cNumber.text}'), body: body, headers: {
+        'Content-Type': 'application/json',
+      });
 
-    print("reponse is " + response.body);
-    if (response.statusCode == 200) {
-      print("the reponse data is " + response.toString());
-      Toast.show("your employee is updated sucessfully", context,
+      print("reponse is " + response.body);
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        print("the reponse data is " + response.toString());
+        Toast.show(data['message'], context,
+            duration: Toast.LENGTH_LONG,
+            gravity: Toast.BOTTOM,
+            textColor: Colors.blue);
+        return "success";
+        // cler_fields();
+      } else {
+        Toast.show("error occurred while updating employee", context,
+            duration: Toast.LENGTH_LONG,
+            gravity: Toast.BOTTOM,
+            textColor: Colors.red);
+        return "failure";
+      }
+    } on IOException catch (e) {
+      Toast.show("no internet", context,
           duration: Toast.LENGTH_LONG,
           gravity: Toast.BOTTOM,
-          textColor: Colors.blue);
-      return "success";
-      // cler_fields();
-    } else {
-      Toast.show("error occurred while updating employee", context,
+          textColor: Colors.red);
+      return "failure";
+    } catch (e) {
+      Toast.show("error occurred", context,
           duration: Toast.LENGTH_LONG,
           gravity: Toast.BOTTOM,
           textColor: Colors.red);
@@ -255,22 +271,36 @@ class _FormPageState extends State<FormPage> {
 
     // String orgId = prefs.getString("worker_id");
     dev.log('$kAddEmp$orgId  $body', name: 'In add employee');
-    var response =
-        await http.post(Uri.parse('$kAddEmp$orgId'), body: body, headers: {
-      'Content-Type': 'application/json',
-    });
+    try {
+      var response =
+          await http.post(Uri.parse('$kAddEmp$orgId'), body: body, headers: {
+        'Content-Type': 'application/json',
+      });
 
-    if (response.statusCode == 200) {
-      var data = json.decode(response.body);
-      dev.log(data.toString(), name: 'In add Employee success response');
-      Toast.show("your employee is added sucessfully", context,
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        dev.log(data.toString(), name: 'In add Employee success response');
+        Toast.show(data['message'].toString(), context,
+            duration: Toast.LENGTH_LONG,
+            gravity: Toast.BOTTOM,
+            textColor: Colors.blue);
+        return "success";
+        // cler_fields();
+      } else {
+        Toast.show("your employee is not added", context,
+            duration: Toast.LENGTH_LONG,
+            gravity: Toast.BOTTOM,
+            textColor: Colors.red);
+        return "failure";
+      }
+    } on IOException catch (e) {
+      Toast.show("no internet", context,
           duration: Toast.LENGTH_LONG,
           gravity: Toast.BOTTOM,
-          textColor: Colors.blue);
-      return "success";
-      // cler_fields();
-    } else {
-      Toast.show("your employee is not added", context,
+          textColor: Colors.red);
+      return "failure";
+    } catch (e) {
+      Toast.show("error occurred", context,
           duration: Toast.LENGTH_LONG,
           gravity: Toast.BOTTOM,
           textColor: Colors.red);
@@ -421,6 +451,9 @@ class _FormPageState extends State<FormPage> {
                                 vertical: 8.0,
                               ),
                               child: TextFormField(
+                                enabled: widget.action.contains('edit')
+                                    ? false
+                                    : true,
                                 keyboardType: TextInputType.numberWithOptions(
                                   decimal: false,
                                   signed: false,
@@ -471,7 +504,7 @@ class _FormPageState extends State<FormPage> {
                                   _cityDropDownMenuItems = cities
                                       .map(
                                         (city) => DropdownMenuItem<String>(
-                                          value: city["id"].toString(),
+                                          value: city["cityname"].toString(),
                                           child: Text(
                                             city["cityname"],
                                           ),
@@ -553,28 +586,16 @@ class _FormPageState extends State<FormPage> {
                                     "city": "",
                                     "state": "",
                                   };
-                                  cities.forEach((city) {
-                                    if (city['id']
-                                        .toString()
-                                        .trim()
-                                        .toLowerCase()
-                                        .contains(cityDropDownValue
-                                            .toString()
-                                            .trim()
-                                            .toLowerCase())) {
-                                      cityAndStateNewValue['city'] =
-                                          city["cityname"];
-                                    }
-                                  });
+
+                                  cityAndStateNewValue['city'] =
+                                      cityDropDownValue;
+
                                   states.forEach((state) {
-                                    if (state['id']
-                                        .toString()
-                                        .trim()
-                                        .toLowerCase()
-                                        .contains(stateDropDownValue
+                                    if (int.parse(
+                                            state['id'].toString().trim()) ==
+                                        int.parse(stateDropDownValue
                                             .toString()
-                                            .trim()
-                                            .toLowerCase())) {
+                                            .trim())) {
                                       cityAndStateNewValue['state'] =
                                           state["statename"];
                                     }

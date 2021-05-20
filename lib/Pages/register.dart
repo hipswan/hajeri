@@ -2,8 +2,8 @@ import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/Pages/sign_up.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/sign_up.dart';
+import '../url.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:toast/toast.dart';
@@ -206,7 +206,7 @@ class RegisterState extends State<Register> {
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
-      if (data['already_presen_status']
+      if (data['already_present_status']
           .toString()
           .trim()
           .toLowerCase()
@@ -257,7 +257,8 @@ class RegisterState extends State<Register> {
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
-      if (data['already_presen_status']
+      dev.log(data.toString());
+      if (data['already_present_status']
           .toString()
           .trim()
           .toLowerCase()

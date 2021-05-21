@@ -79,7 +79,7 @@ class _SignUpState extends State<SignUp> {
                 ),
                 child: Center(
                   child: Text(
-                    'Sign Up',
+                    'Sign In',
                     style: kTextStyleSignUp,
                   ),
                 ),
@@ -180,11 +180,20 @@ class _SignUpState extends State<SignUp> {
                 ),
                 child: Center(
                   child: Text(
-                    'Sign Up',
+                    'Sign In',
                     style: kSignUpTextStyle,
                   ),
                 ),
               ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 8.0,
+            ),
+            child: Text(
+              'if you are an employee, directly sign in',
+              textAlign: TextAlign.center,
             ),
           ),
           Expanded(

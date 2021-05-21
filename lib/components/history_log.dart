@@ -42,7 +42,7 @@ class _HistoryLogState extends State<HistoryLog> {
     ),
     GridTextColumn(
       // columnWidthMode: ColumnWidthMode.auto,
-      mappingName: 'clientmobno',
+      mappingName: 'clientmobile',
       headerText: 'Mobile',
       softWrap: true,
       headerTextSoftWrap: true,

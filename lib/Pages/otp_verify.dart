@@ -27,7 +27,7 @@ class _OtpVerifyState extends State<OtpVerify> {
   String signature = "{{ app signature }}";
   bool isCodeSent = false;
   String verificationCode;
-  String workerId, orgId, orgName, empName, role;
+  String workerId, orgId, orgName, empName, role, hajeriLevel, mainBankId;
 
   Future<void> sendCode(String number) async {
     try {
@@ -74,6 +74,14 @@ class _OtpVerifyState extends State<OtpVerify> {
             empName = data['emp_name'];
           role = data['role'];
 
+          if (data['mainbankid'] == null)
+            mainBankId = data['worker_id'].toString();
+          else
+            mainBankId = data['mainbankid'].toString();
+          // prefs.setBool("is_sub_org", hajeriLevel.contains("Hajeri-Head-1"));
+
+          // dev.log(data.toString());
+          prefs.setString("main_bank_id", mainBankId);
           setState(() {
             verificationCode = data['id'].toString() ?? "error";
 

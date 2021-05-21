@@ -16,7 +16,7 @@ String kCheckOtp = kRootApi + "/logincheck/";
 String kGetDistance = kRootApi + "/getdistance/";
 
 String kUpdateEmp = kRootApi + "/employee/empupdatebymobile/";
-String kEmployeeHistory = kRootApi + "/history/";
+String kEmployeeHistory = kRootApi + "/employee/historylog/";
 String kDeleteEmp = kRootApi + "/employee/empdeletebymobile/";
 
 String kDashboard = kRootApi + "/org/dashboard/";

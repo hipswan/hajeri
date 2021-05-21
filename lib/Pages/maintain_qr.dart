@@ -28,6 +28,7 @@ class ShowCaseQr extends StatelessWidget {
       },
       onComplete: (index, key) {
         dev.log('onComplete: $index, $key');
+        prefs.setBool('showcase_qr', false);
       },
       builder: Builder(builder: (context) => MaintainQr()),
       autoPlay: false,
@@ -48,13 +49,15 @@ class MaintainQr extends StatefulWidget {
 class _MaintainQrState extends State<MaintainQr> {
   String qrPointStatus = "no result";
   List qrCodePointList = [];
-  GlobalKey _addBranchKey = GlobalKey();
+  GlobalKey _addQrKey = GlobalKey();
 
   startShowCase() {
-    if (prefs.getBool('showcase') == null) {
+    if (prefs.getBool('showcase_qr') == null) {
       dev.log('Inside showcase');
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        ShowCaseWidget.of(context).startShowCase([_addBranchKey]);
+        Future.delayed(Duration(milliseconds: 350), () {
+          ShowCaseWidget.of(context).startShowCase([_addQrKey]);
+        });
       });
     }
   }
@@ -104,7 +107,6 @@ class _MaintainQrState extends State<MaintainQr> {
   @override
   void dispose() {
     dev.log('In dispose');
-    prefs.setBool('showcase', false);
     super.dispose();
   }
 
@@ -119,14 +121,14 @@ class _MaintainQrState extends State<MaintainQr> {
           ),
         ),
         floatingActionButton: Showcase(
-          key: _addBranchKey,
-          description: 'Click on add to generate new Qr code point',
-          shapeBorder: CircleBorder(),
+          key: _addQrKey,
+          description: 'Click on Add Button to generate new Qr code points',
+          contentPadding: EdgeInsets.all(8.0),
           showcaseBackgroundColor: Colors.blue,
           textColor: Colors.white,
-          contentPadding: EdgeInsets.all(
-            8.0,
-          ),
+          shapeBorder: CircleBorder(),
+          // 9762540886
+
           child: FloatingActionButton(
             heroTag: 'mainQR',
             backgroundColor: Colors.blue[700],
@@ -153,7 +155,7 @@ class _MaintainQrState extends State<MaintainQr> {
         appBar: AppBar(
           backgroundColor: Colors.blue[800],
           title: Text(
-            'Maintain QR',
+            'Generate QR',
           ),
           centerTitle: true,
         ),
@@ -178,9 +180,23 @@ class _MaintainQrState extends State<MaintainQr> {
         );
         break;
       case "absent":
-        return GenerateQR(
-          action: 'add',
-          title: 'Generate Qr',
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/notify.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'No Qr Code Available',
+              ),
+            ],
+          ),
         );
         break;
       case "error":

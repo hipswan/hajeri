@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io' show Platform, SocketException;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hajeri/components/today_employee.dart';
 import '../components/employee_data_grid.dart';
 import '../components/box_tile.dart';
 import '../components/history_log.dart';
@@ -34,6 +35,7 @@ class _DashboardState extends State<Dashboard> {
   // ignore: avoid_init_to_null
   List<dynamic> visitors;
   List<dynamic> history;
+  List<dynamic> todayEmployee;
 
   List<Employee> employees;
   String orgId;
@@ -50,7 +52,7 @@ class _DashboardState extends State<Dashboard> {
   Future<void> _getData() async {
     // String orgId = prefs.getString("worker_id");
     var response = await http.get(
-      Uri.parse("https://www.hajeri.in/apidev/org/dashboard/$orgId"),
+      Uri.parse("$kDashboard$orgId"),
     );
 
     if (response.statusCode == 200) {
@@ -122,20 +124,9 @@ class _DashboardState extends State<Dashboard> {
         bool emptyData = data.isEmpty;
 
         if (!emptyData) {
-          employees = data
-              .map<Employee>(
-                (e) => Employee(
-                    name: e["nameofworker"],
-                    number: int.parse(e["clientmobno"]),
-                    idCardNumber: int.parse(e["clientid"]),
-                    organizationName: e["organizationname"],
-                    city: e["visitingcity"],
-                    area: e["visitingcityto"],
-                    district: e["passavailableornot"],
-                    state: e["passavailableornot"]),
-              )
-              .toList();
-          return 'employee';
+          todayEmployee = data;
+
+          return 'today_employee';
         } else {
           return 'absent';
         }
@@ -157,6 +148,11 @@ class _DashboardState extends State<Dashboard> {
           employees: employees,
           view: selectedView,
           selectionModeDisabled: true,
+        );
+        break;
+      case "today_employee":
+        return TodayEmployee(
+          data: todayEmployee,
         );
         break;
       case "visitor":
@@ -278,7 +274,11 @@ class _DashboardState extends State<Dashboard> {
   Future<String> _getEmployeeHistory() async {
     log("$kEmployeeHistory");
     try {
-      var response = await http.get(Uri.parse("$kEmployeeHistory"));
+      var response = await http.get(
+        Uri.parse(
+          "$kEmployeeHistory${prefs.getString('mobile')}",
+        ),
+      );
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         // log("the _getTodayVisitorList data is " + data.toString());

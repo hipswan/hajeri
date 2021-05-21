@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
-import 'package:showcaseview/showcaseview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -94,7 +93,8 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-Future<bool> loadResources() async {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await FlutterDownloader.initialize(
     debug: false,
   );
@@ -111,12 +111,12 @@ Future<bool> loadResources() async {
   // Any time the token refreshes, store this in the database too.
   messaging.onTokenRefresh.listen(saveTokenToSharedPreferences);
 
-  SharedPreferences.setMockInitialValues({
-    'login': false,
-    'name': '',
-    'number': '',
-    'showcase': null,
-  });
+  // SharedPreferences.setMockInitialValues({
+  //   'login': true,
+  //   'name': '',
+  //   'number': '',
+  //   'showcase': null,
+  // });
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
@@ -129,12 +129,6 @@ Future<bool> loadResources() async {
     badge: true,
     sound: true,
   );
-  return false;
-}
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
   runApp(
     MyApp(),
   );
@@ -212,9 +206,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         //confortaaTextTheme()
       ),
-      home: ShowCaseWidget(
-        builder: Builder(builder: (context) => Home()),
-      ),
+      home: Home(),
     );
   }
 
@@ -233,7 +225,7 @@ class _HomeState extends State<Home> {
   bool isWait = true;
   String userStatusCheck = "no result";
   String hajeriLevel;
-  int mainBankId;
+  String mainBankId;
 
   Future<String> checkUserRole() async {
     try {
@@ -252,13 +244,13 @@ class _HomeState extends State<Home> {
         else
           hajeriLevel = data['hajerilevel'];
         if (data['mainbankid'] == null && data['hajerilevel'] == "Hajeri-Head")
-          mainBankId = data['id'];
+          mainBankId = data['id'].toString();
         else
-          mainBankId = data['mainbankid'];
+          mainBankId = data['mainbankid'].toString();
         // dev.log(data.toString());
-        // prefs.setBool("is_sub_org", true);
+        prefs.setBool("is_sub_org", hajeriLevel.contains("Hajeri-Head-1"));
         prefs.setString("hajeri_level", hajeriLevel);
-        prefs.setString("main_bank_id", mainBankId.toString());
+        prefs.setString("main_bank_id", mainBankId);
         String mainBankIdfromPrefs = prefs.getString("main_bank_id");
         dev.log(
             "main_bank_idfromprefs: $mainBankIdfromPrefs, main_bank_id: $mainBankId");
@@ -358,17 +350,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    loadResources().then((value) {
-      dev.log(value.toString());
-      setState(() {
-        isWait = value;
-      });
-    });
-    if (prefs != null &&
-        prefs.containsKey('login') &&
-        prefs.get('login') != null &&
-        prefs.get('login')) {
+
+    if (prefs?.getBool('login') != null) {
       checkUserRole().then((value) {
+        dev.log(value.toString());
         setState(() {
           userStatusCheck = value;
         });
@@ -379,25 +364,22 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: ModalProgressHUD(
-        inAsyncCall: isWait,
-        child: Builder(
-          builder: (context) {
-            // ignore: null_aware_in_logical_operator
-            if (prefs != null &&
-                prefs.containsKey('login') &&
-                prefs.get('login') != null &&
-                prefs.get('login')) {
-              // dev.debugger();
+      child: Builder(
+        builder: (context) {
+          // ignore: null_aware_in_logical_operator
+          if (prefs != null &&
+              prefs.containsKey('login') &&
+              prefs.get('login') != null &&
+              prefs.get('login')) {
+            // dev.debugger();
 
-              return Material(
-                child: getAfterRegisterPage(),
-              );
-            } else {
-              return SignUp();
-            }
-          },
-        ),
+            return Material(
+              child: getAfterRegisterPage(),
+            );
+          } else {
+            return SignUp();
+          }
+        },
       ),
     );
   }

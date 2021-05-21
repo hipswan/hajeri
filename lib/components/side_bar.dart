@@ -168,7 +168,7 @@ class _SideBarState extends State<SideBar> {
                 leading: Icon(
                   Icons.qr_code_rounded,
                 ),
-                title: const Text('Maintain Qr Code'),
+                title: const Text('Generate Qr'),
                 onTap: () {
                   section.contains('maintain_qr')
                       ? Navigator.pop(context)
@@ -242,7 +242,7 @@ class _SideBarState extends State<SideBar> {
                 },
               ),
               // prefs.getBool('is_sub_org')
-              true
+              !true
                   ? Container()
                   : ListTile(
                       selected:
@@ -250,14 +250,14 @@ class _SideBarState extends State<SideBar> {
                       leading: Icon(
                         Icons.people_outline,
                       ),
-                      title: const Text('Maintain Branch'),
+                      title: const Text('Branch Management'),
                       onTap: () {
                         section.contains('maintain_branch')
                             ? Navigator.pop(context)
                             : Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MaintainBranch(),
+                                  builder: (context) => ShowCaseBranch(),
                                 ),
                               );
                       },

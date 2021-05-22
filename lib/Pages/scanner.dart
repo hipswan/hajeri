@@ -519,7 +519,12 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
           });
       if (response.statusCode == 200) {
         dev.log(response.body.toString());
-        return 'web success';
+        String data = response.body.toString();
+        if (data.contains("Success")) {
+          return 'web success';
+        } else {
+          return 'web failure';
+        }
       } else {
         return "failed to connect to Internet";
       }
@@ -734,6 +739,41 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
           ),
         );
         break;
+      case "web failure":
+        return Container(
+          padding: EdgeInsets.fromLTRB(
+            10.0,
+            8.0,
+            10.0,
+            8.0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                height: constraints.maxHeight * 0.4,
+                child: Image.asset(
+                  "assets/images/fail.gif",
+                  height: 150.0,
+                  width: 150.0,
+                ),
+              ),
+              Container(
+                child: Text(
+                  "Invalid User, Please scan again",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+        break;
+
       case "failed to connect to Internet":
         return Container(
           child: Column(

@@ -43,6 +43,13 @@ class _OtpVerifyState extends State<OtpVerify> {
             .trim()
             .toLowerCase()
             .contains("not registered")) {
+          Toast.show(
+            "You are not registered please register",
+            context,
+            duration: Toast.LENGTH_LONG,
+            gravity: Toast.BOTTOM,
+            textColor: Colors.redAccent,
+          );
           Navigator.pushNamedAndRemoveUntil(
             context,
             Register.id,
@@ -73,15 +80,18 @@ class _OtpVerifyState extends State<OtpVerify> {
           else
             empName = data['emp_name'];
           role = data['role'];
-
-          if (data['mainbankid'] == null)
+          if (data['hajerilevel'] == null)
+            hajeriLevel = "No Data";
+          else
+            hajeriLevel = data['hajerilevel'];
+          if (data['mainbankid'] == null &&
+              data['hajerilevel'] == "Hajeri-Head")
             mainBankId = data['worker_id'].toString();
           else
             mainBankId = data['mainbankid'].toString();
           // prefs.setBool("is_sub_org", hajeriLevel.contains("Hajeri-Head-1"));
 
           // dev.log(data.toString());
-          prefs.setString("main_bank_id", mainBankId);
           setState(() {
             verificationCode = data['id'].toString() ?? "error";
 
@@ -427,6 +437,9 @@ class _OtpVerifyState extends State<OtpVerify> {
                           if (userTokenStatus.contains('success')) {
                             prefs.setBool("login", true);
                             // prefs.setBool("is_sub_org", true);
+                            prefs.setString("main_bank_id", mainBankId);
+                            prefs.setBool("is_sub_org",
+                                hajeriLevel.contains("Hajeri-Head-1"));
 
                             Navigator.pushAndRemoveUntil(
                               context,

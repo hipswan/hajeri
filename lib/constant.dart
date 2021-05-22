@@ -34,6 +34,7 @@ const List<String> kDepartmentMenuItems = <String>[
   'Admin Department',
   'Stores & Purchasing',
   'Research & Development',
+  'Owner',
   'Other',
 ];
 

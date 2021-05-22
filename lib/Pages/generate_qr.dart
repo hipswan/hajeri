@@ -554,9 +554,11 @@ class _GenerateQRState extends State<GenerateQR> {
                                   .requestFocus(new FocusNode());
                               await SystemChannels.textInput
                                   .invokeMethod('TextInput.hide');
-                              Navigator.pushNamed(
+                              Navigator.push(
                                 context,
-                                MaintainQr.id,
+                                MaterialPageRoute(
+                                  builder: (context) => ShowCaseQr(),
+                                ),
                               );
                             }
                           },

@@ -186,13 +186,7 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                                 color: Colors.white,
                               ),
                               onPressed: () async {
-                                String result = await deleteQrCodePoint(
-                                  mobile: qrCodePoint['mobile'],
-                                  point: qrCodePoint['nameofqrcodepoint'],
-                                );
-
-                                if (result != null) {
-                                  showDialog(
+                                bool delete = await showDialog(
                                     context: context,
                                     barrierDismissible: false,
                                     builder: (context) {
@@ -200,21 +194,56 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                                         actions: [
                                           TextButton(
                                             onPressed: () {
-                                              Navigator.pushNamed(
-                                                context,
-                                                MaintainQr.id,
-                                              );
+                                              Navigator.of(context).pop(true);
                                             },
-                                            child: Text('back'),
+                                            child: Text('Yes'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(false);
+                                            },
+                                            child: Text('No'),
                                           )
                                         ],
                                         title: Text('Delete Qr'),
                                         content: Text(
-                                          result,
+                                          'Do you want to delete qr code point ?',
                                         ),
                                       );
-                                    },
+                                    });
+                                if (delete) {
+                                  String result = await deleteQrCodePoint(
+                                    mobile: qrCodePoint['mobile'],
+                                    point: qrCodePoint['nameofqrcodepoint'],
                                   );
+
+                                  if (result != null) {
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ShowCaseQr(),
+                                                    ));
+                                              },
+                                              child: Text('back'),
+                                            )
+                                          ],
+                                          title: Text('Delete Qr'),
+                                          content: Text(
+                                            result,
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }
                                 }
                               },
                             ),
@@ -328,13 +357,41 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                                     color: Colors.white,
                                   ),
                                   onTap: () async {
-                                    String result = await deleteQrCodePoint(
-                                      mobile: qrCodePoint['mobile'],
-                                      point: qrCodePoint['nameofqrcodepoint'],
-                                    );
+                                    bool delete = await showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop(true);
+                                                },
+                                                child: Text('Yes'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop(false);
+                                                },
+                                                child: Text('No'),
+                                              )
+                                            ],
+                                            title: Text('Delete Qr'),
+                                            content: Text(
+                                              'Do you want to delete qr code point ?',
+                                            ),
+                                          );
+                                        });
+                                    if (delete) {
+                                      String result = await deleteQrCodePoint(
+                                        mobile: qrCodePoint['mobile'],
+                                        point: qrCodePoint['nameofqrcodepoint'],
+                                      );
 
-                                    if (result != null) {
-                                      showDialog(
+                                      if (result != null) {
+                                        showDialog(
                                           context: context,
                                           barrierDismissible: false,
                                           builder: (context) {
@@ -342,10 +399,12 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                                               actions: [
                                                 TextButton(
                                                   onPressed: () {
-                                                    Navigator.pushNamed(
-                                                      context,
-                                                      MaintainQr.id,
-                                                    );
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ShowCaseQr(),
+                                                        ));
                                                   },
                                                   child: Text('back'),
                                                 )
@@ -355,7 +414,9 @@ class _QrCodePointViewState extends State<QrCodePointView> {
                                                 result,
                                               ),
                                             );
-                                          });
+                                          },
+                                        );
+                                      }
                                     }
                                   },
                                   decoration: BoxDecoration(

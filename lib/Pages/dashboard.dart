@@ -93,7 +93,7 @@ class _DashboardState extends State<Dashboard> {
                     organizationName: e["organizationname"],
                     departmentName: e["departmentname"],
                     city: e["city"],
-                    area: e["area"],
+                    addressLine1: e["addressline1"],
                     district: e["district"],
                     state: e["state"]),
               )

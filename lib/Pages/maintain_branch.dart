@@ -104,7 +104,7 @@ class _MaintainBranchState extends State<MaintainBranch> {
     } on SocketException catch (e) {
       return 'no internet';
     } on Exception catch (e) {
-      return 'error';
+      return 'error occurred';
     }
   }
 
@@ -203,7 +203,7 @@ class _MaintainBranchState extends State<MaintainBranch> {
           ),
         );
         break;
-      case "error":
+      case "error occurred":
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

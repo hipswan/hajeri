@@ -174,7 +174,9 @@ class _SideBarState extends State<SideBar> {
                       ? Navigator.pop(context)
                       : Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ShowCaseQr()),
+                          MaterialPageRoute(
+                            builder: (context) => ShowCaseQr(),
+                          ),
                         );
                 },
               ),
@@ -241,8 +243,7 @@ class _SideBarState extends State<SideBar> {
                         );
                 },
               ),
-              // prefs.getBool('is_sub_org')
-              !true
+              prefs.getBool('is_sub_org')
                   ? Container()
                   : ListTile(
                       selected:

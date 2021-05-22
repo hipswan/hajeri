@@ -106,9 +106,11 @@ class Profile extends StatelessWidget {
                                 color: Colors.white,
                                 fontSize: 20,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              prefs.getString('worker_id'),
+                              prefs.getString('mobile'),
                               style: TextStyle(
                                 color: Colors.white,
                               ),

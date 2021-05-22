@@ -229,10 +229,13 @@ class _FormPageState extends State<FormPage> {
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         print("the reponse data is " + response.toString());
-        Toast.show(data['message'], context,
-            duration: Toast.LENGTH_LONG,
-            gravity: Toast.BOTTOM,
-            textColor: Colors.blue);
+        Toast.show(
+          data['message'],
+          context,
+          duration: Toast.LENGTH_LONG,
+          gravity: Toast.BOTTOM,
+          textColor: Colors.green,
+        );
         return "success";
         // cler_fields();
       } else {
@@ -283,7 +286,7 @@ class _FormPageState extends State<FormPage> {
         Toast.show(data['message'].toString(), context,
             duration: Toast.LENGTH_LONG,
             gravity: Toast.BOTTOM,
-            textColor: Colors.blue);
+            textColor: Colors.green);
         return "success";
         // cler_fields();
       } else {

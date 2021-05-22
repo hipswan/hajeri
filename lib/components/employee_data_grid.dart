@@ -195,16 +195,17 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
               mappingName: 'city',
               headerText: 'City',
               allowSorting: false,
+              columnWidthMode: ColumnWidthMode.cells,
             ),
             GridNumericColumn(
               mappingName: 'idCard',
-              headerText: 'ID',
+              headerText: 'ID  ',
               allowSorting: false,
-              columnWidthMode: ColumnWidthMode.cells,
+              columnWidthMode: ColumnWidthMode.header,
             ),
             GridTextColumn(
-              mappingName: 'area',
-              headerText: 'Area',
+              mappingName: 'address',
+              headerText: 'Address',
               allowSorting: false,
             ),
             GridTextColumn(
@@ -264,7 +265,7 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                     'idCard',
                     'number',
                     'city',
-                    'area',
+                    'address',
                     'department',
                     'district',
                     'state',
@@ -337,55 +338,103 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                                       color: Colors.redAccent,
                                     ),
                                     onPressed: () async {
-                                      log('Delete');
-                                      log((_dataGridController.selectedRow
-                                              as Employee)
-                                          .name
-                                          .toString());
+                                      var employee = (_dataGridController
+                                          .selectedRow as Employee);
+                                      bool isMainEmployee = employee.number
+                                          .toString()
+                                          .contains(prefs.getString('mobile'));
+                                      if (!isMainEmployee) {
+                                        bool delete = await showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop(true);
+                                                    },
+                                                    child: Text('Yes'),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop(false);
+                                                    },
+                                                    child: Text('No'),
+                                                  )
+                                                ],
+                                                title: Text('Delete Employee'),
+                                                content: Text(
+                                                  'Do you want to delete employee ?',
+                                                ),
+                                              );
+                                            });
+                                        if (delete) {
+                                          var deleteStatus =
+                                              await deleteEmployee(
+                                                  employee: currentEmployee);
+                                          log(deleteStatus);
+                                          if (deleteStatus
+                                              .toLowerCase()
+                                              .contains('success')) {
+                                            if (_employees
+                                                .remove(currentEmployee)) {
+                                              log('removed ${currentEmployee.name}');
+                                            } else {
+                                              log('not removed removed ${currentEmployee.name}');
+                                            }
+                                          } else {
+                                            log('Error while deleting');
+                                          }
 
-                                      var deleteStatus = await deleteEmployee(
-                                          employee: currentEmployee);
-                                      log(deleteStatus);
-                                      if (deleteStatus
-                                          .toLowerCase()
-                                          .contains('success')) {
-                                        if (_employees
-                                            .remove(currentEmployee)) {
-                                          log('removed ${currentEmployee.name}');
-                                        } else {
-                                          log('not removed removed ${currentEmployee.name}');
+                                          _employeeDataSource
+                                              .updateDataGridSource();
+                                          showDialog(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      child: Text('back'),
+                                                    )
+                                                  ],
+                                                  title:
+                                                      Text('Delete Employees'),
+                                                  content: Text(
+                                                    deleteStatus,
+                                                  ),
+                                                );
+                                              });
                                         }
                                       } else {
-                                        log('Error while deleteing');
+                                        showDialog(
+                                            context: context,
+                                            barrierDismissible: true,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    child: Text('Back'),
+                                                  ),
+                                                ],
+                                                title: Text('Delete Employee'),
+                                                content: Text(
+                                                  'You cannot delete yourself',
+                                                ),
+                                              );
+                                            });
                                       }
-
-// if(success)
-
-                                      //toast if error message
-
-                                      // await getEmployeeList();
-
-                                      _employeeDataSource
-                                          .updateDataGridSource();
-                                      showDialog(
-                                          context: context,
-                                          barrierDismissible: false,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: Text('back'),
-                                                )
-                                              ],
-                                              title: Text('Delete Employees'),
-                                              content: Text(
-                                                deleteStatus,
-                                              ),
-                                            );
-                                          });
                                     }),
                               ],
                             )
@@ -430,8 +479,8 @@ class EmployeeDataSource extends DataGridSource<Employee> {
       case 'city':
         return employee.city;
         break;
-      case 'area':
-        return employee.area;
+      case 'address':
+        return employee.addressLine1;
         break;
       case 'department':
         return employee.departmentName;

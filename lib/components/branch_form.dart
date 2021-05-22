@@ -236,17 +236,23 @@ class _BranchFormState extends State<BranchForm> {
       var data = json.decode(response.body);
       dev.log(data.toString(), name: 'In add Branch success response');
 
-      Toast.show("Your Branch is added sucessfully", context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.blue);
+      Toast.show(
+        "Your Branch is added sucessfully",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.green,
+      );
       return "success";
       // cler_fields();
     } else {
-      Toast.show("Your Branch is not added", context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.red);
+      Toast.show(
+        "Your Branch is not added",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.red,
+      );
       return "failure";
     }
   }
@@ -270,10 +276,13 @@ class _BranchFormState extends State<BranchForm> {
       var data = json.decode(response.body);
       dev.log(data.toString(), name: 'In update Branch success response');
 
-      Toast.show("Your Branch is updated sucessfully", context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.blue);
+      Toast.show(
+        "Your Branch is updated sucessfully",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.green,
+      );
       return "success";
       // cler_fields();
     } else {
@@ -574,12 +583,16 @@ class _BranchFormState extends State<BranchForm> {
                           onPressed: () async {
                             if (_formState.currentState.validate()) {
                               if (widget.action.contains('add')) {
-                                var isBranchAddedSuccess = await addSubBranch();
-                                Navigator.pushNamed(context, MaintainBranch.id);
+                                await addSubBranch();
                               } else {
-                                var isBranchEditSuccess = await updateBranch();
-                                Navigator.pushNamed(context, MaintainBranch.id);
+                                await updateBranch();
                               }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ShowCaseBranch(),
+                                ),
+                              );
                             } else {
                               Toast.show(
                                 "Some details are missing",

@@ -247,6 +247,10 @@ class _HomeState extends State<Home> {
           mainBankId = data['id'].toString();
         else
           mainBankId = data['mainbankid'].toString();
+        if (data['id'] == null)
+          prefs.setString("worker_id", "No Data");
+        else
+          prefs.setString("worker_id", data["id"]);
         // dev.log(data.toString());
         prefs.setBool("is_sub_org", hajeriLevel.contains("Hajeri-Head-1"));
         prefs.setString("hajeri_level", hajeriLevel);

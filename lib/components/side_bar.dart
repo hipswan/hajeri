@@ -168,7 +168,7 @@ class _SideBarState extends State<SideBar> {
                 leading: Icon(
                   Icons.qr_code_rounded,
                 ),
-                title: const Text('Generate Qr'),
+                title: const Text('Generate QR Code'),
                 onTap: () {
                   section.contains('maintain_qr')
                       ? Navigator.pop(context)

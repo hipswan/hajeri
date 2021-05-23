@@ -30,39 +30,46 @@ class _BranchFormState extends State<BranchForm> {
 
   TextEditingController _cOrgName,
       _cName,
-      _cBusiness,
       _cNumber,
       _cAddress,
       _cId,
-      _cDistrict,
-      _cDepartment;
+      _cDistrict;
   String stateDropDownValue,
       cityDropDownValue,
       businessNatureDropDownValue,
       departmentDropDownValue;
   List<DropdownMenuItem<String>> _cityDropDownMenuItems,
-      _departmentDropDownMenuItems,
-      _businessNatureDropDownMenuItems,
+      _departmentDropDownMenuItems = kDepartmentMenuItems
+          .map(
+            (department) => DropdownMenuItem<String>(
+              value: department.toString().trim(),
+              child: Text(
+                department,
+                overflow: TextOverflow.clip,
+              ),
+            ),
+          )
+          .toList(),
+      _businessNatureDropDownMenuItems = kBusinessNatureMenuItems
+          .map(
+            (business) => DropdownMenuItem<String>(
+              value: business,
+              child: Text(
+                business,
+              ),
+            ),
+          )
+          .toList(),
       _stateDropDownMenuItems;
   bool stateSelected = false;
   List<dynamic> states;
   List<dynamic> cities;
-
   @override
   void initState() {
     super.initState();
 
     _formState = GlobalKey<FormState>();
-    _businessNatureDropDownMenuItems = kBusinessNatureMenuItems
-        .map(
-          (business) => DropdownMenuItem<String>(
-            value: business,
-            child: Text(
-              business,
-            ),
-          ),
-        )
-        .toList();
+
     Map branch = widget.branch;
     _cName = TextEditingController(
         text: branch.isEmpty ? '' : branch["personaname"]);
@@ -70,29 +77,27 @@ class _BranchFormState extends State<BranchForm> {
         text: branch.isEmpty ? '' : branch["nameoforganization"]);
     _cDistrict =
         TextEditingController(text: branch.isEmpty ? '' : branch["district"]);
-    businessNatureDropDownValue =
-        branch.isEmpty ? null : branch["natureofbusiness"];
+    // dev.debugger();
+    dev.log(branch["natureofbusiness"]);
+    businessNatureDropDownValue = branch.isEmpty
+        ? null
+        : (branch["natureofbusiness"] == "null"
+            ? null
+            : branch["natureofbusiness"]);
+    // dev.debugger();
+
+    dev.log(kBusinessNatureMenuItems.toString());
     _cNumber = TextEditingController(
       text: branch.isEmpty ? '' : branch["mobile"],
     );
+    departmentDropDownValue =
+        branch.isEmpty ? null : branch["departmentname"].toString().trim();
     _cAddress =
         TextEditingController(text: branch.isEmpty ? '' : branch["address"]);
     _cId = TextEditingController(
       text: branch.isEmpty ? '' : branch["id"].toString(),
     );
-    // _cDepartment = TextEditingController(
-    //   text:  branch.isEmpty ? '': branch[""],
-    // );
-    _departmentDropDownMenuItems = kDepartmentMenuItems
-        .map(
-          (department) => DropdownMenuItem<String>(
-            value: department,
-            child: Text(
-              department,
-            ),
-          ),
-        )
-        .toList();
+
     setStateAndCity();
   }
 

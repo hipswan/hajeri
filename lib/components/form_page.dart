@@ -27,14 +27,7 @@ class FormPage extends StatefulWidget {
 class _FormPageState extends State<FormPage> {
   GlobalKey<FormState> _formState;
 
-  TextEditingController _cOrgName,
-      _cName,
-      _cBusinessName,
-      _cNumber,
-      _cAddress,
-      _cIdentity,
-      _cDistrict,
-      _cDepartment;
+  TextEditingController _cName, _cNumber, _cAddress, _cIdentity, _cDistrict;
   String stateDropDownValue, cityDropDownValue, departmentDropDownValue;
   List<DropdownMenuItem<String>> _cityDropDownMenuItems,
       _departmentDropDownMenuItems,
@@ -52,10 +45,8 @@ class _FormPageState extends State<FormPage> {
     _formState = GlobalKey<FormState>();
     var employee = widget.currentEmployee;
     _cName = TextEditingController(text: employee.name);
-    _cOrgName = TextEditingController(text: employee.organizationName);
     departmentDropDownValue =
         employee.departmentName.isEmpty ? null : employee.departmentName;
-    _cBusinessName = TextEditingController(text: employee.organizationName);
     _cNumber = TextEditingController(
       text: (employee.number == 0) ? '' : employee.number.toString(),
     );
@@ -64,7 +55,6 @@ class _FormPageState extends State<FormPage> {
       text:
           (employee.idCardNumber == 0) ? ' ' : employee.idCardNumber.toString(),
     );
-    _cDepartment = TextEditingController(text: employee.addressLine1);
     _cDistrict = TextEditingController(text: employee.district);
     _departmentDropDownMenuItems = kDepartmentMenuItems
         .map(

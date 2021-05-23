@@ -42,6 +42,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
   @override
   Widget build(BuildContext context) {
     var branch = widget.branchList.first;
+    log(branch.toString(), name: 'branch ');
 
     mediaQuery = MediaQuery.of(context);
     return Container(
@@ -396,7 +397,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                                       foregroundColor: Colors.white,
                                       child: Center(
                                         child: Text(
-                                          branch["personaname"]
+                                          branch["nameoforganization"]
                                               .toString()
                                               .substring(
                                                 0,
@@ -408,7 +409,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                                     ),
                                   ),
                                   title: Text(
-                                    branch["personaname"] ?? '',
+                                    branch["nameoforganization"] ?? '',
                                     style: kBranchTextStyle,
                                   ),
                                   subtitle: Text(

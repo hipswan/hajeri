@@ -180,6 +180,7 @@ class _DisplayQrState extends State<DisplayQr> {
                           ),
                           Text(
                             'Contactless-Attendance System',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 20.0,
@@ -191,6 +192,7 @@ class _DisplayQrState extends State<DisplayQr> {
                           ),
                           Text(
                             prefs.getString('org_name'),
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20.0,

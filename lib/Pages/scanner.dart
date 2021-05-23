@@ -433,7 +433,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
           status = await webLogin();
           dev.log('web scanning status is: $status');
 
-          Navigator.of(context).pop(true);
+          Navigator.pop(context);
 
           // ScaffoldMessenger.of(context).showSnackBar(
           //   SnackBar(

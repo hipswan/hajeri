@@ -272,7 +272,7 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Future<String> _getEmployeeHistory() async {
-    log("$kEmployeeHistory");
+    log("$kEmployeeHistory${prefs.getString('mobile')}");
     try {
       var response = await http.get(
         Uri.parse(
@@ -281,7 +281,7 @@ class _DashboardState extends State<Dashboard> {
       );
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-        // log("the _getTodayVisitorList data is " + data.toString());
+        log("the _get history log data is " + data.toString());
         if (data.isEmpty) {
           return 'absent';
         } else {

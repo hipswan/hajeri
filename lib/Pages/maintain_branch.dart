@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' as dev;
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
@@ -7,16 +7,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hajeri_demo/Pages/generate_qr.dart';
-import 'package:hajeri_demo/Pages/display_qr.dart';
-import 'package:hajeri_demo/Pages/multiple_branch.dart';
-import 'package:hajeri_demo/Pages/qr_code_point.dart';
-import 'package:hajeri_demo/components/branch_form.dart';
-import 'package:hajeri_demo/components/side_bar.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/url.dart';
+import 'package:showcaseview/showcaseview.dart';
+import '../Pages/generate_qr.dart';
+import '../Pages/display_qr.dart';
+import '../Pages/multiple_branch.dart';
+import '../Pages/qr_code_point.dart';
+import '../components/branch_form.dart';
+import '../components/side_bar.dart';
+import '../main.dart';
+import '../url.dart';
 import 'package:http/http.dart' as http;
 import '../constant.dart';
+
+class ShowCaseBranch extends StatelessWidget {
+  const ShowCaseBranch({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ShowCaseWidget(
+      onStart: (index, key) {
+        dev.log('onStart: $index, $key');
+      },
+      onComplete: (index, key) {
+        dev.log('onComplete: $index, $key');
+        prefs.setBool('showcase_branch', false);
+      },
+      builder: Builder(builder: (context) => MaintainBranch()),
+      autoPlay: false,
+      autoPlayDelay: Duration(seconds: 3),
+      autoPlayLockEnable: false,
+    );
+  }
+}
 
 class MaintainBranch extends StatefulWidget {
   static const id = 'maintain_branch';
@@ -29,10 +51,23 @@ class MaintainBranch extends StatefulWidget {
 class _MaintainBranchState extends State<MaintainBranch> {
   String branchStatus = "no result";
   List branchList = [];
+  GlobalKey _addBranchKey = GlobalKey();
+
+  startShowCase() {
+    dev.log('Inside showcase');
+    if (prefs.getBool('showcase_branch') == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        Future.delayed(Duration(milliseconds: 350), () {
+          ShowCaseWidget.of(context).startShowCase([_addBranchKey]);
+        });
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    startShowCase();
     getOrgBranch().then((value) {
       if (value.contains("success")) {
         branchList.isEmpty ? branchStatus = 'absent' : branchStatus = 'present';
@@ -57,10 +92,10 @@ class _MaintainBranchState extends State<MaintainBranch> {
         List<dynamic> data = json.decode(response.body);
 
         branchList = data;
-        // log(
-        //   branchList.toString(),
-        //   name: 'In branch list',
-        // );
+        dev.log(
+          branchList.toString(),
+          name: 'In branch list',
+        );
 
         return "success";
       } else {
@@ -69,7 +104,7 @@ class _MaintainBranchState extends State<MaintainBranch> {
     } on SocketException catch (e) {
       return 'no internet';
     } on Exception catch (e) {
-      return 'error';
+      return 'error occurred';
     }
   }
 
@@ -83,26 +118,34 @@ class _MaintainBranchState extends State<MaintainBranch> {
     var mediaQuery = MediaQuery.of(context);
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          heroTag: 'mainBranch',
-          backgroundColor: Colors.blue[700],
-          onPressed: () {
-            // debugger();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return BranchForm(
-                    branch: {},
-                    title: 'Add Sub Branch',
-                    action: 'add',
-                  );
-                },
-              ),
-            );
-          },
-          child: Icon(
-            Icons.playlist_add,
+        floatingActionButton: Showcase(
+          key: _addBranchKey,
+          description: 'Click on Add Button to create new Branch',
+          contentPadding: EdgeInsets.all(8.0),
+          showcaseBackgroundColor: Colors.blue,
+          textColor: Colors.white,
+          shapeBorder: CircleBorder(),
+          child: FloatingActionButton(
+            heroTag: 'mainBranch',
+            backgroundColor: Colors.blue[700],
+            onPressed: () {
+              // debugger();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return BranchForm(
+                      branch: {},
+                      title: 'Add Branch',
+                      action: 'add',
+                    );
+                  },
+                ),
+              );
+            },
+            child: Icon(
+              Icons.playlist_add,
+            ),
           ),
         ),
         drawer: Drawer(
@@ -114,11 +157,16 @@ class _MaintainBranchState extends State<MaintainBranch> {
         appBar: AppBar(
           backgroundColor: Colors.blue[800],
           title: Text(
-            'Maintain Branch',
+            'Branch Management',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
           centerTitle: true,
         ),
-        body: Container(color: Colors.white, child: getBranchView()),
+        body: Container(
+          color: Colors.white,
+          child: getBranchView(),
+        ),
       ),
     );
   }
@@ -136,13 +184,26 @@ class _MaintainBranchState extends State<MaintainBranch> {
         );
         break;
       case "absent":
-        return BranchForm(
-          branch: {},
-          title: 'Add Sub Branch',
-          action: 'add',
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/vectors/notify.svg',
+                width: 150,
+                height: 150,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                'No Sub Branch Exist Yet',
+              ),
+            ],
+          ),
         );
         break;
-      case "error":
+      case "error occurred":
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

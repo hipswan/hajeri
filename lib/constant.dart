@@ -21,7 +21,7 @@ const List<String> kBusinessNatureMenuItems = <String>[
   'Industry',
   'Other',
 ];
-const kMaxOrganizationName = 15;
+const kMaxOrganizationName = 40;
 const kMaxQrCodePointName = 15;
 
 const List<String> kDepartmentMenuItems = <String>[
@@ -34,6 +34,7 @@ const List<String> kDepartmentMenuItems = <String>[
   'Admin Department',
   'Stores & Purchasing',
   'Research & Development',
+  'Owner',
   'Other',
 ];
 

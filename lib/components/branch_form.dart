@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/Pages/maintain_branch.dart';
-import 'package:hajeri_demo/components/blue_button.dart';
-import 'package:hajeri_demo/constant.dart';
-import 'package:hajeri_demo/main.dart';
+import '../Pages/maintain_branch.dart';
+import '../components/blue_button.dart';
+import '../constant.dart';
+import '../main.dart';
 import 'dart:developer' as dev;
 import 'package:http/http.dart' as http;
-import 'package:hajeri_demo/url.dart';
+import '../url.dart';
 import 'package:toast/toast.dart';
 
 class BranchForm extends StatefulWidget {
@@ -30,65 +30,74 @@ class _BranchFormState extends State<BranchForm> {
 
   TextEditingController _cOrgName,
       _cName,
-      _cBusiness,
       _cNumber,
       _cAddress,
       _cId,
-      _cDistrict,
-      _cDepartment;
-  String stateDropDownValue, cityDropDownValue,businessNatureDropDownValue, departmentDropDownValue;
+      _cDistrict;
+  String stateDropDownValue,
+      cityDropDownValue,
+      businessNatureDropDownValue,
+      departmentDropDownValue;
   List<DropdownMenuItem<String>> _cityDropDownMenuItems,
-      _departmentDropDownMenuItems,_businessNatureDropDownMenuItems,
+      _departmentDropDownMenuItems = kDepartmentMenuItems
+          .map(
+            (department) => DropdownMenuItem<String>(
+              value: department.toString().trim(),
+              child: Text(
+                department,
+                overflow: TextOverflow.clip,
+              ),
+            ),
+          )
+          .toList(),
+      _businessNatureDropDownMenuItems = kBusinessNatureMenuItems
+          .map(
+            (business) => DropdownMenuItem<String>(
+              value: business,
+              child: Text(
+                business,
+              ),
+            ),
+          )
+          .toList(),
       _stateDropDownMenuItems;
   bool stateSelected = false;
   List<dynamic> states;
   List<dynamic> cities;
-
   @override
   void initState() {
     super.initState();
 
     _formState = GlobalKey<FormState>();
-    _businessNatureDropDownMenuItems = kBusinessNatureMenuItems
-        .map(
-          (business) => DropdownMenuItem<String>(
-        value: business,
-        child: Text(
-          business,
-        ),
-      ),
-    )
-        .toList();
+
     Map branch = widget.branch;
     _cName = TextEditingController(
         text: branch.isEmpty ? '' : branch["personaname"]);
     _cOrgName = TextEditingController(
         text: branch.isEmpty ? '' : branch["nameoforganization"]);
-    _cDistrict =TextEditingController(
-        text: branch.isEmpty ? '' : branch["district"]);
-    businessNatureDropDownValue =
-        branch.isEmpty ? null : branch["natureofbusiness"];
+    _cDistrict =
+        TextEditingController(text: branch.isEmpty ? '' : branch["district"]);
+    // dev.debugger();
+    dev.log(branch["natureofbusiness"]);
+    businessNatureDropDownValue = branch.isEmpty
+        ? null
+        : (branch["natureofbusiness"] == "null"
+            ? null
+            : branch["natureofbusiness"]);
+    // dev.debugger();
+
+    dev.log(kBusinessNatureMenuItems.toString());
     _cNumber = TextEditingController(
       text: branch.isEmpty ? '' : branch["mobile"],
     );
+    departmentDropDownValue =
+        branch.isEmpty ? null : branch["departmentname"].toString().trim();
     _cAddress =
         TextEditingController(text: branch.isEmpty ? '' : branch["address"]);
     _cId = TextEditingController(
       text: branch.isEmpty ? '' : branch["id"].toString(),
     );
-    // _cDepartment = TextEditingController(
-    //   text:  branch.isEmpty ? '': branch[""],
-    // );
-    _departmentDropDownMenuItems = kDepartmentMenuItems
-        .map(
-          (department) => DropdownMenuItem<String>(
-            value: department,
-            child: Text(
-              department,
-            ),
-          ),
-        )
-        .toList();
+
     setStateAndCity();
   }
 
@@ -188,12 +197,12 @@ class _BranchFormState extends State<BranchForm> {
                 .toLowerCase()
                 .compareTo(city["cityname"].toString().trim().toLowerCase()) ==
             0) {
-          cityDropDownValue = city["id"].toString();
+          cityDropDownValue = city["cityname"].toString();
           // dev.log(cityDropDownValue
           //     .toString());
         }
         return DropdownMenuItem<String>(
-          value: city["id"].toString(),
+          value: city["cityname"].toString(),
           child: Text(
             city["cityname"],
           ),
@@ -213,58 +222,42 @@ class _BranchFormState extends State<BranchForm> {
     String orgId = prefs.getString("worker_id");
     var currentState;
     states.forEach((state) {
-      if (state['id']
-          .toString()
-          .trim()
-          .toLowerCase()
-          .contains(stateDropDownValue.toString().trim().toLowerCase())) {
-        states.forEach((state) {
-          if (state['id']
-              .toString()
-              .trim()
-              .toLowerCase()
-              .contains(stateDropDownValue.toString().trim().toLowerCase())) {
-            currentState = state["statename"];
-          }
-        });
+      if (int.parse(state['id'].toString().trim()) ==
+          int.parse(stateDropDownValue.toString().trim())) {
+        currentState = state["statename"];
       }
     });
-    var currentCity;
-    cities.forEach((city) {
-      if (city['id']
-          .toString()
-          .trim()
-          .toLowerCase()
-          .contains(cityDropDownValue.toString().trim().toLowerCase())) {
-        currentCity = city["cityname"];
-      }
-    });
-    dev.log('$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=${_cDistrict.text}&city=$currentCity',
+    var currentCity = cityDropDownValue;
+
+    dev.log(
+      '$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=${_cDistrict.text}&city=$currentCity',
     );
 
-        var response = await http.post(Uri.parse('$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=${_cDistrict.text}&city=$currentCity',
+    var response = await http.post(Uri.parse(
+      '$kAddBranch$orgId?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=${_cDistrict.text}&city=$currentCity',
     ));
-
-
-    //        '$kGenerateQrCodePoint?latlong=${currentPosition.latitude.toString()}, ${currentPosition.longitude.toString()}&qrpointname=${_cqrPointController.text}&id=$orgId&mobile=$mobile&fromapp=Yes',
-
-    //https://www.hajeri.in/apidev/branch/addsubbranch/925?nameoforganization=abdbranch2&personaname=siddya&natureofbusiness=Manager&contactpersondepartmentname=Manager&address=Bhakti Shakti Chowk&mobile=1237891010&state=maharashtra&district=aurangabad&city=aurangabad
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       dev.log(data.toString(), name: 'In add Branch success response');
 
-      Toast.show("Your Branch is added sucessfully", context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.blue);
+      Toast.show(
+        "Your Branch is added sucessfully",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.green,
+      );
       return "success";
       // cler_fields();
     } else {
-      Toast.show("Your Branch is not added", context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.red);
+      Toast.show(
+        "Your Branch is not added",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.red,
+      );
       return "failure";
     }
   }
@@ -273,44 +266,28 @@ class _BranchFormState extends State<BranchForm> {
     String orgId = prefs.getString("worker_id");
     var currentState;
     states.forEach((state) {
-      if (state['id']
-          .toString()
-          .trim()
-          .toLowerCase()
-          .contains(stateDropDownValue.toString().trim().toLowerCase())) {
-        states.forEach((state) {
-          if (state['id']
-              .toString()
-              .trim()
-              .toLowerCase()
-              .contains(stateDropDownValue.toString().trim().toLowerCase())) {
-            currentState = state["statename"];
-          }
-        });
+      if (int.parse(state['id'].toString().trim()) ==
+          int.parse(stateDropDownValue.toString().trim())) {
+        currentState = state["statename"];
       }
     });
-    var currentCity;
-    cities.forEach((city) {
-      if (city['id']
-          .toString()
-          .trim()
-          .toLowerCase()
-          .contains(cityDropDownValue.toString().trim().toLowerCase())) {
-        currentCity = city["cityname"];
-      }
-    });
+    var currentCity = cityDropDownValue;
 
-    var response = await http.post(Uri.parse('$kUpdateBranch$orgId/${_cId.text}?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=${_cDistrict.text}&city=$currentCity',
+    var response = await http.post(Uri.parse(
+      '$kUpdateBranch$orgId/${_cId.text}?nameoforganization=${_cOrgName.text}&personaname=${_cName.text}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text}&mobile=${_cNumber.text}&state=$currentState&district=${_cDistrict.text}&city=$currentCity',
     ));
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       dev.log(data.toString(), name: 'In update Branch success response');
 
-      Toast.show("Your Branch is updated sucessfully", context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.blue);
+      Toast.show(
+        "Your Branch is updated sucessfully",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+        textColor: Colors.green,
+      );
       return "success";
       // cler_fields();
     } else {
@@ -325,7 +302,6 @@ class _BranchFormState extends State<BranchForm> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -406,30 +382,23 @@ class _BranchFormState extends State<BranchForm> {
                         ),
 //Business Nature
                         Padding(
-                          padding:
-                          const EdgeInsets.symmetric(
-                              vertical: 8.0),
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: DropdownButtonFormField(
-                            value:
-                            businessNatureDropDownValue,
+                            value: businessNatureDropDownValue,
                             onTap: () {
                               FocusScope.of(context)
-                                  .requestFocus(
-                                  new FocusNode());
+                                  .requestFocus(new FocusNode());
                             },
                             onChanged: (String newValue) {
                               dev.log('$newValue');
-                              businessNatureDropDownValue =
-                                  newValue;
+                              businessNatureDropDownValue = newValue;
                               setState(() {});
                             },
                             decoration: InputDecoration(
-                              labelText:
-                              'Select Nature of Business',
+                              labelText: 'Select Nature of Business',
                               border: OutlineInputBorder(),
                             ),
-                            items:
-                            _businessNatureDropDownMenuItems,
+                            items: _businessNatureDropDownMenuItems,
                             // hint:
                             //     const Text('Select Department'),
                           ),
@@ -460,7 +429,6 @@ class _BranchFormState extends State<BranchForm> {
                             ),
                           ),
                         ),
-
 
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -494,6 +462,8 @@ class _BranchFormState extends State<BranchForm> {
                             vertical: 8.0,
                           ),
                           child: TextFormField(
+                            enabled:
+                                widget.action.contains('edit') ? false : true,
                             keyboardType: TextInputType.numberWithOptions(
                               decimal: false,
                               signed: false,
@@ -540,7 +510,7 @@ class _BranchFormState extends State<BranchForm> {
                               _cityDropDownMenuItems = cities
                                   .map(
                                     (city) => DropdownMenuItem<String>(
-                                      value: city["id"].toString(),
+                                      value: city["cityname"].toString(),
                                       child: Text(
                                         city["cityname"],
                                       ),
@@ -560,19 +530,15 @@ class _BranchFormState extends State<BranchForm> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets
-                              .symmetric(
+                          padding: const EdgeInsets.symmetric(
                             vertical: 8.0,
                           ),
                           child: TextFormField(
-                            keyboardType:
-                            TextInputType.text,
+                            keyboardType: TextInputType.text,
                             textAlign: TextAlign.left,
                             controller: _cDistrict,
                             validator: (value) {
-                              if (value
-                                  .trim()
-                                  .isEmpty) {
+                              if (value.trim().isEmpty) {
                                 return 'Please Enter District';
                               }
 
@@ -581,11 +547,9 @@ class _BranchFormState extends State<BranchForm> {
                             onChanged: (value) {},
                             decoration: InputDecoration(
                               // errorText: null,
-                              hintText:
-                              'Enter District',
+                              hintText: 'Enter District',
                               labelText: 'District',
-                              border:
-                              OutlineInputBorder(),
+                              border: OutlineInputBorder(),
                             ),
                           ),
                         ),
@@ -624,12 +588,16 @@ class _BranchFormState extends State<BranchForm> {
                           onPressed: () async {
                             if (_formState.currentState.validate()) {
                               if (widget.action.contains('add')) {
-                                var isBranchAddedSuccess = await addSubBranch();
-                                Navigator.pushNamed(context, MaintainBranch.id);
+                                await addSubBranch();
                               } else {
-                                var isBranchEditSuccess = await updateBranch();
-                                Navigator.pushNamed(context, MaintainBranch.id);
+                                await updateBranch();
                               }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ShowCaseBranch(),
+                                ),
+                              );
                             } else {
                               Toast.show(
                                 "Some details are missing",

@@ -1,13 +1,13 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/Pages/branch_landing.dart';
-import 'package:hajeri_demo/Pages/display_qr.dart';
-import 'package:hajeri_demo/Pages/maintain_branch.dart';
-import 'package:hajeri_demo/components/branch_form.dart';
-import 'package:hajeri_demo/constant.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/branch_landing.dart';
+import '../Pages/display_qr.dart';
+import '../Pages/maintain_branch.dart';
+import '../components/branch_form.dart';
+import '../constant.dart';
+import '../main.dart';
+import '../url.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
@@ -42,6 +42,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
   @override
   Widget build(BuildContext context) {
     var branch = widget.branchList.first;
+    log(branch.toString(), name: 'branch ');
 
     mediaQuery = MediaQuery.of(context);
     return Container(
@@ -161,34 +162,26 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                                 color: Colors.white,
                               ),
                               onPressed: () async {
-                                String result = await deleteBranch(
-                                  id: branch['id'].toString(),
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('back'),
+                                        )
+                                      ],
+                                      title: Text('Delete Branch'),
+                                      content: Text(
+                                        'Cannot Delete Main Branch',
+                                      ),
+                                    );
+                                  },
                                 );
-
-                                if (result != null) {
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pushNamed(
-                                                context,
-                                                MaintainBranch.id,
-                                              );
-                                            },
-                                            child: Text('back'),
-                                          )
-                                        ],
-                                        content: Text(
-                                          result,
-                                        ),
-                                      );
-                                    },
-                                  );
-                                }
                               },
                             ),
                           ),
@@ -201,7 +194,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
             ),
           ),
           DraggableScrollableSheet(
-            initialChildSize: 0.6,
+            initialChildSize: 0.4,
             minChildSize: 0.35,
             maxChildSize: 0.8,
             builder: (BuildContext context, scrollController) {
@@ -294,32 +287,66 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                                     color: Colors.white,
                                   ),
                                   onTap: () async {
-                                    String result = await deleteBranch(
-                                      id: branch['id'].toString(),
-                                    );
-
-                                    if (result != null) {
-                                      showDialog(
-                                          context: context,
-                                          barrierDismissible: false,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.pushNamed(
-                                                      context,
-                                                      MaintainBranch.id,
-                                                    );
-                                                  },
-                                                  child: Text('back'),
-                                                )
-                                              ],
-                                              content: Text(
-                                                result,
+                                    bool delete = await showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop(true);
+                                                },
+                                                child: Text('Yes'),
                                               ),
-                                            );
-                                          });
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop(false);
+                                                },
+                                                child: Text('No'),
+                                              )
+                                            ],
+                                            title: Text('Delete Branch'),
+                                            content: Text(
+                                              'Do you want to delete Branch ?',
+                                            ),
+                                          );
+                                        });
+                                    if (delete) {
+                                      String result = await deleteBranch(
+                                        id: branch['id'].toString(),
+                                      );
+
+                                      if (result != null) {
+                                        showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                ShowCaseBranch()),
+                                                      );
+                                                    }, //8551913068
+                                                    child: Text('back'),
+                                                  )
+                                                ],
+                                                title: Text('Delete Branch'),
+                                                content: Text(
+                                                  result,
+                                                ),
+                                              );
+                                            });
+                                      }
+                                    } else {
+                                      //do nothing
                                     }
                                   },
                                   decoration: BoxDecoration(
@@ -370,7 +397,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                                       foregroundColor: Colors.white,
                                       child: Center(
                                         child: Text(
-                                          branch["personaname"]
+                                          branch["nameoforganization"]
                                               .toString()
                                               .substring(
                                                 0,
@@ -382,7 +409,7 @@ class _MultipleBranchViewState extends State<MultipleBranchView> {
                                     ),
                                   ),
                                   title: Text(
-                                    branch["personaname"] ?? '',
+                                    branch["nameoforganization"] ?? '',
                                     style: kBranchTextStyle,
                                   ),
                                   subtitle: Text(

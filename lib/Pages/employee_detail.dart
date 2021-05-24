@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/components/blue_button.dart';
-import 'package:hajeri_demo/components/employee_data_grid.dart';
+import '../components/blue_button.dart';
+import '../components/employee_data_grid.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../components/form_page.dart';
-import 'package:hajeri_demo/components/side_bar.dart';
-import 'package:hajeri_demo/model/Employee.dart';
-import 'package:hajeri_demo/url.dart';
+import '../components/side_bar.dart';
+import '../model/Employee.dart';
+import '../url.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
 import 'package:toast/toast.dart';
@@ -214,7 +214,7 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
             organizationName: e["organizationname"],
             departmentName: e['departmentname'],
             city: e["city"],
-            area: e["area"],
+            addressLine1: e["addressline1"],
             district: e["district"],
             state: e["state"]);
       }).toList();

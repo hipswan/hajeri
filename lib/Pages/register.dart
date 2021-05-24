@@ -2,8 +2,8 @@ import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/Pages/sign_up.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/sign_up.dart';
+import '../url.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:toast/toast.dart';
@@ -191,57 +191,45 @@ class RegisterState extends State<Register> {
   Future<String> createOrgAccount() async {
     String orgState;
     states.forEach((state) {
-      if (state['id']
-          .toString()
-          .trim()
-          .contains(stateDropDownValue.toString().trim())) {
+      if (int.parse(state['id'].toString().trim()) ==
+          int.parse(stateDropDownValue.toString().trim())) {
         orgState = state["statename"].toString();
       }
     });
     // var headers = {'Content-Type': 'application/json'};
-    var request = http.Request(
-      'POST',
+    dev.log(
+        '$kAddOrg?nameoforganization=${_cOrgName.text.trim()}&personaname=${_cName.text.trim()}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$orgState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue');
+    var response = await http.post(
       Uri.parse(
-          '$kAddOrg?nameoforganization=${_cOrgName.text.trim()}&personaname=${_cName.text.trim()}&natureofbusiness=$businessNatureDropDownValue&contactpersondeparmentname=$departmentDropDownValue&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$orgState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue'),
+          '$kAddOrg?nameoforganization=${_cOrgName.text.trim()}&personaname=${_cName.text.trim()}&natureofbusiness=$businessNatureDropDownValue&contactpersondepartmentname=$departmentDropDownValue&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$orgState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue'),
     );
-    // request.body = '''{
-    //   "nameoforganization": "${_cOrgName.text.trim()}",
-    //   "personaname": "${_cName.text.trim()}",
-    //   "natureofbusiness": "$businessNatureDropDownValue",
-    //   "contactpersondeparmentname": "$departmentDropDownValue",
-    //   "address": "${_cAddress.text.trim()}",
-    //   "mobile": "${_cNumber.text.trim()}",
-    //   "state": "$orgState",
-    //   "district":'${_cDistrict.text.trim()}',
-    //   "city": "$cityDropDownValue"
-    // }''';
-    // dev.log('''{
-    //   "nameoforganization": "${_cOrgName.text.trim()}",
-    //   "personaname": "${_cName.text.trim()}",
-    //   "natureofbusiness": "$businessNatureDropDownValue",
-    //   "contactpersondeparmentname": "$departmentDropDownValue",
-    //   "address": "${_cAddress.text.trim()}",
-    //   "mobile": "${_cNumber.text.trim()}",
-    //   "state": "$orgState",
-    //   "district":'${_cDistrict.text.trim()}',
-    //   "city": "$cityDropDownValue"
-    // }''');
-    // request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
-      Toast.show(
-        "Organization has been successfully added",
-        context,
-        duration: Toast.LENGTH_LONG,
-        gravity: Toast.BOTTOM,
-        textColor: Colors.greenAccent,
-      );
+      var data = json.decode(response.body);
+      if (data['already_present_status']
+          .toString()
+          .trim()
+          .toLowerCase()
+          .contains('yes')) {
+        Toast.show(
+          "You are already registered please login",
+          context,
+          duration: Toast.LENGTH_LONG,
+          gravity: Toast.BOTTOM,
+          textColor: Colors.greenAccent,
+        );
+      } else {
+        Toast.show(
+          "Organization has been successfully added",
+          context,
+          duration: Toast.LENGTH_LONG,
+          gravity: Toast.BOTTOM,
+          textColor: Colors.greenAccent,
+        );
+      }
+      Navigator.of(context).pushNamed(SignUp.id);
       return "success";
     } else {
-      print(response.reasonPhrase);
       Toast.show(
         "Your account is not created",
         context,
@@ -256,58 +244,43 @@ class RegisterState extends State<Register> {
   Future<dynamic> addUser() async {
     String userState;
     states.forEach((state) {
-      if (state['id']
-          .toString()
-          .trim()
-          .toLowerCase()
-          .contains(stateDropDownValue.toString().trim().toLowerCase())) {
+      if (int.parse(state['id'].toString().trim()) ==
+          int.parse(stateDropDownValue.toString().trim())) {
         userState = state["statename"].toString();
       }
     });
 
-    // Map<String, String> body = {
-    //   "personaname": "${_cName.text}",
-    //   "address": "${_cAddress.text}",
-    //   "mobile": "${_cNumber.text}",
-    //   "state": "$userState",
-    //   "district": "${_cDistrict.text}",
-    //   "city": "$cityDropDownValue",
-    // };
-    // dev.log('''{
-    //   "personaname": "${_cName.text}",
-    //   "address": "${_cAddress.text}",
-    //   "mobile": "${_cNumber.text}",
-    //   "state": "$userState",
-    //   "district": "${_cDistrict.text}",
-    //   "city": "$cityDropDownValue",
-    // }''');
-    var response = await http.post(Uri(
-      path:
-          '''$kAddUser?personaname=${_cName.text.trim()}&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state:=$userState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue''',
-    ) // body: jsonEncode(body),
-        // headers: {
-        //   'Content-Type': 'application/json',
-        // },
-        );
+    var response = await http.post(
+      Uri.parse(
+          '$kAddUser?personaname=${_cName.text.trim()}&address=${_cAddress.text.trim()}&mobile=${_cNumber.text.trim()}&state=$userState&district=${_cDistrict.text.trim()}&city=$cityDropDownValue'),
+    );
 
     if (response.statusCode == 200) {
-      dev.log(response.body.toString());
-      Toast.show(
-        "Your account has been sucessfully created",
-        context,
-        duration: Toast.LENGTH_LONG,
-        gravity: Toast.BOTTOM,
-        textColor: Colors.greenAccent,
-      );
-      Future.delayed(
-          Duration(
-            seconds: 1,
-          ), () {
-        Navigator.pushNamed(
+      var data = json.decode(response.body);
+      dev.log(data.toString());
+      if (data['already_present_status']
+          .toString()
+          .trim()
+          .toLowerCase()
+          .contains('yes')) {
+        Toast.show(
+          "You are already registered please login",
           context,
-          SignUp.id,
+          duration: Toast.LENGTH_LONG,
+          gravity: Toast.BOTTOM,
+          textColor: Colors.greenAccent,
         );
-      });
+      } else {
+        Toast.show(
+          "Your account has been sucessfully created",
+          context,
+          duration: Toast.LENGTH_LONG,
+          gravity: Toast.BOTTOM,
+          textColor: Colors.greenAccent,
+        );
+      }
+      Navigator.of(context).pushNamed(SignUp.id);
+      return "success";
     } else {
       Toast.show(
         "Your account is not created",
@@ -316,6 +289,7 @@ class RegisterState extends State<Register> {
         gravity: Toast.BOTTOM,
         textColor: Colors.red,
       );
+      return "failure";
     }
   }
 
@@ -1088,15 +1062,6 @@ class RegisterState extends State<Register> {
                                                       await createOrgAccount();
                                                   dev.log(
                                                       addOrgResult.toString());
-                                                  Future.delayed(
-                                                      Duration(
-                                                        seconds: 2,
-                                                      ), () {
-                                                    Navigator.pushNamed(
-                                                      context,
-                                                      SignUp.id,
-                                                    );
-                                                  });
                                                 } else {
                                                   Toast.show(
                                                     "Some details are missing",

@@ -4,8 +4,8 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:hajeri_demo/Pages/generate_qr.dart';
-import 'package:hajeri_demo/main.dart';
+import '../Pages/generate_qr.dart';
+import '../main.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:toast/toast.dart';
@@ -180,6 +180,7 @@ class _DisplayQrState extends State<DisplayQr> {
                           ),
                           Text(
                             'Contactless-Attendance System',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 20.0,
@@ -191,6 +192,7 @@ class _DisplayQrState extends State<DisplayQr> {
                           ),
                           Text(
                             prefs.getString('org_name'),
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20.0,
@@ -217,7 +219,7 @@ class _DisplayQrState extends State<DisplayQr> {
                                 10.0,
                               ),
                               data:
-                                  'Hajeri_${prefs.getString("worker_id")}_${widget.latitude}_${widget.longitude}',
+                                  'Hajeri_${prefs.getString("worker_id")}_${widget.latitude}_${widget.longitude}_${prefs.getString("main_bank_id")}',
 
                               // onError: (ex) {
                               //   print("[QR] ERROR - $ex");

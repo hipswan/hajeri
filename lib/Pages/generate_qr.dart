@@ -6,9 +6,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hajeri_demo/Pages/maintain_qr.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/maintain_qr.dart';
+import '../main.dart';
+import '../url.dart';
 import 'package:toast/toast.dart';
 
 import '../constant.dart';
@@ -554,9 +554,11 @@ class _GenerateQRState extends State<GenerateQR> {
                                   .requestFocus(new FocusNode());
                               await SystemChannels.textInput
                                   .invokeMethod('TextInput.hide');
-                              Navigator.pushNamed(
+                              Navigator.push(
                                 context,
-                                MaintainQr.id,
+                                MaterialPageRoute(
+                                  builder: (context) => ShowCaseQr(),
+                                ),
                               );
                             }
                           },

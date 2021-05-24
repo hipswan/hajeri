@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -9,21 +8,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hajeri_demo/Pages/about_us.dart';
-import 'package:hajeri_demo/Pages/contact_us.dart';
-import 'package:hajeri_demo/Pages/dashboard.dart';
-import 'package:hajeri_demo/Pages/generate_qr.dart';
-import 'package:hajeri_demo/Pages/landing.dart';
-import 'package:hajeri_demo/Pages/maintain_branch.dart';
-import 'package:hajeri_demo/Pages/maintain_qr.dart';
-import 'package:hajeri_demo/Pages/privacy_policy.dart';
-import 'package:hajeri_demo/Pages/sign_up_update.dart';
-import 'package:hajeri_demo/Pages/terms_and_conditions.dart';
-import 'package:hajeri_demo/Pages/verify_otp.dart';
-import 'package:hajeri_demo/Pages/profile.dart';
-import 'package:hajeri_demo/Pages/scanner.dart';
-import 'package:hajeri_demo/Pages/sign_up.dart';
-import 'package:hajeri_demo/Pages/monthly_attendance.dart';
+import './Pages/about_us.dart';
+import './Pages/contact_us.dart';
+import './Pages/dashboard.dart';
+import './Pages/generate_qr.dart';
+import './Pages/landing.dart';
+import './Pages/maintain_branch.dart';
+import './Pages/maintain_qr.dart';
+import './Pages/privacy_policy.dart';
+import './Pages/sign_up_update.dart';
+import './Pages/terms_and_conditions.dart';
+import './Pages/verify_otp.dart';
+import './Pages/profile.dart';
+import './Pages/scanner.dart';
+import './Pages/sign_up.dart';
+import './Pages/monthly_attendance.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Pages/register.dart';
 import 'Pages/display_qr.dart';
@@ -92,12 +92,13 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 /// Initialize the [FlutterLocalNotificationsPlugin] package.
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterDownloader.initialize(
     debug: false,
   );
-  FirebaseApp app = await Firebase.initializeApp();
+  await Firebase.initializeApp();
 
   prefs = await SharedPreferences.getInstance();
   messaging = FirebaseMessaging.instance;
@@ -111,9 +112,10 @@ void main() async {
   messaging.onTokenRefresh.listen(saveTokenToSharedPreferences);
 
   // SharedPreferences.setMockInitialValues({
-  //   'login': false,
+  //   'login': true,
   //   'name': '',
   //   'number': '',
+  //   'showcase': null,
   // });
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
@@ -208,7 +210,7 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  // ignore: missing_return
+// ignore: missing_return
 
 }
 
@@ -220,9 +222,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  bool isWait = true;
   String userStatusCheck = "no result";
+  String hajeriLevel;
+  String mainBankId;
+
   Future<String> checkUserRole() async {
     try {
+      dev.log("$kUserDetails${prefs.getString('mobile')}");
       var response = await http.get(
         Uri.parse(
           '$kUserDetails${prefs.getString('mobile')}',
@@ -231,7 +238,26 @@ class _HomeState extends State<Home> {
       // dev.debugger();
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
+        dev.log("$data");
+        if (data['hajerilevel'] == null)
+          hajeriLevel = "No Data";
+        else
+          hajeriLevel = data['hajerilevel'];
+        if (data['mainbankid'] == null && data['hajerilevel'] == "Hajeri-Head")
+          mainBankId = data['id'].toString();
+        else
+          mainBankId = data['mainbankid'].toString();
+        if (data['id'] == null)
+          prefs.setString("worker_id", "No Data");
+        else
+          prefs.setString("worker_id", data["id"]);
         // dev.log(data.toString());
+        prefs.setBool("is_sub_org", hajeriLevel.contains("Hajeri-Head-1"));
+        prefs.setString("hajeri_level", hajeriLevel);
+        prefs.setString("main_bank_id", mainBankId);
+        String mainBankIdfromPrefs = prefs.getString("main_bank_id");
+        dev.log(
+            "main_bank_idfromprefs: $mainBankIdfromPrefs, main_bank_id: $mainBankId");
         prefs.setBool("is_org",
             data['roles'].trim().toLowerCase().contains('role_organization'));
         return "success";
@@ -241,6 +267,7 @@ class _HomeState extends State<Home> {
     } on SocketException catch (e) {
       return "no internet";
     } catch (e) {
+      dev.log('error occurred: $e');
       return "error occurred";
     }
   }
@@ -275,7 +302,7 @@ class _HomeState extends State<Home> {
                 height: 10.0,
               ),
               Text(
-                'Error has occured',
+                'Error has occurred',
               ),
             ],
           ),
@@ -327,11 +354,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    if (prefs != null &&
-        prefs.containsKey('login') &&
-        prefs.get('login') != null &&
-        prefs.get('login')) {
+
+    if (prefs?.getBool('login') != null) {
       checkUserRole().then((value) {
+        dev.log(value.toString());
         setState(() {
           userStatusCheck = value;
         });

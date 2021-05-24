@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/Pages/landing.dart';
-import 'package:hajeri_demo/Pages/register.dart';
-import 'package:hajeri_demo/url.dart';
+import '../Pages/landing.dart';
+import '../Pages/register.dart';
+import '../url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import '../constant.dart';

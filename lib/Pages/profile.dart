@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/Pages/about_us.dart';
-import 'package:hajeri_demo/Pages/contact_us.dart';
-import 'package:hajeri_demo/Pages/privacy_policy.dart';
-import 'package:hajeri_demo/Pages/terms_and_conditions.dart';
-import 'package:hajeri_demo/components/side_bar.dart';
-import 'package:hajeri_demo/main.dart';
+import '../Pages/about_us.dart';
+import '../Pages/contact_us.dart';
+import '../Pages/privacy_policy.dart';
+import '../Pages/terms_and_conditions.dart';
+import '../components/side_bar.dart';
+import '../main.dart';
 
 import '../constant.dart';
 
@@ -106,9 +106,11 @@ class Profile extends StatelessWidget {
                                 color: Colors.white,
                                 fontSize: 20,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              prefs.getString('worker_id'),
+                              prefs.getString('mobile'),
                               style: TextStyle(
                                 color: Colors.white,
                               ),

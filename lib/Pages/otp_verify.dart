@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/Pages/register.dart';
-import 'package:hajeri_demo/Pages/sign_up.dart';
-import 'package:hajeri_demo/main.dart';
-import 'package:hajeri_demo/url.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../Pages/register.dart';
+import '../Pages/sign_up.dart';
+import '../main.dart';
+import '../url.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:http/http.dart' as http;
@@ -26,7 +27,7 @@ class _OtpVerifyState extends State<OtpVerify> {
   String signature = "{{ app signature }}";
   bool isCodeSent = false;
   String verificationCode;
-  String workerId, orgId, orgName, empName, role;
+  String workerId, orgId, orgName, empName, role, hajeriLevel, mainBankId;
 
   Future<void> sendCode(String number) async {
     try {
@@ -34,9 +35,6 @@ class _OtpVerifyState extends State<OtpVerify> {
         'Content-Type': 'application/json',
       });
       if (response.statusCode == 200) {
-        setState(() {
-          isCodeSent = true;
-        });
         var data = json.decode(response.body);
         dev.log("the data is " + data.toString(), name: 'In send otp verify');
 
@@ -45,6 +43,13 @@ class _OtpVerifyState extends State<OtpVerify> {
             .trim()
             .toLowerCase()
             .contains("not registered")) {
+          Toast.show(
+            "You are not registered please register",
+            context,
+            duration: Toast.LENGTH_LONG,
+            gravity: Toast.BOTTOM,
+            textColor: Colors.redAccent,
+          );
           Navigator.pushNamedAndRemoveUntil(
             context,
             Register.id,
@@ -75,7 +80,18 @@ class _OtpVerifyState extends State<OtpVerify> {
           else
             empName = data['emp_name'];
           role = data['role'];
+          if (data['hajerilevel'] == null)
+            hajeriLevel = "No Data";
+          else
+            hajeriLevel = data['hajerilevel'];
+          if (data['mainbankid'] == null &&
+              data['hajerilevel'] == "Hajeri-Head")
+            mainBankId = data['worker_id'].toString();
+          else
+            mainBankId = data['mainbankid'].toString();
+          // prefs.setBool("is_sub_org", hajeriLevel.contains("Hajeri-Head-1"));
 
+          // dev.log(data.toString());
           setState(() {
             verificationCode = data['id'].toString() ?? "error";
 
@@ -86,12 +102,81 @@ class _OtpVerifyState extends State<OtpVerify> {
         dev.log(
           '''Could't fetch otp''',
         );
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Center(child: Text('Server Error')),
+                content: SvgPicture.asset(
+                  'assets/vectors/server_down.svg',
+                  width: 150,
+                  height: 150,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: Text(
+                      'Back',
+                    ),
+                  ),
+                ],
+              );
+            });
       }
     } on SocketException catch (e) {
       dev.log(e.message);
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Center(child: Text('no internet')),
+              content: SvgPicture.asset(
+                'assets/vectors/no_signal.svg',
+                width: 150,
+                height: 150,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text(
+                    'Back',
+                  ),
+                ),
+              ],
+            );
+          });
     } on Exception catch (e) {
       dev.log(e.toString());
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Center(child: Text('error occurred')),
+              content: SvgPicture.asset(
+                'assets/vectors/notify.svg',
+                width: 150,
+                height: 150,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text(
+                    'Back',
+                  ),
+                ),
+              ],
+            );
+          });
     }
+    setState(() {
+      isCodeSent = true;
+    });
   }
 
   String userTokenStatus;
@@ -112,7 +197,7 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   setUserToken() async {
     try {
-      var response = await http.get(Uri.parse(
+      var response = await http.post(Uri.parse(
           '$kSaveToken${prefs.getString('worker_id')}/${prefs.getString('mobile')}?userfirebasetoken=${prefs.getString('token')}'));
 
       if (response.statusCode == 200) {
@@ -349,8 +434,12 @@ class _OtpVerifyState extends State<OtpVerify> {
                                   .contains('role_organization'));
                           userTokenStatus = await setUserToken();
 
-                          if (!userTokenStatus.contains('success')) {
+                          if (userTokenStatus.contains('success')) {
                             prefs.setBool("login", true);
+                            // prefs.setBool("is_sub_org", true);
+                            prefs.setString("main_bank_id", mainBankId);
+                            prefs.setBool("is_sub_org",
+                                hajeriLevel.contains("Hajeri-Head-1"));
 
                             Navigator.pushAndRemoveUntil(
                               context,

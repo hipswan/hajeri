@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/Pages/dashboard.dart';
-import 'package:hajeri_demo/Pages/monthly_attendance.dart';
-import 'package:hajeri_demo/Pages/employee_detail.dart';
-import 'package:hajeri_demo/constant.dart';
+import '../Pages/dashboard.dart';
+import '../Pages/monthly_attendance.dart';
+import '../Pages/employee_detail.dart';
+import '../constant.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
 class BranchLanding extends StatefulWidget {

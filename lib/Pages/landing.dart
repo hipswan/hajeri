@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hajeri_demo/Pages/dashboard.dart';
-import 'package:hajeri_demo/Pages/profile.dart';
-import 'package:hajeri_demo/Pages/scanner.dart';
+import '../Pages/dashboard.dart';
+import '../Pages/profile.dart';
+import '../Pages/scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:hajeri_demo/Pages/monthly_attendance.dart';
-import 'package:hajeri_demo/constant.dart';
+import '../Pages/monthly_attendance.dart';
+import '../constant.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:hajeri_demo/main.dart';
+import '../main.dart';
 
 class Landing extends StatefulWidget {
   final initialPageIndex;

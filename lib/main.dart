@@ -250,7 +250,7 @@ class _HomeState extends State<Home> {
         if (data['id'] == null)
           prefs.setString("worker_id", "No Data");
         else
-          prefs.setString("worker_id", data["id"]);
+          prefs.setString("worker_id", data["id"].toString());
         // dev.log(data.toString());
         prefs.setBool("is_sub_org", hajeriLevel.contains("Hajeri-Head-1"));
         prefs.setString("hajeri_level", hajeriLevel);

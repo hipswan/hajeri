@@ -255,7 +255,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
 
       if (response.statusCode == 200) {
         data = json.decode(response.body);
-        log("the data is " + data.toString());
+        // log("the data is " + data.toString());
 
 //      print(data);
         if (data is List) {

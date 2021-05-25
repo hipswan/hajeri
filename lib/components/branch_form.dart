@@ -78,7 +78,7 @@ class _BranchFormState extends State<BranchForm> {
     _cDistrict =
         TextEditingController(text: branch.isEmpty ? '' : branch["district"]);
     // dev.debugger();
-    dev.log(branch["natureofbusiness"]);
+
     businessNatureDropDownValue = branch.isEmpty
         ? null
         : (branch["natureofbusiness"] == "null"

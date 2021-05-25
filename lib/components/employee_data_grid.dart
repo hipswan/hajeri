@@ -4,17 +4,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../Pages/employee_detail.dart';
-import '../components/blue_button.dart';
+import 'package:hajeri/constant.dart';
 import '../components/form_page.dart';
-import '../components/transition.dart';
 import '../main.dart';
 import '../model/Employee.dart';
 import '../url.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:http/http.dart' as http;
-import 'package:toast/toast.dart';
 
 List<Employee> _employees = <Employee>[];
 
@@ -128,100 +125,118 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
         data: SfDataGridThemeData(
           gridLineColor: Colors.grey,
           gridLineStrokeWidth: 0.5,
-          headerStyle: DataGridHeaderCellStyle(
-            textStyle: TextStyle(
-              // fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-            backgroundColor: Colors.blue[800],
-          ),
-          selectionStyle: DataGridCellStyle(
-            backgroundColor: Colors.redAccent,
-            textStyle: TextStyle(
-              fontWeight: FontWeight.w300,
-              color: Colors.white,
-            ),
-          ),
-          currentCellStyle: DataGridCurrentCellStyle(
-            borderWidth: 2,
-            borderColor: Colors.pinkAccent,
-          ),
+          headerColor: Colors.blue[800],
+          selectionColor: Colors.blue[100],
+          frozenPaneElevation: 1,
+          sortIconColor: Colors.white,
         ),
         child: SfDataGrid(
-          columnWidthMode: ColumnWidthMode.auto,
-
-          allowSorting: true,
-          headerGridLinesVisibility: GridLinesVisibility.horizontal,
+          headerGridLinesVisibility: GridLinesVisibility.both,
+          gridLinesVisibility: GridLinesVisibility.both,
           controller: _dataGridController,
+          allowSorting: true,
           source: _employeeDataSource,
-          // headerCellBuilder:
-          //     (BuildContext context, GridColumn column) {
-          //   if (column.mappingName == 'number')
-          //     return Row(
-          //       children: <Widget>[
-          //         Icon(Icons.phone_android),
-          //         SizedBox(width: 5),
-          //         Flexible(
-          //             child: Text(
-          //           column.headerText,
-          //           style: TextStyle(fontWeight: FontWeight.bold),
-          //         ))
-          //       ],
-          //     );
-          //   else
-          //     return null;
-          // },
+          isScrollbarAlwaysShown: true,
+          columnWidthMode: ColumnWidthMode.fill,
           columns: [
             GridTextColumn(
-              // columnWidthMode: ColumnWidthMode.auto,
-              mappingName: 'name',
-              headerText: 'Name',
+              columnName: 'name',
+              label: Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.only(left: 8.0),
+                child: Text(
+                  'Name',
+                  style: kDataGridHeaderTextStyle,
+                ),
+              ),
               width: 175.0,
-              columnWidthMode: ColumnWidthMode.cells,
-
-              softWrap: true,
-              headerTextSoftWrap: true,
-              headerStyle: DataGridHeaderCellStyle(
-                sortIconColor: Colors.redAccent,
+            ),
+            GridTextColumn(
+              // columnWidthMode: ColumnWidthMode.auto,
+              columnName: 'id',
+              label: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  'ID',
+                  style: kDataGridHeaderTextStyle,
+                ),
               ),
             ),
-            GridNumericColumn(
-              columnWidthMode: ColumnWidthMode.cells,
-              mappingName: 'number',
-              headerText: 'Mobile',
-              allowSorting: false,
+            GridTextColumn(
+              // columnWidthMode: ColumnWidthMode.auto,
+              columnName: 'number',
+              width: 150,
+
+              label: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  'Number',
+                  style: kDataGridHeaderTextStyle,
+                ),
+              ),
             ),
             GridTextColumn(
-              mappingName: 'city',
-              headerText: 'City',
-              allowSorting: false,
-              columnWidthMode: ColumnWidthMode.cells,
-            ),
-            GridNumericColumn(
-              mappingName: 'idCard',
-              headerText: 'ID  ',
-              allowSorting: false,
-              columnWidthMode: ColumnWidthMode.header,
-            ),
-            GridTextColumn(
-              mappingName: 'address',
-              headerText: 'Address',
-              allowSorting: false,
+              // columnWidthMode: ColumnWidthMode.auto,
+              width: 150,
+
+              columnName: 'address',
+              label: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  'Address',
+                  style: kDataGridHeaderTextStyle,
+                ),
+              ),
             ),
             GridTextColumn(
-              mappingName: 'department',
-              headerText: 'Department',
-              allowSorting: false,
+              width: 150,
+              columnName: 'department',
+              label: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  'Department',
+                  style: kDataGridHeaderTextStyle,
+                ),
+              ),
             ),
             GridTextColumn(
-              mappingName: 'district',
-              headerText: 'District',
-              allowSorting: false,
+              // columnWidthMode: ColumnWidthMode.auto,
+              width: 150,
+
+              columnName: 'city',
+              label: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  'City',
+                  style: kDataGridHeaderTextStyle,
+                ),
+              ),
             ),
             GridTextColumn(
-              mappingName: 'state',
-              headerText: 'State',
-              allowSorting: false,
+              // columnWidthMode: ColumnWidthMode.auto,
+              width: 150,
+
+              columnName: 'district',
+              label: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  'District',
+                  style: kDataGridHeaderTextStyle,
+                ),
+              ),
+            ),
+            GridTextColumn(
+              // columnWidthMode: ColumnWidthMode.auto,
+              columnName: 'state',
+              width: 150,
+
+              label: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  'State',
+                  style: kDataGridHeaderTextStyle,
+                ),
+              ),
             ),
           ],
           frozenColumnsCount: 1,
@@ -229,28 +244,38 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
               ? SelectionMode.none
               : SelectionMode.singleDeselect,
           navigationMode: GridNavigationMode.row,
-          onSelectionChanging:
-              (List<Object> addedRows, List<Object> removedRows) {
-            if (addedRows.isNotEmpty &&
-                (addedRows.last as Employee).name == 'Manager') {
-              return false;
-            }
+          // onSelectionChanging:
+          //     (List<Object> addedRows, List<Object> removedRows) {
+          //   if (addedRows.isNotEmpty &&
+          //       (addedRows.last as Employee).name == 'Manager') {
+          //     return false;
+          //   }
 
-            return true;
-          },
+          //   return true;
+          // },
           onSelectionChanged:
-              (List<Object> addedRows, List<Object> removedRows) {
+              (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
             // // apply your logic
-            // log((addedRows.last as Employee).name.toString());
             //After First or Subsequent Select
             if (addedRows.isNotEmpty) {
+              var selectedEmployee = addedRows.first.getCells();
+
               setState(() {
                 isRowSelected = true;
-                currentEmployee = addedRows.last as Employee;
+                currentEmployee = Employee(
+                  name: selectedEmployee[0].value,
+                  idCardNumber: selectedEmployee[1].value,
+                  number: selectedEmployee[2].value,
+                  addressLine1: selectedEmployee[3].value,
+                  departmentName: selectedEmployee[4].value,
+                  city: selectedEmployee[5].value,
+                  district: selectedEmployee[6].value,
+                  state: selectedEmployee[7].value,
+                );
               });
             }
             //After Deselect
-            if (addedRows.isEmpty && removedRows.isNotEmpty) {
+            if (addedRows.isEmpty) {
               setState(() {
                 isRowSelected = false;
               });
@@ -262,11 +287,11 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                 StackedHeaderCell(
                   columnNames: [
                     'name',
-                    'idCard',
+                    'id',
                     'number',
-                    'city',
                     'address',
                     'department',
+                    'city',
                     'district',
                     'state',
                   ],
@@ -274,7 +299,10 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        child: Text(widget.view ?? ''),
+                        child: Text(
+                          widget.view ?? '',
+                          style: kDataGridHeaderTextStyle,
+                        ),
                       ),
                       isRowSelected
                           ? Row(
@@ -282,7 +310,7 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                                 IconButton(
                                     icon: Icon(
                                       Icons.edit,
-                                      color: Colors.blue,
+                                      color: Colors.white,
                                     ),
                                     onPressed: () async {
                                       Employee selectedEmployeeWithEdit =
@@ -335,11 +363,10 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                                 IconButton(
                                     icon: Icon(
                                       Icons.delete,
-                                      color: Colors.redAccent,
+                                      color: Colors.white,
                                     ),
                                     onPressed: () async {
-                                      var employee = (_dataGridController
-                                          .selectedRow as Employee);
+                                      var employee = currentEmployee;
                                       bool isMainEmployee = employee.number
                                           .toString()
                                           .contains(prefs.getString('mobile'));
@@ -367,7 +394,7 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
                                                 ],
                                                 title: Text('Delete Employee'),
                                                 content: Text(
-                                                  'Do you want to delete employee ?',
+                                                  'Do you want to delete your employee: ${employee.name} ?',
                                                 ),
                                               );
                                             });
@@ -457,65 +484,84 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
   }
 }
 
-class EmployeeDataSource extends DataGridSource<Employee> {
-  EmployeeDataSource({this.employees});
+class EmployeeDataSource extends DataGridSource {
   final List<Employee> employees;
+  EmployeeDataSource({this.employees}) {
+    buildDataGridRows();
+  }
 
-  @override
-  List<Employee> get dataSource => employees;
-
-  @override
-  getValue(Employee employee, String columnName) {
-    switch (columnName) {
-      case 'name':
-        return employee.name;
-        break;
-      case 'idCard':
-        return employee.idCardNumber;
-        break;
-      case 'number':
-        return employee.number;
-        break;
-      case 'city':
-        return employee.city;
-        break;
-      case 'address':
-        return employee.addressLine1;
-        break;
-      case 'department':
-        return employee.departmentName;
-        break;
-      case 'district':
-        return employee.district;
-        break;
-      case 'state':
-        return employee.state;
-        break;
-      default:
-        return ' ';
-        break;
-    }
+  void buildDataGridRows() {
+    dataGridRows = _employees
+        .map<DataGridRow>(
+          (dataGridRow) => DataGridRow(
+            cells: [
+              DataGridCell<String>(
+                columnName: 'name',
+                value: dataGridRow.name,
+              ),
+              DataGridCell<int>(
+                columnName: 'id',
+                value: dataGridRow.idCardNumber,
+              ),
+              DataGridCell<int>(
+                columnName: 'number',
+                value: dataGridRow.number,
+              ),
+              DataGridCell<String>(
+                columnName: 'address',
+                value: dataGridRow.addressLine1,
+              ),
+              DataGridCell<String>(
+                  columnName: 'department', value: dataGridRow.departmentName),
+              DataGridCell<String>(
+                columnName: 'city',
+                value: dataGridRow.city,
+              ),
+              DataGridCell<String>(
+                columnName: 'district',
+                value: dataGridRow.district,
+              ),
+              DataGridCell<String>(
+                columnName: 'state',
+                value: dataGridRow.state,
+              ),
+            ],
+          ),
+        )
+        .toList();
   }
 
   @override
-  int get rowCount => _employees.length;
+  bool shouldRecalculateColumnWidths() {
+    return true;
+  }
+
+  List<DataGridRow> dataGridRows = [];
+
+  @override
+  List<DataGridRow> get rows => dataGridRows;
+
+  @override
+  DataGridRowAdapter buildRow(DataGridRow row) {
+    return DataGridRowAdapter(
+        cells: row.getCells().map<Widget>((dataGridCell) {
+      return Container(
+        alignment: dataGridCell.columnName.toString().contains('name')
+            ? Alignment.centerLeft
+            : Alignment.center,
+        padding: EdgeInsets.symmetric(
+          horizontal: 8.0,
+        ),
+        child: Text(
+          dataGridCell.value.toString(),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
+      );
+    }).toList());
+  }
 
   void updateDataGridSource() {
     notifyListeners();
   }
-
-  // @override
-  // Future<bool> handlePageChange(int oldPageIndex, int newPageIndex,
-  //     int startRowIndex, int rowsPerPage) async {
-  //   log('$oldPageIndex $startRowIndex $newPageIndex $rowsPerPage  ${_employees.length}');
-  //   int endIndex = startRowIndex + rowsPerPage;
-  //   if (endIndex > _employees.length) {
-  //     endIndex = _employees.length - 1;
-  //   }
-
-  //   paginatedDataSource = List.from(
-  //       _employees.getRange(startRowIndex, endIndex).toList(growable: false));
-  //   notifyListeners();
-  //   return true;
-  // }
 }

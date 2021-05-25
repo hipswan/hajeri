@@ -8,12 +8,9 @@ import '../components/branch_form.dart';
 import '../constant.dart';
 import '../main.dart';
 import '../url.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 var mediaQuery;
 

@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'dart:io' show Platform, SocketException;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hajeri/components/today_employee.dart';
+import '../components/today_employee.dart';
 import '../components/employee_data_grid.dart';
 import '../components/box_tile.dart';
 import '../components/history_log.dart';
@@ -124,9 +124,9 @@ class _DashboardState extends State<Dashboard> {
         bool emptyData = data.isEmpty;
 
         if (!emptyData) {
-          todayEmployee = data;
+          visitors = data;
 
-          return 'today_employee';
+          return 'visitor';
         } else {
           return 'absent';
         }
@@ -150,14 +150,16 @@ class _DashboardState extends State<Dashboard> {
           selectionModeDisabled: true,
         );
         break;
-      case "today_employee":
-        return TodayEmployee(
-          data: todayEmployee,
-        );
-        break;
+      // case "today_employee":
+      //   return TodayEmployee(
+      //     data: todayEmployee,
+      //   );
+      //   break;
       case "visitor":
-        return VisitorDataGrid(
-          attendanceSheet: visitors,
+        return Card(
+          child: VisitorDataGrid(
+            attendanceSheet: visitors,
+          ),
         );
         break;
       case "history":
@@ -307,6 +309,7 @@ class _DashboardState extends State<Dashboard> {
         //     }
         //   ];
         //   return 'history';
+
         return 'server issue';
       }
     } on SocketException catch (e) {

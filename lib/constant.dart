@@ -11,6 +11,11 @@ const kOrgPages = <String, IconData>{
   'Attendance': Icons.list_alt,
 };
 
+const kDataGridHeaderTextStyle = TextStyle(
+  color: Colors.white,
+  fontFamily: 'Comfortaa',
+  fontSize: 17.0,
+);
 const List<String> kBusinessNatureMenuItems = <String>[
   'Office',
   'Bank',

@@ -11,9 +11,7 @@ import '../model/Employee.dart';
 import '../url.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
-import 'package:toast/toast.dart';
 import '../main.dart';
-import 'package:excel/excel.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
@@ -89,59 +87,59 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
     }
   }
 
-  Future<String> excelToJson() async {
-    var bytes = File(excelFilePath).readAsBytesSync();
-    var excel = Excel.decodeBytes(bytes);
-    int i = 0;
-    List<dynamic> keys = [];
-    var jsonMap = [];
+  // Future<String> excelToJson() async {
+  //   var bytes = File(excelFilePath).readAsBytesSync();
+  //   var excel = Excel.decodeBytes(bytes);
+  //   int i = 0;
+  //   List<dynamic> keys = [];
+  //   var jsonMap = [];
 
-    for (var table in excel.tables.keys) {
-      // dev.log(table.toString());
-      for (var row in excel.tables[table].rows) {
-        // dev.log(row.toString());
-        if (i == 0) {
-          // dev.log(row.toString());
-          keys = [
-            "idcardno",
-            "nameofworker",
-            "addressline1",
-            "state",
-            "district",
-            "city",
-            "mobileno",
-            "departmentname"
-          ];
-          i++;
-        } else {
-          var temp = {};
-          int j = 0;
-          String tk = '';
-          for (var key in keys) {
-            tk = '\"${key.toString()}\"';
-            temp[tk] = (row[j].runtimeType == String)
-                ? '\"${row[j].toString()}\"'
-                : row[j];
-            j++;
-          }
+  //   for (var table in excel.tables.keys) {
+  //     // dev.log(table.toString());
+  //     for (var row in excel.tables[table].rows) {
+  //       // dev.log(row.toString());
+  //       if (i == 0) {
+  //         // dev.log(row.toString());
+  //         keys = [
+  //           "idcardno",
+  //           "nameofworker",
+  //           "addressline1",
+  //           "state",
+  //           "district",
+  //           "city",
+  //           "mobileno",
+  //           "departmentname"
+  //         ];
+  //         i++;
+  //       } else {
+  //         var temp = {};
+  //         int j = 0;
+  //         String tk = '';
+  //         for (var key in keys) {
+  //           tk = '\"${key.toString()}\"';
+  //           temp[tk] = (row[j].runtimeType == String)
+  //               ? '\"${row[j].toString()}\"'
+  //               : row[j];
+  //           j++;
+  //         }
 
-          jsonMap.add(temp);
-        }
-      }
-    }
-    // dev.log(
-    //   jsonMap.length.toString(),
-    //   name: 'excel to json',
-    // );
-    // dev.log(jsonMap.toString(), name: 'excel to json');
-    // String fullJson =
-    //     jsonMap.toString().substring(1, jsonMap.toString().length - 1);
-    // dev.log(
-    //   fullJson.toString(),
-    //   name: 'excel to json',
-    // );
-    return jsonMap.toString();
-  }
+  //         jsonMap.add(temp);
+  //       }
+  //     }
+  //   }
+  //   // dev.log(
+  //   //   jsonMap.length.toString(),
+  //   //   name: 'excel to json',
+  //   // );
+  //   // dev.log(jsonMap.toString(), name: 'excel to json');
+  //   // String fullJson =
+  //   //     jsonMap.toString().substring(1, jsonMap.toString().length - 1);
+  //   // dev.log(
+  //   //   fullJson.toString(),
+  //   //   name: 'excel to json',
+  //   // );
+  //   return jsonMap.toString();
+  // }
 
   Future<bool> _checkPermission() async {
     if (platform == TargetPlatform.android) {
@@ -160,35 +158,35 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
     return false;
   }
 
-  Future<String> createBulkEmployee() async {
-    // String orgId = prefs.getString("worker_id");
-    var body = await excelToJson();
+  // Future<String> createBulkEmployee() async {
+  //   // String orgId = prefs.getString("worker_id");
+  //   var body = await excelToJson();
 
-    var response = await http
-        .post(Uri.parse('$kUploadEmpExcel /$orgId'), body: body, headers: {
-      'Content-Type': 'application/json',
-    });
+  //   var response = await http
+  //       .post(Uri.parse('$kUploadEmpExcel /$orgId'), body: body, headers: {
+  //     'Content-Type': 'application/json',
+  //   });
 
-    print("reponse is " + response.statusCode.toString());
-    if (response.statusCode == 200) {
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => Login()),
-      // );
-      Toast.show("Your Emplyees added", context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.blue);
+  //   print("reponse is " + response.statusCode.toString());
+  //   if (response.statusCode == 200) {
+  //     // Navigator.push(
+  //     //   context,
+  //     //   MaterialPageRoute(builder: (context) => Login()),
+  //     // );
+  //     Toast.show("Your Emplyees added", context,
+  //         duration: Toast.LENGTH_LONG,
+  //         gravity: Toast.BOTTOM,
+  //         textColor: Colors.blue);
 
-      Navigator.of(context, rootNavigator: true).pop();
-    } else {
-      Toast.show("Your Emplyees not added", context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.red);
-      Navigator.of(context, rootNavigator: true).pop();
-    }
-  }
+  //     Navigator.of(context, rootNavigator: true).pop();
+  //   } else {
+  //     Toast.show("Your Emplyees not added", context,
+  //         duration: Toast.LENGTH_LONG,
+  //         gravity: Toast.BOTTOM,
+  //         textColor: Colors.red);
+  //     Navigator.of(context, rootNavigator: true).pop();
+  //   }
+  // }
 
   Future<List<Employee>> _getEmployeeList() async {
     // String orgId = prefs.getString("worker_id");
@@ -344,8 +342,9 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
                                 'Please use this feature on web for seamless user-experience',
                               ),
                               actions: <Widget>[
-                                new GestureDetector(
-                                  onTap: () => Navigator.of(context).pop(true),
+                                new TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
                                   child: Text("Back"),
                                 ),
                               ],

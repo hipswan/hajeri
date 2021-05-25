@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:upgrader/upgrader.dart';
 import './Pages/about_us.dart';
 import './Pages/contact_us.dart';
 import './Pages/dashboard.dart';
@@ -206,7 +207,12 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         //confortaaTextTheme()
       ),
-      home: Home(),
+      home: UpgradeAlert(
+        dialogStyle: Platform.isAndroid
+            ? UpgradeDialogStyle.material
+            : UpgradeDialogStyle.cupertino,
+        child: Home(),
+      ),
     );
   }
 

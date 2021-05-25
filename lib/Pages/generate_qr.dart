@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'package:flutter/services.dart';
+import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -367,60 +368,63 @@ class _GenerateQRState extends State<GenerateQR> {
                             markers: _markers.values.toSet(),
                           ),
                           //recenter button
-                          Positioned(
-                            right: 18,
-                            bottom: 18,
-                            child: FloatingActionButton(
-                              heroTag: null,
-                              onPressed: () async {
-                                LatLng center = await getUserLocation();
-                                mapController.moveCamera(
-                                  CameraUpdate.newCameraPosition(
-                                    CameraPosition(
-                                      target: LatLng(
-                                        center.latitude,
-                                        center.longitude,
-                                      ),
-                                      zoom: 15.0,
-                                    ),
-                                  ),
-                                );
-                                setState(() {
-                                  currentPosition =
-                                      LatLng(center.latitude, center.longitude);
-                                  _markers['position'] = Marker(
-                                      consumeTapEvents: true,
-                                      draggable: true,
-                                      markerId: MarkerId('Marker Id'),
-                                      position: LatLng(
-                                        center.latitude,
-                                        center.longitude,
-                                      ),
-                                      infoWindow: InfoWindow(
-                                        title: 'Info title',
-                                        snippet: 'Info snippet',
-                                      ),
-                                      onDragEnd: (value) {
-                                        setState(() {
-                                          currentPosition = LatLng(
-                                              value.latitude, value.longitude);
-                                          dev.log(value.toString());
-                                        });
-                                      });
+                          Platform.isAndroid
+                              ? Positioned(
+                                  right: 18,
+                                  bottom: 18,
+                                  child: FloatingActionButton(
+                                    heroTag: null,
+                                    onPressed: () async {
+                                      LatLng center = await getUserLocation();
+                                      mapController.moveCamera(
+                                        CameraUpdate.newCameraPosition(
+                                          CameraPosition(
+                                            target: LatLng(
+                                              center.latitude,
+                                              center.longitude,
+                                            ),
+                                            zoom: 15.0,
+                                          ),
+                                        ),
+                                      );
+                                      setState(() {
+                                        currentPosition = LatLng(
+                                            center.latitude, center.longitude);
+                                        _markers['position'] = Marker(
+                                            consumeTapEvents: true,
+                                            draggable: true,
+                                            markerId: MarkerId('Marker Id'),
+                                            position: LatLng(
+                                              center.latitude,
+                                              center.longitude,
+                                            ),
+                                            infoWindow: InfoWindow(
+                                              title: 'Info title',
+                                              snippet: 'Info snippet',
+                                            ),
+                                            onDragEnd: (value) {
+                                              setState(() {
+                                                currentPosition = LatLng(
+                                                    value.latitude,
+                                                    value.longitude);
+                                                dev.log(value.toString());
+                                              });
+                                            });
 
-                                  isRecenterFinished = true;
-                                });
-                              },
-                              tooltip: 'Center',
-                              backgroundColor: Colors.white,
-                              child: isRecenterFinished
-                                  ? Icon(
-                                      Icons.gps_fixed_outlined,
-                                      color: Colors.blue,
-                                    )
-                                  : CircularProgressIndicator(),
-                            ),
-                          ),
+                                        isRecenterFinished = true;
+                                      });
+                                    },
+                                    tooltip: 'Center',
+                                    backgroundColor: Colors.white,
+                                    child: isRecenterFinished
+                                        ? Icon(
+                                            Icons.gps_fixed_outlined,
+                                            color: Colors.blue,
+                                          )
+                                        : CircularProgressIndicator(),
+                                  ),
+                                )
+                              : Container(),
                         ],
                       );
                     }

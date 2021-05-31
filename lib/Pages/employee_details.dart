@@ -15,17 +15,17 @@ import '../main.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
-class EmployeeDetail extends StatefulWidget {
+class EmployeeDetails extends StatefulWidget {
   static const id = 'employee_detail';
   final String orgId;
-  EmployeeDetail({
+  EmployeeDetails({
     this.orgId,
   });
   @override
-  _EmployeeDetailState createState() => _EmployeeDetailState();
+  _EmployeeDetailsState createState() => _EmployeeDetailsState();
 }
 
-class _EmployeeDetailState extends State<EmployeeDetail> {
+class _EmployeeDetailsState extends State<EmployeeDetails> {
 //Drop Down Section
   String btnValue;
   bool showShimmer = true;
@@ -267,7 +267,7 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
         appBar: AppBar(
           backgroundColor: Colors.blue[800],
           title: Text(
-            'Employee Detail',
+            'Employee Details',
           ),
           centerTitle: true,
           automaticallyImplyLeading: true,
@@ -321,7 +321,7 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: const Text(
-                                    'error has occured during add employee'),
+                                    'error has occurred during add employee'),
                               ),
                             );
                           }

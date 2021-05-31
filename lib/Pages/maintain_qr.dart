@@ -140,7 +140,7 @@ class _MaintainQrState extends State<MaintainQr> {
                   builder: (context) {
                     return GenerateQR(
                       action: 'add',
-                      title: 'Generate Qr',
+                      title: 'Generate QR Code',
                     );
                   },
                 ),
@@ -155,7 +155,7 @@ class _MaintainQrState extends State<MaintainQr> {
         appBar: AppBar(
           backgroundColor: Colors.blue[800],
           title: Text(
-            'Generate QR',
+            'Generate QR Code',
           ),
           centerTitle: true,
         ),

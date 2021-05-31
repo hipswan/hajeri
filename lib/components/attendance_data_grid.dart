@@ -54,7 +54,7 @@ class _AttendanceDataGridState extends State<AttendanceDataGrid> {
     //TODO: Add list to attendances
     // log(referenceAttendance.length.toString(), name: 'In Attendance Grid Init');
 
-    for (int i = 1; i <= referenceAttendance.length - 2; i++) {
+    for (int i = 1; i <= referenceAttendance.length - 4; i++) {
       _gridColumn.add(GridTextColumn(
         width: 65.0,
         columnName: i.toString(),

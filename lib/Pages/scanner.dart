@@ -8,19 +8,15 @@ import '../url.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import '../Pages/employee_detail.dart';
 import '../components/side_bar.dart';
 import '../main.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:toast/toast.dart';
 import 'dart:io';
-
-import 'generate_qr.dart';
 
 Position _currrentUserLocation;
 var orgLng;
@@ -636,10 +632,10 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
           return 'error occurred';
         }
       } else {
-        Toast.show("Please be under 3 meters of Organization", context,
-            duration: Toast.LENGTH_LONG,
-            gravity: Toast.BOTTOM,
-            textColor: Colors.red);
+        // Toast.show("Please be under 3 meters of Organization", context,
+        //     duration: Toast.LENGTH_LONG,
+        //     gravity: Toast.BOTTOM,
+        //     textColor: Colors.red);
         return "Please be under 3 meters of Organization";
       }
     }

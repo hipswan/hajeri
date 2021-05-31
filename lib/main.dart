@@ -28,7 +28,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Pages/register.dart';
 import 'Pages/display_qr.dart';
-import 'Pages/employee_detail.dart';
+import 'Pages/employee_details.dart';
 import 'package:http/http.dart' as http;
 
 import 'url.dart';
@@ -156,7 +156,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
       routes: {
-        EmployeeDetail.id: (_) => EmployeeDetail(),
+        EmployeeDetails.id: (_) => EmployeeDetails(),
         Profile.id: (_) => Profile(),
         Dashboard.id: (_) => Dashboard(),
         MonthlyAttendance.id: (_) => MonthlyAttendance(),
@@ -257,6 +257,29 @@ class _HomeState extends State<Home> {
           prefs.setString("worker_id", "No Data");
         else
           prefs.setString("worker_id", data["id"].toString());
+        if(data['tokenforuser'] == null)
+          {
+            try {
+              var response = await http.post(Uri.parse(
+                  '$kSaveToken${prefs.getString('worker_id')}/${prefs.getString('mobile')}?userfirebasetoken=${prefs.getString('token')}'));
+
+              if (response.statusCode == 200) {
+                var data = json.decode(response.body);
+                dev.log('token ${data.toString()}');
+                return "success";
+              } else {
+                return "server issue";
+              }
+            } on SocketException catch (e) {
+              return "no internet";
+            } catch (e) {
+              return "error occurred";
+            }
+          }
+        else
+            {
+              dev.log("$data['tokenforuser']");
+            }
         // dev.log(data.toString());
         prefs.setBool("is_sub_org", hajeriLevel.contains("Hajeri-Head-1"));
         prefs.setString("hajeri_level", hajeriLevel);

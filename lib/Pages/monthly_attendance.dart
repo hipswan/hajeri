@@ -336,7 +336,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
         automaticallyImplyLeading: true,
         backgroundColor: Colors.blue[800],
         title: Text(
-          'Attendance',
+          'Monthly Attendance',
           // 'हाजिरी',
         ),
         centerTitle: true,

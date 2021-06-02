@@ -618,7 +618,7 @@ class _FormPageState extends State<FormPage> {
                                                   cityAndStateNewValue['state'],
                                               district: _cDistrict.text.trim(),
                                               city:
-                                                  cityAndStateNewValue['state'])
+                                                  cityAndStateNewValue['city'])
                                           : Employee.empty(),
                                     );
                                   } else {
@@ -633,9 +633,8 @@ class _FormPageState extends State<FormPage> {
                                             ? Employee(
                                                 addressLine1: _cAddress.text
                                                     .trim(),
-                                                idCardNumber:
-                                                    int.parse(_cIdentity.text
-                                                        .trim()),
+                                                idCardNumber: int.parse(
+                                                    _cIdentity.text.trim()),
                                                 departmentName:
                                                     departmentDropDownValue,
                                                 number: int.parse(
@@ -646,7 +645,7 @@ class _FormPageState extends State<FormPage> {
                                                 district:
                                                     _cDistrict.text.trim(),
                                                 city: cityAndStateNewValue[
-                                                    'state'])
+                                                    'city'])
                                             : Employee.empty());
                                   }
                                 } else {

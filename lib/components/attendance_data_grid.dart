@@ -48,13 +48,10 @@ class _AttendanceDataGridState extends State<AttendanceDataGrid> {
     ];
     _attendances = widget.attendanceSheet;
 
-    // log(_attendances.toString(), name: 'In Attendance Grid Init');
-
     referenceAttendance = (_attendances.first as Map);
     //TODO: Add list to attendances
-    // log(referenceAttendance.length.toString(), name: 'In Attendance Grid Init');
-
-    for (int i = 1; i <= referenceAttendance.length - 4; i++) {
+    log(referenceAttendance.toString(), name: 'In Attendance Grid Init');
+    for (int i = 1; i <= referenceAttendance.length - 3; i++) {
       _gridColumn.add(GridTextColumn(
         width: 65.0,
         columnName: i.toString(),
@@ -183,15 +180,15 @@ class AttendanceDataSource extends DataGridSource {
     dataGridRows = attendanceSheet.map<DataGridRow>(
       (dataGridRow) {
         return DataGridRow(
-            cells: _gridColumn
-                .map<DataGridCell>(
-                  (employee) => DataGridCell<String>(
-                    columnName: employee.columnName.toString(),
-                    value:
-                        dataGridRow[employee.columnName..toString()].toString(),
-                  ),
-                )
-                .toList());
+          cells: _gridColumn
+              .map<DataGridCell>(
+                (employee) => DataGridCell<String>(
+                  columnName: employee.columnName.toString(),
+                  value: dataGridRow[employee.columnName.toString()].toString(),
+                ),
+              )
+              .toList(),
+        );
       },
     ).toList();
   }
@@ -209,9 +206,12 @@ class AttendanceDataSource extends DataGridSource {
           if (dataGridCell.columnName != 'name' &&
               dataGridCell.columnName != 'mobileno') {
             String currentAttendance = dataGridCell.value.toString();
-
             return !currentAttendance.contains('A')
                 ? Container(
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.0,
+                    ),
                     child: Scrollbar(
                       key: UniqueKey(),
                       child: SingleChildScrollView(
@@ -235,7 +235,7 @@ class AttendanceDataSource extends DataGridSource {
                 : Container();
           } else {
             return Container(
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.center,
               padding: EdgeInsets.symmetric(
                 horizontal: 8.0,
               ),
@@ -251,9 +251,5 @@ class AttendanceDataSource extends DataGridSource {
         return getAttendanceWidget();
       }).toList(),
     );
-  }
-
-  void updateDataGridSource() {
-    notifyListeners();
   }
 }

@@ -136,6 +136,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                   bottom: 50,
                   right: 50,
                   child: FloatingActionButton(
+                    heroTag: 'flash',
                     backgroundColor: Colors.white.withAlpha(100),
                     focusColor: Colors.white,
                     splashColor: Colors.blueAccent,
@@ -163,6 +164,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                   bottom: 50,
                   left: 50,
                   child: FloatingActionButton(
+                    heroTag: 'camera',
                     backgroundColor: isFrontCamera
                         ? Colors.blue
                         : Colors.white.withAlpha(100),

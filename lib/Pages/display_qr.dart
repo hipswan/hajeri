@@ -4,6 +4,8 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:open_file/open_file.dart';
 import '../Pages/generate_qr.dart';
 import '../main.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -12,6 +14,7 @@ import 'package:toast/toast.dart';
 import '../constant.dart';
 import 'package:path_provider/path_provider.dart' as path;
 import 'dart:core';
+import 'package:http/http.dart' as http;
 
 class DisplayQr extends StatefulWidget {
   static String id = 'display_qr';
@@ -30,7 +33,6 @@ class DisplayQr extends StatefulWidget {
 }
 
 class _DisplayQrState extends State<DisplayQr> {
-  ReceivePort _port = ReceivePort();
   TargetPlatform platform = TargetPlatform.android;
   List<String> _pdfSizeFormatItems = [
     'A4size',
@@ -56,16 +58,22 @@ class _DisplayQrState extends State<DisplayQr> {
           ),
         )
         .toList();
-    IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
-    _port.listen((dynamic data) {
-      String id = data[0];
-      DownloadTaskStatus status = data[1];
-      int progress = data[2];
-      setState(() {});
-    });
+    var initializationSettingsAndroid =
+        new AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = new IOSInitializationSettings();
 
-    FlutterDownloader.registerCallback(downloadCallback);
+    var initializationSettings = new InitializationSettings(
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+
+    //flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+  }
+
+  Future onSelectNotification(String payload) async {
+    // print("Payload: $payload");
+    OpenFile.open(payload);
   }
 
   Future<String> _prepare() async {
@@ -104,15 +112,7 @@ class _DisplayQrState extends State<DisplayQr> {
 
   @override
   void dispose() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
-  }
-
-  static void downloadCallback(
-      String id, DownloadTaskStatus status, int progress) {
-    final SendPort send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-    send.send([id, status, progress]);
   }
 
   @override
@@ -294,31 +294,102 @@ class _DisplayQrState extends State<DisplayQr> {
                               "https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
                               name: 'In display qr');
                           try {
-                            await FlutterDownloader.enqueue(
-                              url:
-                                  "https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
-                              savedDir: io.Platform.isAndroid
-                                  ? '/storage/emulated/0/Download/'
-                                  : (await path
-                                          .getApplicationDocumentsDirectory())
-                                      .path,
+                            http.Response response = await http.get(
+                              Uri.parse(
+                                "https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
+                              ),
                               headers: {'content-type': 'application/pdf'},
-                              fileName: fileName,
-                              showNotification: true,
-                              openFileFromNotification: true,
                             );
+                            if (response.statusCode == 200) {
+                              List<int> data = response.bodyBytes;
+                              String pdfPath = io.Platform.isAndroid
+                                  ? '/storage/emulated/0/Download/$fileName'
+                                  : (await path
+                                              .getApplicationDocumentsDirectory())
+                                          .path +
+                                      '/Download/$fileName';
+                              io.File result =
+                                  await io.File('$pdfPath').writeAsBytes(data);
+                              if (result != null) {
+                                var androidPlatformChannelSpecifics =
+                                    new AndroidNotificationDetails(
+                                  'pdf_download',
+                                  'pdf_download',
+                                  'download pdf',
+                                  importance: Importance.max,
+                                  priority: Priority.high,
+                                  playSound: true,
+                                  tag: 'Hajeri',
+                                  icon: '@drawable/ic_stat_hajeri',
+                                );
+                                var iOSPlatformChannelSpecifics =
+                                    new IOSNotificationDetails();
+                                var platformChannelSpecifics =
+                                    new NotificationDetails(
+                                        android:
+                                            androidPlatformChannelSpecifics,
+                                        iOS: iOSPlatformChannelSpecifics);
+
+                                await flutterLocalNotificationsPlugin.show(
+                                    0,
+                                    'Qr code is downloaded',
+                                    'Tap To Open',
+                                    platformChannelSpecifics,
+                                    payload: pdfPath);
+                                // Platform.isIOS ? OpenFile.open(excelPath) : null;
+
+                                Toast.show(
+                                  "file downloaded",
+                                  context,
+                                  duration: Toast.LENGTH_LONG,
+                                  gravity: Toast.BOTTOM,
+                                  textColor: Colors.green,
+                                );
+                              } else
+                                Toast.show(
+                                  "file not downloaded",
+                                  context,
+                                  duration: Toast.LENGTH_LONG,
+                                  gravity: Toast.BOTTOM,
+                                  textColor: Colors.green,
+                                );
+                            } else {
+                              Toast.show(
+                                "server error",
+                                context,
+                                duration: Toast.LENGTH_LONG,
+                                gravity: Toast.BOTTOM,
+                                textColor: Colors.redAccent,
+                              );
+                            }
+
+                            // await FlutterDownloader.enqueue(
+                            //   url:
+                            //       "https://hajeri.in/qrcodes/${prefs.getString('org_id')}/${widget.pointName}/$pdfSizeDropDownValue.pdf",
+                            //   savedDir: io.Platform.isAndroid
+                            //       ? '/storage/emulated/0/Download/'
+                            //       : (await path
+                            //               .getApplicationDocumentsDirectory())
+                            //           .path,
+                            //   headers: {'content-type': 'application/pdf'},
+                            //   fileName: fileName,
+                            //   showNotification: true,
+                            //   openFileFromNotification: true,
+                            // );
+
+                          } on io.SocketException catch (e) {
                             Toast.show(
-                              "file download",
+                              "device is not connected to internet",
                               context,
                               duration: Toast.LENGTH_LONG,
                               gravity: Toast.BOTTOM,
-                              textColor: Colors.green,
+                              textColor: Colors.redAccent,
                             );
                           } on path
                               .MissingPlatformDirectoryException catch (e1) {
                             dev.log(e1.message, name: 'In flutter downloader');
                             Toast.show(
-                              "file not download",
+                              "file not downloaded",
                               context,
                               duration: Toast.LENGTH_LONG,
                               gravity: Toast.BOTTOM,
@@ -329,7 +400,7 @@ class _DisplayQrState extends State<DisplayQr> {
                                 name: 'In flutter downloader');
 
                             Toast.show(
-                              "file not download",
+                              "file not downloaded",
                               context,
                               duration: Toast.LENGTH_LONG,
                               gravity: Toast.BOTTOM,

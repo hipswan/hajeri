@@ -13,7 +13,7 @@ import '../Pages/maintain_qr.dart';
 import '../Pages/privacy_policy.dart';
 import '../Pages/scanner.dart';
 import '../Pages/terms_and_conditions.dart';
-import '../Pages/employee_detail.dart';
+import '../Pages/employee_details.dart';
 import '../Pages/monthly_attendance.dart';
 
 import '../main.dart';
@@ -192,7 +192,7 @@ class _SideBarState extends State<SideBar> {
                       : Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) {
-                            return EmployeeDetail(
+                            return EmployeeDetails(
                               orgId: prefs.getString(
                                 'worker_id',
                               ),

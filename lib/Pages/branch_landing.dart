@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Pages/dashboard.dart';
 import '../Pages/monthly_attendance.dart';
-import '../Pages/employee_detail.dart';
+import '../Pages/employee_details.dart';
 import '../constant.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
@@ -25,7 +25,7 @@ class _BranchLandingState extends State<BranchLanding> {
       Dashboard(
         orgId: widget.orgId,
       ),
-      EmployeeDetail(
+      EmployeeDetails(
         orgId: widget.orgId,
       ),
       MonthlyAttendance(

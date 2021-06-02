@@ -1042,7 +1042,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
         String excelPath = Platform.isAndroid
             ? '/storage/emulated/0/Download/excel.xlsx'
             : (await path.getApplicationDocumentsDirectory()).path +
-                '/excel.xlsx';
+                '/Download/excel.xlsx';
         File result = await File('$excelPath').writeAsBytes(bytes);
         if (result != null) {
           var androidPlatformChannelSpecifics = new AndroidNotificationDetails(

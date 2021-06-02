@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'dart:io' show Platform, SocketException;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../components/today_employee.dart';
 import '../components/employee_data_grid.dart';
 import '../components/box_tile.dart';
 import '../components/history_log.dart';
@@ -81,21 +80,31 @@ class _DashboardState extends State<Dashboard> {
       var response = await http.get(Uri.parse("$kEmployeeList$orgId"));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-        // log("the _getEmployeeList data is " + data.toString());
+        log("the _getEmployeeList data is " + data.toString());
         if (data.isNotEmpty) {
           employees = data
               .map<Employee>(
                 (e) => Employee(
-                    name: e["nameofworker"],
-                    number:
-                        e["mobileno"] == null ? 0 : int.parse(e["mobileno"]),
-                    idCardNumber: int.parse('0'),
-                    organizationName: e["organizationname"],
-                    departmentName: e["departmentname"],
-                    city: e["city"],
-                    addressLine1: e["addressline1"],
-                    district: e["district"],
-                    state: e["state"]),
+                  name: e["nameofworker"].toString(),
+                  number: (e["mobileno"] == null ||
+                          e["idcardno"].toString().trim().isEmpty)
+                      ? 0
+                      : int.parse(e["mobileno"]),
+                  idCardNumber: (e["idcardno"] == null ||
+                          e["idcardno"].toString().trim().isEmpty ||
+                          e["idcardno"]
+                              .toString()
+                              .trim()
+                              .contains(new RegExp(r'[a-zA-Z]')))
+                      ? 0
+                      : int.parse(e["idcardno"]),
+                  organizationName: e["organizationname"].toString(),
+                  departmentName: e["departmentname"].toString(),
+                  city: e["city"].toString(),
+                  addressLine1: e["addressline1"].toString(),
+                  district: e["district"].toString(),
+                  state: e["state"].toString(),
+                ),
               )
               .toList();
           return 'employee';
@@ -326,7 +335,7 @@ class _DashboardState extends State<Dashboard> {
       var response = await http.get(Uri.parse("$kVisitorOneMonthList$orgId"));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-        log("the _getTotal VisitorList data is " + data.toString());
+        // log("the _getTotal VisitorList data is " + data.toString());
         if (data.isEmpty) {
           return 'absent';
         } else {

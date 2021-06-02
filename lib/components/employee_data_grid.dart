@@ -40,52 +40,9 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
   @override
   void initState() {
     super.initState();
-
     _employees = widget.employees;
-    // log(_employees.toString(), name: 'In employee grid');
-    _employeeDataSource = EmployeeDataSource(employees: _employees);
-  }
-
-  Future<List<dynamic>> getStateList() async {
-    List<dynamic> data = [
-      {'': ''}
-    ];
-    print('In get states');
-    log(kStates);
-    http.Response response = await http.get(Uri.parse(kStates));
-
-    if (response.statusCode == 200) {
-      data = json.decode(response.body);
-    } else {
-      data = [
-        {"id": -1, "statename": "error couldn't fetch states details"},
-      ];
-      log('$data');
-    }
-
-    return data;
-  }
-
-  Future<List<dynamic>> getCityList(String stateId) async {
-    List<dynamic> data = [
-      {'': ''}
-    ];
-    print('In get city');
-    log('$kCity/$stateId');
-    http.Response response = await http.get(Uri.parse('$kCity/$stateId'));
-    print(
-      response.body,
-    );
-    if (response.statusCode == 200) {
-      data = json.decode(response.body);
-    } else {
-      data = [
-        {"id": -1, "cityname": "error couldn't fetch states details"},
-      ];
-      log('$data');
-    }
-
-    return data;
+    log(_employees.toString(), name: 'In employee grid');
+    _employeeDataSource = EmployeeDataSource();
   }
 
   Future<String> deleteEmployee({Employee employee}) async {
@@ -244,15 +201,6 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
               ? SelectionMode.none
               : SelectionMode.singleDeselect,
           navigationMode: GridNavigationMode.row,
-          // onSelectionChanging:
-          //     (List<Object> addedRows, List<Object> removedRows) {
-          //   if (addedRows.isNotEmpty &&
-          //       (addedRows.last as Employee).name == 'Manager') {
-          //     return false;
-          //   }
-
-          //   return true;
-          // },
           onSelectionChanged:
               (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
             // // apply your logic
@@ -281,203 +229,229 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
               });
             }
           },
-          stackedHeaderRows: <StackedHeaderRow>[
-            StackedHeaderRow(
-              cells: [
-                StackedHeaderCell(
-                  columnNames: [
-                    'name',
-                    'id',
-                    'number',
-                    'address',
-                    'department',
-                    'city',
-                    'district',
-                    'state',
-                  ],
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        child: Text(
-                          widget.view ?? '',
-                          style: kDataGridHeaderTextStyle,
-                        ),
-                      ),
-                      isRowSelected
-                          ? Row(
-                              children: [
-                                IconButton(
-                                    icon: Icon(
-                                      Icons.edit,
-                                      color: Colors.white,
-                                    ),
-                                    onPressed: () async {
-                                      Employee selectedEmployeeWithEdit =
-                                          await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) {
-                                          return FormPage(
-                                            orgId: widget.orgId,
-                                            currentEmployee: currentEmployee,
-                                            action: 'edit',
-                                            title:
-                                                'Edit ${currentEmployee.name} ',
-                                          );
-                                        }),
-                                      );
-                                      if (selectedEmployeeWithEdit == null) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: const Text(
-                                                'no action taken while editing'),
+          stackedHeaderRows: widget.selectionModeDisabled
+              ? []
+              : <StackedHeaderRow>[
+                  StackedHeaderRow(
+                    cells: [
+                      StackedHeaderCell(
+                        columnNames: [
+                          'name',
+                          'id',
+                          'number',
+                          'address',
+                          'department',
+                          'city',
+                          'district',
+                          'state',
+                        ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              child: Text(
+                                widget.view ?? '',
+                                style: kDataGridHeaderTextStyle,
+                              ),
+                            ),
+                            isRowSelected
+                                ? Row(
+                                    children: [
+                                      IconButton(
+                                          icon: Icon(
+                                            Icons.edit,
+                                            color: Colors.white,
                                           ),
-                                        );
-                                      } else if (selectedEmployeeWithEdit
-                                          .name.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: const Text(
-                                                'Error has occured during edit'),
-                                          ),
-                                        );
-                                      } else {
-// / // ignore: unnecessary_statements
-                                        (_employees.remove(currentEmployee))
-                                            ? _employees
-                                                .add(selectedEmployeeWithEdit)
-                                            : ScaffoldMessenger.of(context)
-                                                .showSnackBar(
+                                          onPressed: () async {
+                                            Employee selectedEmployeeWithEdit =
+                                                await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) {
+                                                return FormPage(
+                                                  orgId: widget.orgId,
+                                                  currentEmployee:
+                                                      currentEmployee,
+                                                  action: 'edit',
+                                                  title:
+                                                      'Edit ${currentEmployee.name} ',
+                                                );
+                                              }),
+                                            );
+                                            if (selectedEmployeeWithEdit ==
+                                                null) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
                                                 SnackBar(
                                                   content: const Text(
-                                                      'Error has occured during save'),
+                                                      'no action taken while editing'),
                                                 ),
                                               );
-                                      }
-
-                                      _employeeDataSource
-                                          .updateDataGridSource();
-                                    }),
-                                IconButton(
-                                    icon: Icon(
-                                      Icons.delete,
-                                      color: Colors.white,
-                                    ),
-                                    onPressed: () async {
-                                      var employee = currentEmployee;
-                                      bool isMainEmployee = employee.number
-                                          .toString()
-                                          .contains(prefs.getString('mobile'));
-                                      if (!isMainEmployee) {
-                                        bool delete = await showDialog(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            builder: (context) {
-                                              return AlertDialog(
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop(true);
-                                                    },
-                                                    child: Text('Yes'),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop(false);
-                                                    },
-                                                    child: Text('No'),
-                                                  )
-                                                ],
-                                                title: Text('Delete Employee'),
-                                                content: Text(
-                                                  'Do you want to delete your employee: ${employee.name} ?',
+                                            } else if (selectedEmployeeWithEdit
+                                                .name.isEmpty) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: const Text(
+                                                      'Error has occured during edit'),
                                                 ),
                                               );
-                                            });
-                                        if (delete) {
-                                          var deleteStatus =
-                                              await deleteEmployee(
-                                                  employee: currentEmployee);
-                                          log(deleteStatus);
-                                          if (deleteStatus
-                                              .toLowerCase()
-                                              .contains('success')) {
-                                            if (_employees
-                                                .remove(currentEmployee)) {
-                                              log('removed ${currentEmployee.name}');
                                             } else {
-                                              log('not removed removed ${currentEmployee.name}');
-                                            }
-                                          } else {
-                                            log('Error while deleting');
-                                          }
+// / // ignore: unnecessary_statements
+                                              _employees.removeWhere(
+                                                  (employee) =>
+                                                      employee.name ==
+                                                      currentEmployee.name);
 
-                                          _employeeDataSource
-                                              .updateDataGridSource();
-                                          showDialog(
-                                              context: context,
-                                              barrierDismissible: false,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      },
-                                                      child: Text('back'),
-                                                    )
-                                                  ],
-                                                  title:
-                                                      Text('Delete Employees'),
-                                                  content: Text(
-                                                    deleteStatus,
-                                                  ),
-                                                );
-                                              });
-                                        }
-                                      } else {
-                                        showDialog(
-                                            context: context,
-                                            barrierDismissible: true,
-                                            builder: (context) {
-                                              return AlertDialog(
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: Text('Back'),
-                                                  ),
-                                                ],
-                                                title: Text('Delete Employee'),
-                                                content: Text(
-                                                  'You cannot delete yourself',
-                                                ),
-                                              );
-                                            });
-                                      }
-                                    }),
-                              ],
-                            )
-                          : Container(),
+                                              _employees.add(
+                                                  selectedEmployeeWithEdit);
+                                              // ScaffoldMessenger.of(
+                                              //         context)
+                                              //     .showSnackBar(
+                                              //     SnackBar(
+                                              //       content: const Text(
+                                              //           'Error has occured during save'),
+                                              //     ),
+                                              //   );
+                                              _employeeDataSource
+                                                  .buildDataGridRows();
+                                              _employeeDataSource
+                                                  .updateDataGridSource();
+                                            }
+                                          }),
+                                      IconButton(
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color: Colors.white,
+                                          ),
+                                          onPressed: () async {
+                                            var employee = currentEmployee;
+                                            bool isMainEmployee = employee
+                                                .number
+                                                .toString()
+                                                .contains(
+                                                    prefs.getString('mobile'));
+                                            if (!isMainEmployee) {
+                                              bool delete = await showDialog(
+                                                  context: context,
+                                                  barrierDismissible: false,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(true);
+                                                          },
+                                                          child: Text('Yes'),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(false);
+                                                          },
+                                                          child: Text('No'),
+                                                        )
+                                                      ],
+                                                      title: Text(
+                                                          'Delete Employee'),
+                                                      content: Text(
+                                                        'Do you want to delete your employee: ${employee.name} ?',
+                                                      ),
+                                                    );
+                                                  });
+                                              if (delete) {
+                                                var deleteStatus =
+                                                    await deleteEmployee(
+                                                        employee:
+                                                            currentEmployee);
+                                                log(deleteStatus);
+                                                if (deleteStatus
+                                                    .toLowerCase()
+                                                    .contains('success')) {
+                                                  // if (_employees.remove(
+                                                  //     currentEmployee)) {
+                                                  //   log('removed ${currentEmployee.name}');
+                                                  // } else {
+                                                  //   log('not removed ${currentEmployee.name}');
+                                                  // }
+                                                  _employees.removeWhere(
+                                                      (employee) =>
+                                                          employee.name ==
+                                                          currentEmployee.name);
+                                                  _employeeDataSource
+                                                      .buildDataGridRows();
+                                                  _employeeDataSource
+                                                      .updateDataGridSource();
+                                                } else {
+                                                  log('Error while deleting');
+                                                }
+
+                                                showDialog(
+                                                    context: context,
+                                                    barrierDismissible: false,
+                                                    builder: (context) {
+                                                      return AlertDialog(
+                                                        actions: [
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            child: Text('back'),
+                                                          )
+                                                        ],
+                                                        title: Text(
+                                                            'Delete Employees'),
+                                                        content: Text(
+                                                          deleteStatus,
+                                                        ),
+                                                      );
+                                                    });
+                                              }
+                                            } else {
+                                              showDialog(
+                                                  context: context,
+                                                  barrierDismissible: true,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          child: Text('Back'),
+                                                        ),
+                                                      ],
+                                                      title: Text(
+                                                          'Delete Employee'),
+                                                      content: Text(
+                                                        'You cannot delete yourself',
+                                                      ),
+                                                    );
+                                                  });
+                                            }
+                                          }),
+                                    ],
+                                  )
+                                : Container(),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            // StackedHeaderCell(
-            //     columnNames: ['productId', 'product'],
-            //     child: Container(
-            //         color: const Color(0xFFF1F1F1),
-            //         child:
-            //             Center(child: Text('Product Details'))))
-          ],
+                  // StackedHeaderCell(
+                  //     columnNames: ['productId', 'product'],
+                  //     child: Container(
+                  //         color: const Color(0xFFF1F1F1),
+                  //         child:
+                  //             Center(child: Text('Product Details'))))
+                ],
         ),
       ),
     );
@@ -485,8 +459,7 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
 }
 
 class EmployeeDataSource extends DataGridSource {
-  final List<Employee> employees;
-  EmployeeDataSource({this.employees}) {
+  EmployeeDataSource() {
     buildDataGridRows();
   }
 
@@ -531,11 +504,6 @@ class EmployeeDataSource extends DataGridSource {
         .toList();
   }
 
-  @override
-  bool shouldRecalculateColumnWidths() {
-    return true;
-  }
-
   List<DataGridRow> dataGridRows = [];
 
   @override
@@ -559,6 +527,11 @@ class EmployeeDataSource extends DataGridSource {
         ),
       );
     }).toList());
+  }
+
+  @override
+  bool shouldRecalculateColumnWidths() {
+    return true;
   }
 
   void updateDataGridSource() {

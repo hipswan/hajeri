@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:upgrader/upgrader.dart';
 import './Pages/about_us.dart';
 import './Pages/contact_us.dart';
 import './Pages/dashboard.dart';
@@ -30,12 +29,17 @@ import 'Pages/register.dart';
 import 'Pages/display_qr.dart';
 import 'Pages/employee_details.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:new_version/new_version.dart';
 import 'url.dart';
 
 SharedPreferences prefs;
 FirebaseMessaging messaging;
 
+final newVersion = NewVersion(
+  iOSId: 'com.hajeri.amventures',
+  androidId: 'am.attendance.hajeri',
+);
+VersionStatus status;
 Future<void> saveTokenToSharedPreferences(String token) async {
   // Assume user is logged in for this example
   prefs.setString('token', token);
@@ -207,12 +211,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         //confortaaTextTheme()
       ),
-      home: UpgradeAlert(
-        dialogStyle: Platform.isAndroid
-            ? UpgradeDialogStyle.material
-            : UpgradeDialogStyle.cupertino,
-        child: Home(),
-      ),
+      home: Home(),
     );
   }
 
@@ -257,29 +256,26 @@ class _HomeState extends State<Home> {
           prefs.setString("worker_id", "No Data");
         else
           prefs.setString("worker_id", data["id"].toString());
-        if(data['tokenforuser'] == null)
-          {
-            try {
-              var response = await http.post(Uri.parse(
-                  '$kSaveToken${prefs.getString('worker_id')}/${prefs.getString('mobile')}?userfirebasetoken=${prefs.getString('token')}'));
+        if (data['tokenforuser'] == null) {
+          try {
+            var response = await http.post(Uri.parse(
+                '$kSaveToken${prefs.getString('worker_id')}/${prefs.getString('mobile')}?userfirebasetoken=${prefs.getString('token')}'));
 
-              if (response.statusCode == 200) {
-                var data = json.decode(response.body);
-                dev.log('token ${data.toString()}');
-                return "success";
-              } else {
-                return "server issue";
-              }
-            } on SocketException catch (e) {
-              return "no internet";
-            } catch (e) {
-              return "error occurred";
+            if (response.statusCode == 200) {
+              var data = json.decode(response.body);
+              dev.log('token ${data.toString()}');
+              return "success";
+            } else {
+              return "server issue";
             }
+          } on SocketException catch (e) {
+            return "no internet";
+          } catch (e) {
+            return "error occurred";
           }
-        else
-            {
-              dev.log("$data['tokenforuser']");
-            }
+        } else {
+          dev.log("$data['tokenforuser']");
+        }
         // dev.log(data.toString());
         prefs.setBool("is_sub_org", hajeriLevel.contains("Hajeri-Head-1"));
         prefs.setString("hajeri_level", hajeriLevel);
@@ -392,6 +388,28 @@ class _HomeState extends State<Home> {
         });
       });
     }
+    checkVersion();
+  }
+
+  checkVersion() async {
+    status = await newVersion.getVersionStatus();
+    dev.log(status.appStoreLink);
+    dev.log(status.localVersion);
+    dev.log(status.storeVersion);
+    // newVersion.showUpdateDialog(
+    //   context: context,
+    //   versionStatus: status,
+    //   dialogTitle: 'Update!!',
+    //   dialogText: 'Custom dialog text',
+    //   updateButtonText: 'Update',
+    //   dismissButtonText: 'Ignore',
+    //   dismissAction: () => functionToRunAfterDialogDismissed(),
+    // );
+    newVersion.showAlertIfNecessary(context: context);
+  }
+
+  functionToRunAfterDialogDismissed() {
+    print('dismissed');
   }
 
   @override

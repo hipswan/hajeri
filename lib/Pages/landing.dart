@@ -158,7 +158,7 @@ class _LandingState extends State<Landing>
                     ),
             ],
             onTap: (int i) {
-              print('Click index=$i');
+              // print('Click index=$i');
               _pageController.jumpToPage(i);
             },
           ),

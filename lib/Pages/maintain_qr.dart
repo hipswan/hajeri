@@ -53,7 +53,7 @@ class _MaintainQrState extends State<MaintainQr> {
 
   startShowCase() {
     if (prefs.getBool('showcase_qr') == null) {
-      dev.log('Inside showcase');
+      // dev.log('Inside showcase');
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         Future.delayed(Duration(milliseconds: 350), () {
           ShowCaseWidget.of(context).startShowCase([_addQrKey]);
@@ -91,7 +91,7 @@ class _MaintainQrState extends State<MaintainQr> {
 
         qrCodePointList = data;
 
-        dev.log(data.toString());
+        // dev.log(data.toString());
 
         return "success";
       } else {

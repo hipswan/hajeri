@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../constant.dart';
-import '../main.dart';
 import '../model/Employee.dart';
 import '../url.dart';
 import 'dart:developer' as dev;
@@ -215,12 +214,12 @@ class _FormPageState extends State<FormPage> {
         'Content-Type': 'application/json',
       });
 
-      print("reponse is " + response.body);
+      print("reponse and status code ${response.body} ${response.statusCode}");
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        print("the reponse data is " + response.toString());
+        print("the reponse data is " + response.body.toString());
         Toast.show(
-          data['message'],
+          data['message'] ?? 'done',
           context,
           duration: Toast.LENGTH_LONG,
           gravity: Toast.BOTTOM,

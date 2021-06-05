@@ -64,18 +64,22 @@ class _OtpVerifyState extends State<OtpVerify> {
                   onPressed: () {
                     Navigator.pushNamedAndRemoveUntil(
                       context,
+                      SignUp.id,
+                      (route) => false,
+                    );
+                  },
+                  child: Text('Back'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
                       Register.id,
                       (route) => false,
                     );
                   },
                   child: Text('Register'),
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('Back'),
-                )
               ],
             ),
           );
@@ -241,7 +245,7 @@ class _OtpVerifyState extends State<OtpVerify> {
   @override
   Widget build(BuildContext context) {
     var mediaQuery = MediaQuery.of(context);
-
+    var bottomInset = mediaQuery.viewInsets.bottom;
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -428,7 +432,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                 ),
               ),
               Positioned(
-                bottom: 30.0,
+                bottom: 30.0 + bottomInset,
                 right: 15.0,
                 left: 15.0,
                 child: Container(

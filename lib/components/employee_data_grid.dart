@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hajeri/constant.dart';
 import '../components/form_page.dart';
 import '../main.dart';
@@ -41,7 +40,6 @@ class _EmployeeDataGridState extends State<EmployeeDataGrid> {
   void initState() {
     super.initState();
     _employees = widget.employees;
-    log(_employees.toString(), name: 'In employee grid');
     _employeeDataSource = EmployeeDataSource();
   }
 

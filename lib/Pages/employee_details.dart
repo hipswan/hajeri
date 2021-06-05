@@ -195,9 +195,9 @@ class _EmployeeDetailsState extends State<EmployeeDetails> {
     var response = await http.get(Uri.parse("$kEmployeeList$orgId"));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      print("the _getEmployeeList data is " + data.toString());
+      // print("the _getEmployeeList data is " + data.toString());
       employeeList = data.map<Employee>((e) {
-        dev.log(e["idcardno"].toString());
+        // dev.log(e["idcardno"].toString());
         return Employee(
             name: e["nameofworker"],
             number: e["mobileno"] == null ? 0 : int.parse(e["mobileno"]),

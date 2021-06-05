@@ -56,7 +56,7 @@ class _DashboardState extends State<Dashboard> {
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
-      print("the _getData  data is " + data.toString());
+      // print("the _getData  data is " + data.toString());
 
 //      print(data);
       setState(() {
@@ -80,7 +80,7 @@ class _DashboardState extends State<Dashboard> {
       var response = await http.get(Uri.parse("$kEmployeeList$orgId"));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-        log("the _getEmployeeList data is " + data.toString());
+        // log("the _getEmployeeList data is " + data.toString());
         if (data.isNotEmpty) {
           employees = data
               .map<Employee>(
@@ -265,7 +265,7 @@ class _DashboardState extends State<Dashboard> {
       var response = await http.get(Uri.parse("$kTodayVisitor$orgId"));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-        log("the _getTodayVisitorList data is " + data.toString());
+        // log("the _getTodayVisitorList data is " + data.toString());
         if (data.isEmpty) {
           return 'absent';
         } else {

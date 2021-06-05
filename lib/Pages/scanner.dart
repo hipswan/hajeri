@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import '../Pages/landing.dart';
 import '../components/blue_button.dart';
 import '../constant.dart';
@@ -39,6 +40,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
   bool isQrScanned = false;
   bool isFrontCamera = false;
   bool showAd = true;
+  bool isLoading = false;
   Barcode result;
   String status;
   StreamSubscription<Barcode> _streamQrSubscription;
@@ -128,209 +130,238 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
         title: Text('QR Scanner'),
         centerTitle: true,
       ),
-      body: !isQrScanned
-          ? Stack(
-              children: <Widget>[
-                _buildQrView(context),
-                Positioned(
-                  bottom: 50,
-                  right: 50,
-                  child: FloatingActionButton(
-                    heroTag: 'flash',
-                    backgroundColor: Colors.white.withAlpha(100),
-                    focusColor: Colors.white,
-                    splashColor: Colors.blueAccent,
-                    tooltip: 'Flash',
-                    // focusColor: Colors.amberAccent,
-                    // hoverColor: Colors.deepOrange,
-                    child: isFlashOn
-                        ? Icon(
-                            Icons.flash_on,
-                            color: Colors.grey[300],
-                            size: 35,
-                          )
-                        : Icon(
-                            Icons.flash_off,
-                            color: Colors.grey[300],
-                            size: 35,
-                          ),
-
-                    onPressed: () {
-                      _handleFlashOn();
-                    },
-                  ),
+      body: ModalProgressHUD(
+        inAsyncCall: isLoading,
+        progressIndicator: Container(
+          width: size.width * 0.7,
+          height: 75,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(
+                5.0,
+              )),
+          padding: EdgeInsets.all(
+            16.0,
+          ),
+          child: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'Loading..',
+                style: TextStyle(
+                  fontSize: 18,
                 ),
-                Positioned(
-                  bottom: 50,
-                  left: 50,
-                  child: FloatingActionButton(
-                    heroTag: 'camera',
-                    backgroundColor: isFrontCamera
-                        ? Colors.blue
-                        : Colors.white.withAlpha(100),
-                    focusColor: Colors.white,
-                    splashColor: Colors.blueAccent,
-                    tooltip: 'Camera',
-                    // focusColor: Colors.amberAccent,
-                    // hoverColor: Colors.deepOrange,
-                    child: Icon(
-                      Icons.flip_camera_ios_outlined,
-                      color: Colors.white,
-                      size: 35,
+              ),
+            ],
+          ),
+        ),
+        child: !isQrScanned
+            ? Stack(
+                children: <Widget>[
+                  _buildQrView(context),
+                  Positioned(
+                    bottom: 30,
+                    right: 50,
+                    child: FloatingActionButton(
+                      heroTag: 'flash',
+                      backgroundColor: Colors.white.withAlpha(100),
+                      focusColor: Colors.white,
+                      splashColor: Colors.blueAccent,
+                      tooltip: 'Flash',
+                      // focusColor: Colors.amberAccent,
+                      // hoverColor: Colors.deepOrange,
+                      child: isFlashOn
+                          ? Icon(
+                              Icons.flash_on,
+                              color: Colors.grey[300],
+                              size: 35,
+                            )
+                          : Icon(
+                              Icons.flash_off,
+                              color: Colors.grey[300],
+                              size: 35,
+                            ),
+
+                      onPressed: () {
+                        _handleFlashOn();
+                      },
                     ),
-
-                    onPressed: () {
-                      _handleFrontCamera();
-                    },
                   ),
-                ),
-                // Expanded(
-                //   flex: 1,
-                //   child: FittedBox(
-                //     fit: BoxFit.contain,
-                //     child: Column(
-                //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //       children: <Widget>[
-                //         if (result != null)
-                //           Text(
-                //               'Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
-                //         else
-                //           Text('Scan a code'),
-                //         Row(
-                //           mainAxisAlignment: MainAxisAlignment.center,
-                //           crossAxisAlignment: CrossAxisAlignment.center,
-                //           children: <Widget>[
-                //             Container(
-                //               margin: EdgeInsets.all(8),
-                //               child: ElevatedButton(
-                //                   onPressed: () async {
-                //                     await controller?.toggleFlash();
-                //                     setState(() {});
-                //                   },
-                //                   child: FutureBuilder(
-                //                     future: controller?.getFlashStatus(),
-                //                     builder: (context, snapshot) {
-                //                       return Text('Flash: ${snapshot.data}');
-                //                     },
-                //                   )),
-                //             ),
-                //             Container(
-                //               margin: EdgeInsets.all(8),
-                //               child: ElevatedButton(
-                //                   onPressed: () async {
-                //                     await controller?.flipCamera();
-                //                     setState(() {});
-                //                   },
-                //                   child: FutureBuilder(
-                //                     future: controller?.getCameraInfo(),
-                //                     builder: (context, snapshot) {
-                //                       if (snapshot.data != null) {
-                //                         return Text(
-                //                             'Camera facing ${describeEnum(snapshot.data)}');
-                //                       } else {
-                //                         return Text('loading');
-                //                       }
-                //                     },
-                //                   )),
-                //             )
-                //           ],
-                //         ),
-                //         Row(
-                //           mainAxisAlignment: MainAxisAlignment.center,
-                //           crossAxisAlignment: CrossAxisAlignment.center,
-                //           children: <Widget>[
-                //             Container(
-                //               margin: EdgeInsets.all(8),
-                //               child: ElevatedButton(
-                //                 onPressed: () async {
-                //                   await controller?.pauseCamera();
-                //                 },
-                //                 child: Text('pause', style: TextStyle(fontSize: 20)),
-                //               ),
-                //             ),
-                //             Container(
-                //               margin: EdgeInsets.all(8),
-                //               child: ElevatedButton(
-                //                 onPressed: () async {
-                //                   await controller?.resumeCamera();
-                //                 },
-                //                 child: Text('resume', style: TextStyle(fontSize: 20)),
-                //               ),
-                //             )
-                //           ],
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // )
-              ],
-            )
-          : LayoutBuilder(
-              builder: (context, constraints) {
-                _streamQrSubscription?.cancel();
-                Future.delayed(
-                    Duration(
-                      seconds: 10,
-                    ), () {
-                  setState(() {
-                    showAd = false;
+                  Positioned(
+                    bottom: 30,
+                    left: 50,
+                    child: FloatingActionButton(
+                      heroTag: 'camera',
+                      backgroundColor: isFrontCamera
+                          ? Colors.blue
+                          : Colors.white.withAlpha(100),
+                      focusColor: Colors.white,
+                      splashColor: Colors.blueAccent,
+                      tooltip: 'Camera',
+                      // focusColor: Colors.amberAccent,
+                      // hoverColor: Colors.deepOrange,
+                      child: Icon(
+                        Icons.flip_camera_ios_outlined,
+                        color: Colors.white,
+                        size: 35,
+                      ),
+
+                      onPressed: () {
+                        _handleFrontCamera();
+                      },
+                    ),
+                  ),
+                  // Expanded(
+                  //   flex: 1,
+                  //   child: FittedBox(
+                  //     fit: BoxFit.contain,
+                  //     child: Column(
+                  //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //       children: <Widget>[
+                  //         if (result != null)
+                  //           Text(
+                  //               'Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
+                  //         else
+                  //           Text('Scan a code'),
+                  //         Row(
+                  //           mainAxisAlignment: MainAxisAlignment.center,
+                  //           crossAxisAlignment: CrossAxisAlignment.center,
+                  //           children: <Widget>[
+                  //             Container(
+                  //               margin: EdgeInsets.all(8),
+                  //               child: ElevatedButton(
+                  //                   onPressed: () async {
+                  //                     await controller?.toggleFlash();
+                  //                     setState(() {});
+                  //                   },
+                  //                   child: FutureBuilder(
+                  //                     future: controller?.getFlashStatus(),
+                  //                     builder: (context, snapshot) {
+                  //                       return Text('Flash: ${snapshot.data}');
+                  //                     },
+                  //                   )),
+                  //             ),
+                  //             Container(
+                  //               margin: EdgeInsets.all(8),
+                  //               child: ElevatedButton(
+                  //                   onPressed: () async {
+                  //                     await controller?.flipCamera();
+                  //                     setState(() {});
+                  //                   },
+                  //                   child: FutureBuilder(
+                  //                     future: controller?.getCameraInfo(),
+                  //                     builder: (context, snapshot) {
+                  //                       if (snapshot.data != null) {
+                  //                         return Text(
+                  //                             'Camera facing ${describeEnum(snapshot.data)}');
+                  //                       } else {
+                  //                         return Text('loading');
+                  //                       }
+                  //                     },
+                  //                   )),
+                  //             )
+                  //           ],
+                  //         ),
+                  //         Row(
+                  //           mainAxisAlignment: MainAxisAlignment.center,
+                  //           crossAxisAlignment: CrossAxisAlignment.center,
+                  //           children: <Widget>[
+                  //             Container(
+                  //               margin: EdgeInsets.all(8),
+                  //               child: ElevatedButton(
+                  //                 onPressed: () async {
+                  //                   await controller?.pauseCamera();
+                  //                 },
+                  //                 child: Text('pause', style: TextStyle(fontSize: 20)),
+                  //               ),
+                  //             ),
+                  //             Container(
+                  //               margin: EdgeInsets.all(8),
+                  //               child: ElevatedButton(
+                  //                 onPressed: () async {
+                  //                   await controller?.resumeCamera();
+                  //                 },
+                  //                 child: Text('resume', style: TextStyle(fontSize: 20)),
+                  //               ),
+                  //             )
+                  //           ],
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // )
+                ],
+              )
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  _streamQrSubscription?.cancel();
+                  Future.delayed(
+                      Duration(
+                        seconds: 10,
+                      ), () {
+                    setState(() {
+                      showAd = false;
+                    });
                   });
-                });
-                return showAd
-                    ? Container(
-                        child: Center(
-                          child: Column(
-                            children: [
-                              Image.asset('assets/images/hajerilogo.png'),
-                              SizedBox(
-                                height: 10.0,
-                              ),
-                              Shimmer.fromColors(
-                                baseColor: Colors.blue[800],
-                                highlightColor: Colors.blue[100],
-                                enabled: true,
-                                child: Text(
-                                  'Scanning in progress',
-                                  style: TextStyle(
-                                    color: Colors.blue[800],
-                                    fontSize: 22.0,
+                  return showAd
+                      ? Container(
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Image.asset('assets/images/hajerilogo.png'),
+                                SizedBox(
+                                  height: 10.0,
+                                ),
+                                Shimmer.fromColors(
+                                  baseColor: Colors.blue[800],
+                                  highlightColor: Colors.blue[100],
+                                  enabled: true,
+                                  child: Text(
+                                    'Scanning in progress',
+                                    style: TextStyle(
+                                      color: Colors.blue[800],
+                                      fontSize: 22.0,
+                                    ),
                                   ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : Container(
+                          width: constraints.maxWidth,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              getScanStatusWidget(context, constraints),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                width: size.width * 0.5,
+                                child: BlueButton(
+                                  label: 'Scan Again',
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Landing(
+                                          initialPageIndex: 1,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      )
-                    : Container(
-                        width: constraints.maxWidth,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            getScanStatusWidget(context, constraints),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              width: size.width * 0.5,
-                              child: BlueButton(
-                                label: 'Scan Again',
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => Landing(
-                                        initialPageIndex: 1,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-              },
-            ),
+                        );
+                },
+              ),
+      ),
     );
   }
 
@@ -364,30 +395,33 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
       dev.log(scanData.toString());
 
       if (result != null) {
-        showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (context) {
-              // Future.delayed(Duration(seconds: 10), () {
-              //   Navigator.of(context).pop(true);
-              // });
-              return WillPopScope(
-                onWillPop: () async => false,
-                child: AlertDialog(
-                  content: Row(
-                    children: [
-                      CircularProgressIndicator(),
-                      SizedBox(
-                        width: 10.0,
-                      ),
-                      Text(
-                        'Loading....',
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            });
+        // showDialog(
+        //     barrierDismissible: false,
+        //     context: context,
+        //     builder: (context) {
+        //       // Future.delayed(Duration(seconds: 10), () {
+        //       //   Navigator.of(context).pop(true);
+        //       // });
+        //       return WillPopScope(
+        //         onWillPop: () async => false,
+        //         child: AlertDialog(
+        //           content: Row(
+        //             children: [
+        //               CircularProgressIndicator(),
+        //               SizedBox(
+        //                 width: 10.0,
+        //               ),
+        //               Text(
+        //                 'Loading....',
+        //               ),
+        //             ],
+        //           ),
+        //         ),
+        //       );
+        //     });
+        setState(() {
+          isLoading = true;
+        });
         // dev.debugger();
         if (result.code.contains("Hajeri")) {
           await controller?.pauseCamera();
@@ -398,7 +432,11 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
               (status.contains('no internet') ||
                   status.contains('connectivity issue') ||
                   status.contains('error occurred'))) {
-            Navigator.pop(context);
+            // Navigator.pop(context);
+            await controller?.resumeCamera();
+            setState(() {
+              isLoading = false;
+            });
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 backgroundColor: Colors.white,
@@ -417,21 +455,24 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                 ),
               ),
             );
-            await controller?.resumeCamera();
           } else {
-            Navigator.pop(context);
+            // Navigator.pop(context);
             // await controller?.stopCamera();
-
             dev.log('$status', name: 'In scanner result');
+            await controller?.stopCamera();
+
             setState(() {
+              isLoading = false;
               isQrScanned = true;
             });
           }
         } else if (result.code.toLowerCase().contains("hjrwebqrcode")) {
+          await controller.stopCamera();
+
           status = await webLogin();
           dev.log('web scanning status is: $status');
 
-          Navigator.pop(context);
+          // Navigator.pop(context);
 
           // ScaffoldMessenger.of(context).showSnackBar(
           //   SnackBar(
@@ -459,12 +500,19 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
             isQrScanned = true;
           });*/
           setState(() {
+            isLoading = false;
+
             isQrScanned = true;
           });
         } else if (result.code.isNotEmpty && !result.code.contains("Hajeri")) {
+          await controller.stopCamera();
           status = "no hajeri";
+          setState(() {
+            isLoading = false;
 
-          Navigator.pop(context);
+            isQrScanned = true;
+          });
+          // Navigator.pop(context);
           //         await controller.pauseCamera();
           //         await controller.resumeCamera();
           // dev.debugger();
@@ -487,10 +535,6 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
           //           ),
           //         );
 
-          dev.log('$status', name: 'In scanner result');
-          setState(() {
-            isQrScanned = true;
-          });
           //await controller.resumeCamera();
         }
       }
@@ -587,18 +631,28 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
 
     // get allow distance from api
     int allowdistance;
-
-    var response = await http.get(Uri.parse("$kAllowDistance"), headers: {
-      'Content-Type': 'application/json',
-    });
-    if (response.statusCode == 200) {
-      String allowdist;
-      allowdist = response.body.toString();
-      dev.log(response.body.toString(),
-          name: 'In scanner didt within 3 meters');
-      allowdistance = int.parse(allowdist);
-    } else {
-      return "failed to connect to Internet";
+    try {
+      var response = await http.get(Uri.parse("$kAllowDistance"), headers: {
+        'Content-Type': 'application/json',
+      });
+      if (response.statusCode == 200) {
+        String allowdist;
+        allowdist = response.body.toString();
+        dev.log(response.body.toString(),
+            name: 'In scanner didt within 3 meters');
+        allowdistance = int.parse(allowdist);
+      } else {
+        return "failed to connect to Internet";
+      }
+    } on SocketException catch (e) {
+      dev.log(e.message);
+      return 'no internet';
+    } on IOException catch (e) {
+      dev.log(e.toString());
+      return 'connectivity issue';
+    } on Exception catch (e) {
+      dev.log(e.toString());
+      return 'error occurred';
     }
 
     // String userMobileNumber = prefs.getString("mobile");

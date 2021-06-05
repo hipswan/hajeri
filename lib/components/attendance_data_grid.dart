@@ -48,10 +48,7 @@ class _AttendanceDataGridState extends State<AttendanceDataGrid> {
     ];
     _attendances = widget.attendanceSheet;
 
-    referenceAttendance = (_attendances.first as Map);
-    //TODO: Add list to attendances
-    log(referenceAttendance.toString(), name: 'In Attendance Grid Init');
-    for (int i = 1; i <= referenceAttendance.length - 3; i++) {
+    for (int i = 1; i <= 31; i++) {
       _gridColumn.add(GridTextColumn(
         width: 65.0,
         columnName: i.toString(),

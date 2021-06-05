@@ -50,10 +50,34 @@ class _OtpVerifyState extends State<OtpVerify> {
             gravity: Toast.BOTTOM,
             textColor: Colors.redAccent,
           );
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            Register.id,
-            (route) => false,
+
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              title: Center(
+                child: Text('Login Failed'),
+              ),
+              content: Text('You are not registered, Kindly register.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      Register.id,
+                      (route) => false,
+                    );
+                  },
+                  child: Text('Register'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Back'),
+                )
+              ],
+            ),
           );
         } else
         // if (data['already_present_status']

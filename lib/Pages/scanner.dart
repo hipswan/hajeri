@@ -663,9 +663,11 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
       dev.log("the diff distance is ${distanceInMeters.toString()}");
       if (distanceInMeters < allowdistance) {
         try {
-          dev.log("$kMarkAttendance$orgId/$userId/Employee");
+          dev.log(
+              "$kMarkAttendance$orgId/$userId/Employee?lat=$orgLat&lng=$orgLng");
           var response = await http.get(
-              Uri.parse("$kMarkAttendance$orgId/$userId/Employee"),
+              Uri.parse(
+                  "$kMarkAttendance$orgId/$userId/Employee?lat=$orgLat&lng=$orgLng"),
               headers: {
                 'Content-Type': 'application/json',
               });
@@ -700,11 +702,14 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     // });
     else {
       try {
-        dev.log("$kMarkAttendance$orgId/$userId/Visitor");
-        var response = await http
-            .get(Uri.parse("$kMarkAttendance$orgId/$userId/Visitor"), headers: {
-          'Content-Type': 'application/json',
-        });
+        dev.log(
+            "$kMarkAttendance$orgId/$userId/Visitor?lat=$orgLat&lng=$orgLng");
+        var response = await http.get(
+            Uri.parse(
+                "$kMarkAttendance$orgId/$userId/Visitor?lat=$orgLat&lng=$orgLng"),
+            headers: {
+              'Content-Type': 'application/json',
+            });
 
         if (response.statusCode == 200) {
           dev.log(response.body.toString(), name: 'In scanner ');

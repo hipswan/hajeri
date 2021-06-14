@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../Pages/register.dart';
@@ -43,46 +44,77 @@ class _OtpVerifyState extends State<OtpVerify> {
             .trim()
             .toLowerCase()
             .contains("not registered")) {
-          Toast.show(
-            "You are not registered please register",
-            context,
-            duration: Toast.LENGTH_LONG,
-            gravity: Toast.BOTTOM,
-            textColor: Colors.redAccent,
-          );
-
-          showDialog(
+          // Toast.show(
+          //   "You are not registered please register",
+          //   context,
+          //   duration: Toast.LENGTH_LONG,
+          //   gravity: Toast.BOTTOM,
+          //   textColor: Colors.redAccent,
+          // );
+          AwesomeDialog(
             context: context,
-            barrierDismissible: false,
-            builder: (context) => AlertDialog(
-              title: Center(
-                child: Text('Login Failed'),
-              ),
-              content: Text('You are not registered, Kindly register.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      SignUp.id,
-                      (route) => false,
-                    );
-                  },
-                  child: Text('Back'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      Register.id,
-                      (route) => false,
-                    );
-                  },
-                  child: Text('Register'),
-                ),
-              ],
-            ),
-          );
+            dialogType: DialogType.ERROR,
+            borderSide: BorderSide(color: Colors.red, width: 2),
+            width: 310,
+            buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+            headerAnimationLoop: false,
+            animType: AnimType.BOTTOMSLIDE,
+            title: 'Sign In Failed',
+            desc: 'You are not registered, Kindly register first.',
+            showCloseIcon: false,
+            btnCancelText: 'Cancel',
+            btnCancelColor: Colors.red,
+            btnCancelOnPress: () {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                SignUp.id,
+                (route) => false,
+              );
+            },
+            btnOkColor: Colors.green,
+            btnOkText: 'Register',
+            btnOkOnPress: () {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Register.id,
+                (route) => false,
+              );
+            },
+          )..show();
+
+          // showDialog(
+          //   context: context,
+          //   barrierDismissible: false,
+          //   builder: (context) => AlertDialog(
+          //     title: Center(
+          //       child: Text('Login Failed'),
+          //     ),
+          //     content: Text('You are not registered, Kindly register.'),
+          //     actions: [
+          //       TextButton(
+          //         onPressed: () {
+          //           Navigator.pushNamedAndRemoveUntil(
+          //             context,
+          //             SignUp.id,
+          //             (route) => false,
+          //           );
+          //         },
+          //         child: Text('Back'),
+          //       ),
+          //       TextButton(
+          //         onPressed: () {
+          //           Navigator.pushNamedAndRemoveUntil(
+          //             context,
+          //             Register.id,
+          //             (route) => false,
+          //           );
+          //         },
+          //         child: Text('Register'),
+          //       ),
+          //     ],
+          //   ),
+          // );
+
         } else
         // if (data['already_present_status']
         //     .toString()

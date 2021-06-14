@@ -868,6 +868,7 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
   Future<void> _createExcel() async {
 //Create an Excel document.
     List attendance = attendanceData as List;
+    log(attendance.toString());
     if (attendance != null && attendance.isNotEmpty) {
       //Creating a workbook.
       final excel.Workbook workbook = excel.Workbook();
@@ -965,17 +966,17 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
           }
         }
       } else {
-        for (int i = 1; i <= firstMapLength - 2; i++) {
+        for (int i = 1; i <= 31; i++) {
           sheet.getRangeByIndex(15, 2 + i)..setText('$i');
         }
-        sheet.getRangeByIndex(15, 2 + firstMapLength - 1).setText('Mobile');
+        sheet.getRangeByIndex(15, 31 + 3).setText('Mobile');
         // debugger();
         for (int i = 0; i < attendance.length; i++) {
           sheet.getRangeByIndex(16 + i, 2)
             ..setText(attendance[i]['name'])
             ..autoFit();
 
-          for (int j = 1; j < firstMapLength - 2; j++) {
+          for (int j = 1; j <= 31; j++) {
             if (attendance[i][j.toString()]
                 .toString()
                 .trim()
@@ -994,15 +995,14 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
                 ..autoFit();
             }
           }
-          sheet.getRangeByIndex(16 + i, 2 + firstMapLength - 1)
+          sheet.getRangeByIndex(16 + i, 31 + 3)
             ..setText(attendance[i]['mobileno'].toString())
             ..autoFit();
         }
       }
-      sheet.getRangeByIndex(15, 2, 15, firstMapLength + 1)
-        ..cellStyle.bold = true;
+      sheet.getRangeByIndex(15, 2, 15, 31 + 3)..cellStyle.bold = true;
       sheet
-          .getRangeByIndex(15, 2, 15 + attendance.length, firstMapLength + 1)
+          .getRangeByIndex(15, 2, 15 + attendance.length, 31 + 3)
           .cellStyle
           .borders
           .all
@@ -1011,8 +1011,8 @@ class _MonthlyAttendanceState extends State<MonthlyAttendance> {
           'hajeri , Aurangabad, Maharashtra | admin@amvenures.com';
       sheet.getRangeByIndex(16 + attendance.length, 1).cellStyle.fontSize = 8;
 
-      final excel.Range range9 = sheet.getRangeByIndex(16 + attendance.length,
-          1, 16 + attendance.length, firstMapLength + 1);
+      final excel.Range range9 = sheet.getRangeByIndex(
+          16 + attendance.length, 1, 16 + attendance.length, 31 + 3);
       range9.cellStyle.backColor = '#ACB9CA';
       range9.merge();
       range9.cellStyle.hAlign = excel.HAlignType.center;

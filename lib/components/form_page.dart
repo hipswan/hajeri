@@ -222,7 +222,7 @@ class _FormPageState extends State<FormPage> {
           data['message'] ?? 'done',
           context,
           duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
+          gravity: Toast.CENTER,
           textColor: Colors.green,
         );
         return "success";
@@ -230,20 +230,20 @@ class _FormPageState extends State<FormPage> {
       } else {
         Toast.show("error occurred while updating employee", context,
             duration: Toast.LENGTH_LONG,
-            gravity: Toast.BOTTOM,
+            gravity: Toast.CENTER,
             textColor: Colors.red);
         return "failure";
       }
     } on IOException catch (e) {
       Toast.show("no internet", context,
           duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
+          gravity: Toast.CENTER,
           textColor: Colors.red);
       return "failure";
     } catch (e) {
       Toast.show("error occurred", context,
           duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
+          gravity: Toast.CENTER,
           textColor: Colors.red);
       return "failure";
     }
@@ -274,27 +274,27 @@ class _FormPageState extends State<FormPage> {
         dev.log(data.toString(), name: 'In add Employee success response');
         Toast.show(data['message'].toString(), context,
             duration: Toast.LENGTH_LONG,
-            gravity: Toast.BOTTOM,
+            gravity: Toast.CENTER,
             textColor: Colors.green);
         return "success";
         // cler_fields();
       } else {
         Toast.show("your employee is not added", context,
             duration: Toast.LENGTH_LONG,
-            gravity: Toast.BOTTOM,
+            gravity: Toast.CENTER,
             textColor: Colors.red);
         return "failure";
       }
     } on IOException catch (e) {
       Toast.show("no internet", context,
           duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
+          gravity: Toast.CENTER,
           textColor: Colors.red);
       return "failure";
     } catch (e) {
       Toast.show("error occurred", context,
           duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
+          gravity: Toast.CENTER,
           textColor: Colors.red);
       return "failure";
     }
@@ -393,13 +393,13 @@ class _FormPageState extends State<FormPage> {
                                 keyboardType: TextInputType.text,
                                 textAlign: TextAlign.left,
                                 controller: _cAddress,
-                                validator: (value) {
-                                  if (value.trim().isEmpty) {
-                                    return 'Please Enter Your Address';
-                                  }
+                                // validator: (value) {
+                                //   if (value.trim().isEmpty) {
+                                //     return 'Please Enter Your Address';
+                                //   }
 
-                                  return null;
-                                },
+                                //   return null;
+                                // },
                                 onChanged: (value) {},
                                 decoration: InputDecoration(
                                   // errorText: null,

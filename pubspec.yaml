@@ -53,6 +53,8 @@ dependencies:
   syncfusion_flutter_xlsio: ^19.1.64-beta
   toast: ^0.1.5
   webview_flutter: ^2.0.2
+  awesome_dialog: ^2.1.0
+
 
 dev_dependencies:
   flutter_test:

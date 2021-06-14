@@ -413,13 +413,13 @@ class _BranchFormState extends State<BranchForm> {
                             keyboardType: TextInputType.text,
                             textAlign: TextAlign.left,
                             controller: _cAddress,
-                            validator: (value) {
-                              if (value.trim().isEmpty) {
-                                return 'Please Enter Your Address';
-                              }
+                            // validator: (value) {
+                            //   if (value.trim().isEmpty) {
+                            //     return 'Please Enter Your Address';
+                            //   }
 
-                              return null;
-                            },
+                            //   return null;
+                            // },
                             onChanged: (value) {},
                             decoration: InputDecoration(
                               // errorText: null,

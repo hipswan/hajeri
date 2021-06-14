@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:toast/toast.dart';
 import 'package:shimmer/shimmer.dart';
-
+import 'package:awesome_dialog/awesome_dialog.dart';
 import '../constant.dart';
 
 class Register extends StatefulWidget {
@@ -211,32 +211,85 @@ class RegisterState extends State<Register> {
           .trim()
           .toLowerCase()
           .contains('yes')) {
-        Toast.show(
-          "You are already registered please login",
-          context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.greenAccent,
-        );
+        // Toast.show(
+        //   "You are already registered please login",
+        //   context,
+        //   duration: Toast.LENGTH_LONG,
+        //   gravity: Toast.BOTTOM,
+        //   textColor: Colors.greenAccent,
+        // );
+
       } else {
-        Toast.show(
-          "Organization has been successfully added",
-          context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.greenAccent,
-        );
+        // Toast.show(
+        //   "Organization has been successfully added",
+        //   context,
+        //   duration: Toast.LENGTH_LONG,
+        //   gravity: Toast.BOTTOM,
+        //   textColor: Colors.greenAccent,
+        // );
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.SUCCES,
+          borderSide: BorderSide(color: Colors.green, width: 2),
+          width: 310,
+          buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+          headerAnimationLoop: false,
+          animType: AnimType.RIGHSLIDE,
+          title: 'Succesfully Registered',
+          desc: 'Organization has been successfully registered',
+          showCloseIcon: false,
+          btnOkColor: Colors.green,
+          btnOkText: 'SignIn',
+          btnOkOnPress: () {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              SignUp.id,
+              (route) => false,
+            );
+          },
+        )..show();
       }
-      Navigator.of(context).pushNamed(SignUp.id);
+      // Navigator.of(context).pushNamed(SignUp.id);
       return "success";
     } else {
-      Toast.show(
-        "Your account is not created",
-        context,
-        duration: Toast.LENGTH_LONG,
-        gravity: Toast.BOTTOM,
-        textColor: Colors.red,
-      );
+      // Toast.show(
+      //   "Your account is not created",
+      //   context,
+      //   duration: Toast.LENGTH_LONG,
+      //   gravity: Toast.BOTTOM,
+      //   textColor: Colors.red,
+      // );
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.ERROR,
+        borderSide: BorderSide(color: Colors.red, width: 2),
+        width: 310,
+        buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+        headerAnimationLoop: false,
+        animType: AnimType.RIGHSLIDE,
+        title: 'Not Registered',
+        desc: 'Internal Error, Kindly try again',
+        showCloseIcon: false,
+        btnOkColor: Colors.green,
+        btnOkText: 'Try Again',
+        btnOkOnPress: () {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            Register.id,
+            (route) => false,
+          );
+        },
+        btnCancelColor: Colors.red,
+        btnCancelText: 'Cancel',
+        btnCancelOnPress: () {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            SignUp.id,
+            (route) => false,
+          );
+        },
+      )..show();
+
       return "failure";
     }
   }
@@ -263,32 +316,105 @@ class RegisterState extends State<Register> {
           .trim()
           .toLowerCase()
           .contains('yes')) {
-        Toast.show(
-          "You are already registered please login",
-          context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.greenAccent,
-        );
+        // Toast.show(
+        //   "You are already registered please login",
+        //   context,
+        //   duration: Toast.LENGTH_LONG,
+        //   gravity: Toast.BOTTOM,
+        //   textColor: Colors.greenAccent,
+        // );
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.WARNING,
+          borderSide: BorderSide(color: Colors.orange, width: 2),
+          width: 310,
+          buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+          headerAnimationLoop: false,
+          animType: AnimType.RIGHSLIDE,
+          title: 'Already Present',
+          desc: 'You are already registered, Please SignIn',
+          showCloseIcon: false,
+          btnOkColor: Colors.orange,
+          btnOkText: 'SignIn',
+          btnOkOnPress: () {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              SignUp.id,
+              (route) => false,
+            );
+          },
+        )..show();
       } else {
-        Toast.show(
-          "Your account has been sucessfully created",
-          context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.BOTTOM,
-          textColor: Colors.greenAccent,
-        );
+        // Toast.show(
+        //   "Your account has been sucessfully created",
+        //   context,
+        //   duration: Toast.LENGTH_LONG,
+        //   gravity: Toast.BOTTOM,
+        //   textColor: Colors.greenAccent,
+        // );
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.SUCCES,
+          borderSide: BorderSide(color: Colors.green, width: 2),
+          width: 310,
+          buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+          headerAnimationLoop: false,
+          animType: AnimType.RIGHSLIDE,
+          title: 'Succesfully Registered',
+          desc: 'Your account has been successfully registered',
+          showCloseIcon: false,
+          btnOkColor: Colors.green,
+          btnOkText: 'SignIn',
+          btnOkOnPress: () {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              SignUp.id,
+              (route) => false,
+            );
+          },
+        )..show();
       }
-      Navigator.of(context).pushNamed(SignUp.id);
+      // Navigator.of(context).pushNamed(SignUp.id);
       return "success";
     } else {
-      Toast.show(
-        "Your account is not created",
-        context,
-        duration: Toast.LENGTH_LONG,
-        gravity: Toast.BOTTOM,
-        textColor: Colors.red,
-      );
+      // Toast.show(
+      //   "Your account is not created",
+      //   context,
+      //   duration: Toast.LENGTH_LONG,
+      //   gravity: Toast.BOTTOM,
+      //   textColor: Colors.red,
+      // );
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.ERROR,
+        borderSide: BorderSide(color: Colors.red, width: 2),
+        width: 310,
+        buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+        headerAnimationLoop: false,
+        animType: AnimType.RIGHSLIDE,
+        title: 'Not Registered',
+        desc: 'Internal Error, Kindly try again',
+        showCloseIcon: false,
+        btnOkColor: Colors.green,
+        btnOkText: 'Try Again',
+        btnOkOnPress: () {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            Register.id,
+            (route) => false,
+          );
+        },
+        btnCancelColor: Colors.red,
+        btnCancelText: 'Cancel',
+        btnCancelOnPress: () {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            SignUp.id,
+            (route) => false,
+          );
+        },
+      )..show();
+
       return "failure";
     }
   }
@@ -446,15 +572,15 @@ class RegisterState extends State<Register> {
                                                         TextInputType.text,
                                                     textAlign: TextAlign.left,
                                                     controller: _cAddress,
-                                                    validator: (value) {
-                                                      if (value
-                                                          .trim()
-                                                          .isEmpty) {
-                                                        return 'Please Enter Your Address';
-                                                      }
+                                                    // validator: (value) {
+                                                    //   if (value
+                                                    //       .trim()
+                                                    //       .isEmpty) {
+                                                    //     return 'Please Enter Your Address';
+                                                    //   }
 
-                                                      return null;
-                                                    },
+                                                    //   return null;
+                                                    // },
                                                     onChanged: (value) {},
                                                     decoration: InputDecoration(
                                                       // errorText: null,
@@ -776,13 +902,13 @@ class RegisterState extends State<Register> {
                                                     TextInputType.text,
                                                 textAlign: TextAlign.left,
                                                 controller: _cAddress,
-                                                validator: (value) {
-                                                  if (value.trim().isEmpty) {
-                                                    return 'Please Enter Your Address';
-                                                  }
+                                                // validator: (value) {
+                                                //   if (value.trim().isEmpty) {
+                                                //     return 'Please Enter Your Address';
+                                                //   }
 
-                                                  return null;
-                                                },
+                                                //   return null;
+                                                // },
                                                 onChanged: (value) {},
                                                 decoration: InputDecoration(
                                                   // errorText: null,

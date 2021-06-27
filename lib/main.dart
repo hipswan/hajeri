@@ -116,12 +116,12 @@ void main() async {
   // Any time the token refreshes, store this in the database too.
   messaging.onTokenRefresh.listen(saveTokenToSharedPreferences);
 
-  // SharedPreferences.setMockInitialValues({
-  //   'login': true,
-  //   'name': '',
-  //   'number': '',
-  //   'showcase': null,
-  // });
+  SharedPreferences.setMockInitialValues({
+    'login': null,
+    'name': '',
+    'number': '',
+    'showcase': null,
+  });
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
@@ -143,7 +143,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Signup(),
+      home: SignUp(),
     );
   }
 }

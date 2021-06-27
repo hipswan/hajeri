@@ -222,8 +222,9 @@ class _BranchFormState extends State<BranchForm> {
     String orgId = prefs.getString("worker_id");
     var currentState;
     states.forEach((state) {
-      if (int.parse(state['id'].toString().trim()) ==
-          int.parse(stateDropDownValue.toString().trim())) {
+      if (stateDropDownValue != null &&
+          int.parse(state['id'].toString().trim()) ==
+              int.parse(stateDropDownValue.toString().trim())) {
         currentState = state["statename"];
       }
     });
@@ -242,7 +243,7 @@ class _BranchFormState extends State<BranchForm> {
       dev.log(data.toString(), name: 'In add Branch success response');
 
       Toast.show(
-        "Your Branch is added sucessfully",
+        data["success_message"] ?? '',
         context,
         duration: Toast.LENGTH_LONG,
         gravity: Toast.BOTTOM,
@@ -380,7 +381,7 @@ class _BranchFormState extends State<BranchForm> {
                             ),
                           ),
                         ),
-//Business Nature
+                        //Business Nature
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: DropdownButtonFormField(
@@ -429,7 +430,7 @@ class _BranchFormState extends State<BranchForm> {
                             ),
                           ),
                         ),
-
+                        //Department
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Container(
@@ -464,6 +465,7 @@ class _BranchFormState extends State<BranchForm> {
                           child: TextFormField(
                             enabled:
                                 widget.action.contains('edit') ? false : true,
+                            maxLength: 10,
                             keyboardType: TextInputType.numberWithOptions(
                               decimal: false,
                               signed: false,
@@ -529,6 +531,7 @@ class _BranchFormState extends State<BranchForm> {
                             // hint: const Text('Select State'),
                           ),
                         ),
+                        //District
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             vertical: 8.0,
@@ -538,9 +541,9 @@ class _BranchFormState extends State<BranchForm> {
                             textAlign: TextAlign.left,
                             controller: _cDistrict,
                             validator: (value) {
-                              if (value.trim().isEmpty) {
-                                return 'Please Enter District';
-                              }
+                              // if (value.trim().isEmpty) {
+                              //   return 'Please Enter District';
+                              // }
 
                               return null;
                             },
@@ -575,16 +578,16 @@ class _BranchFormState extends State<BranchForm> {
                             //   'Select City',
                             // ),
                             decoration: InputDecoration(
-                              errorText: !stateSelected
-                                  ? 'Please Select State First'
-                                  : null,
+                              // errorText: !stateSelected
+                              //     ? 'Please Select State First'
+                              //     : null,
                               labelText: 'Select City',
                               border: OutlineInputBorder(),
                             ),
                           ),
                         ),
                         //Submit Button User
-                        BlueButton(
+                        ElevatedButton(
                           onPressed: () async {
                             if (_formState.currentState.validate()) {
                               if (widget.action.contains('add')) {
@@ -608,7 +611,25 @@ class _BranchFormState extends State<BranchForm> {
                               );
                             }
                           },
-                          label: 'Submit',
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                              Colors.blue[700],
+                            ),
+                            padding:
+                                MaterialStateProperty.all<EdgeInsetsGeometry>(
+                              EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Submit',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),

@@ -191,8 +191,9 @@ class RegisterState extends State<Register> {
   Future<String> createOrgAccount() async {
     String orgState;
     states.forEach((state) {
-      if (int.parse(state['id'].toString().trim()) ==
-          int.parse(stateDropDownValue.toString().trim())) {
+      if (stateDropDownValue != null &&
+          int.parse(state['id'].toString().trim()) ==
+              int.parse(stateDropDownValue.toString().trim())) {
         orgState = state["statename"].toString();
       }
     });
@@ -297,8 +298,9 @@ class RegisterState extends State<Register> {
   Future<dynamic> addUser() async {
     String userState;
     states.forEach((state) {
-      if (int.parse(state['id'].toString().trim()) ==
-          int.parse(stateDropDownValue.toString().trim())) {
+      if (stateDropDownValue != null &&
+          int.parse(state['id'].toString().trim()) ==
+              int.parse(stateDropDownValue.toString().trim())) {
         userState = state["statename"].toString();
       }
     });
@@ -435,7 +437,13 @@ class RegisterState extends State<Register> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.only(top: 30),
+              padding: EdgeInsets.only(
+                top: 30,
+              ),
+              decoration: BoxDecoration(
+                boxShadow: kElevationToShadow[1],
+                color: Colors.grey[50],
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -444,49 +452,51 @@ class RegisterState extends State<Register> {
                   Expanded(
                     flex: 5,
                     child: Center(
-                      child: Text(
-                        'Organization',
-                        style: TextStyle(
-                          fontWeight: switchControl
-                              ? FontWeight.normal
-                              : FontWeight.bold,
+                      child: FittedBox(
+                        child: Text(
+                          'Organization',
+                          style: TextStyle(
+                            fontWeight: switchControl
+                                ? FontWeight.normal
+                                : FontWeight.bold,
+                            fontSize: 18.0,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  Expanded(
-                    flex: 2,
-                    child: Transform.scale(
-                      scale: 1.5,
-                      child: Switch(
-                        onChanged: toggleSwitch,
-                        value: switchControl,
-                        activeColor: Colors.white,
-                        activeTrackColor: Colors.blue,
-                        inactiveThumbColor: Colors.white,
-                        inactiveTrackColor: Colors.grey,
+                  Transform.scale(
+                    scale: 1.3,
+                    child: Switch(
+                      onChanged: toggleSwitch,
+                      thumbColor: MaterialStateProperty.all(
+                        Colors.blueGrey[50],
                       ),
+                      value: switchControl,
+                      activeColor: Colors.white,
+                      activeTrackColor: Colors.blue,
+                      inactiveThumbColor: Colors.white,
+                      inactiveTrackColor: Colors.grey,
                     ),
                   ),
                   Expanded(
                     flex: 5,
                     child: Center(
-                      child: Text(
-                        'User',
-                        style: TextStyle(
-                          fontWeight: switchControl
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                      child: FittedBox(
+                        child: Text(
+                          'User',
+                          style: TextStyle(
+                            fontWeight: switchControl
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            fontSize: 18.0,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
-
-            SizedBox(
-              height: 10.0,
             ),
 
             Expanded(
@@ -604,6 +614,7 @@ class RegisterState extends State<Register> {
                                                       decimal: false,
                                                       signed: false,
                                                     ),
+                                                    maxLength: 10,
                                                     textAlign: TextAlign.left,
                                                     controller: _cNumber,
                                                     validator: (value) {
@@ -617,7 +628,7 @@ class RegisterState extends State<Register> {
                                                           value.trim().contains(
                                                               new RegExp(
                                                                   r'[A-Za-z]'))) {
-                                                        return 'Please Enter Valid Number';
+                                                        return 'Please make sure to enter 10 digit number';
                                                       }
                                                       return null;
                                                     },
@@ -712,11 +723,11 @@ class RegisterState extends State<Register> {
                                                     textAlign: TextAlign.left,
                                                     controller: _cDistrict,
                                                     validator: (value) {
-                                                      if (value
-                                                          .trim()
-                                                          .isEmpty) {
-                                                        return 'Please Enter District';
-                                                      }
+                                                      // if (value
+                                                      //     .trim()
+                                                      //     .isEmpty) {
+                                                      //   return 'Please Enter District';
+                                                      // }
 
                                                       return null;
                                                     },
@@ -763,9 +774,9 @@ class RegisterState extends State<Register> {
                                                     //   'Select City',
                                                     // ),
                                                     decoration: InputDecoration(
-                                                      errorText: !stateSelected
-                                                          ? 'Please Select State First'
-                                                          : null,
+                                                      // errorText: !stateSelected
+                                                      //     ? 'Please Select State First'
+                                                      //     : null,
                                                       labelText: 'Select City',
                                                       border:
                                                           OutlineInputBorder(),
@@ -928,6 +939,8 @@ class RegisterState extends State<Register> {
                                                 // autovalidateMode:
                                                 //     AutovalidateMode
                                                 //         .onUserInteraction,
+                                                maxLength: 10,
+
                                                 keyboardType:
                                                     TextInputType.number,
                                                 textAlign: TextAlign.left,
@@ -943,7 +956,7 @@ class RegisterState extends State<Register> {
                                                       value.trim().contains(
                                                           new RegExp(
                                                               r'[A-Za-z/@_-]'))) {
-                                                    return "Please Enter Valid Mobile Number";
+                                                    return "Please make sure to enter 10 digit number";
                                                   }
                                                   // if (value.trim().length ==
                                                   //     10) {
@@ -1106,9 +1119,9 @@ class RegisterState extends State<Register> {
                                                 items: _stateDropDownMenuItems,
 
                                                 decoration: InputDecoration(
-                                                  errorText: !departmentSelected
-                                                      ? 'Please Select Department First'
-                                                      : null,
+                                                  // errorText: !departmentSelected
+                                                  //     ? 'Please Select Department First'
+                                                  //     : null,
                                                   labelText: 'Select State',
                                                   border: OutlineInputBorder(),
                                                 ),
@@ -1127,9 +1140,9 @@ class RegisterState extends State<Register> {
                                                 textAlign: TextAlign.left,
                                                 controller: _cDistrict,
                                                 validator: (value) {
-                                                  if (value.trim().isEmpty) {
-                                                    return 'Please Enter District';
-                                                  }
+                                                  // if (value.trim().isEmpty) {
+                                                  //   return 'Please Enter District';
+                                                  // }
 
                                                   return null;
                                                 },
@@ -1171,9 +1184,9 @@ class RegisterState extends State<Register> {
                                                 //   'Select City',
                                                 // ),
                                                 decoration: InputDecoration(
-                                                  errorText: !stateSelected
-                                                      ? 'Please Select State First'
-                                                      : null,
+                                                  // errorText: !stateSelected
+                                                  //     ? 'Please Select State First'
+                                                  //     : null,
                                                   labelText: 'Select City',
                                                   border: OutlineInputBorder(),
                                                 ),
@@ -1344,7 +1357,7 @@ class RegisterState extends State<Register> {
     _cName.dispose();
     _cOrgName.dispose();
     _cNumber.dispose();
-    _formState.currentState.dispose();
+    _formState.currentState?.dispose();
     _cDistrict.dispose();
     super.dispose();
   }

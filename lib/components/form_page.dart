@@ -52,7 +52,7 @@ class _FormPageState extends State<FormPage> {
     _cAddress = TextEditingController(text: employee.addressLine1);
     _cIdentity = TextEditingController(
       text:
-          (employee.idCardNumber == 0) ? ' ' : employee.idCardNumber.toString(),
+          (employee.idCardNumber == 0) ? '' : employee.idCardNumber.toString(),
     );
     _cDistrict = TextEditingController(text: employee.district);
     _departmentDropDownMenuItems = kDepartmentMenuItems
@@ -228,23 +228,32 @@ class _FormPageState extends State<FormPage> {
         return "success";
         // cler_fields();
       } else {
-        Toast.show("error occurred while updating employee", context,
-            duration: Toast.LENGTH_LONG,
-            gravity: Toast.CENTER,
-            textColor: Colors.red);
+        Toast.show(
+          "error occurred while updating employee",
+          context,
+          duration: Toast.LENGTH_LONG,
+          gravity: Toast.CENTER,
+          textColor: Colors.red,
+        );
         return "failure";
       }
     } on IOException catch (e) {
-      Toast.show("no internet", context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.CENTER,
-          textColor: Colors.red);
+      Toast.show(
+        "no internet",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.CENTER,
+        textColor: Colors.red,
+      );
       return "failure";
     } catch (e) {
-      Toast.show("error occurred", context,
-          duration: Toast.LENGTH_LONG,
-          gravity: Toast.CENTER,
-          textColor: Colors.red);
+      Toast.show(
+        "error occurred",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.CENTER,
+        textColor: Colors.red,
+      );
       return "failure";
     }
   }
@@ -446,6 +455,7 @@ class _FormPageState extends State<FormPage> {
                                 enabled: widget.action.contains('edit')
                                     ? false
                                     : true,
+                                maxLength: 10,
                                 keyboardType: TextInputType.numberWithOptions(
                                   decimal: false,
                                   signed: false,
@@ -525,9 +535,9 @@ class _FormPageState extends State<FormPage> {
                                 textAlign: TextAlign.left,
                                 controller: _cDistrict,
                                 validator: (value) {
-                                  if (value.trim().isEmpty) {
-                                    return 'Please Enter District';
-                                  }
+                                  // if (value.trim().isEmpty) {
+                                  //   return 'Please Enter District';
+                                  // }
 
                                   return null;
                                 },
@@ -561,16 +571,19 @@ class _FormPageState extends State<FormPage> {
                                 //   'Select City',
                                 // ),
                                 decoration: InputDecoration(
-                                  errorText: !stateSelected
-                                      ? 'Please Select State First'
-                                      : null,
+                                  // errorText: !stateSelected
+                                  //     ? 'Please Select State First'
+                                  //     : null,
                                   labelText: 'Select City',
                                   border: OutlineInputBorder(),
                                 ),
                               ),
                             ),
-                            //Submit Button User
-                            BlueButton(
+                            SizedBox(
+                              height: 8.0,
+                            ),
+                            //Submit Button
+                            ElevatedButton(
                               onPressed: () async {
                                 if (_formState.currentState.validate()) {
                                   Map<String, String> cityAndStateNewValue =
@@ -583,11 +596,13 @@ class _FormPageState extends State<FormPage> {
                                       cityDropDownValue;
 
                                   states.forEach((state) {
-                                    if (int.parse(
-                                            state['id'].toString().trim()) ==
-                                        int.parse(stateDropDownValue
-                                            .toString()
-                                            .trim())) {
+                                    if (stateDropDownValue != null &&
+                                        int.parse(state['id']
+                                                .toString()
+                                                .trim()) ==
+                                            int.parse(stateDropDownValue
+                                                .toString()
+                                                .trim())) {
                                       cityAndStateNewValue['state'] =
                                           state["statename"];
                                     }
@@ -657,7 +672,25 @@ class _FormPageState extends State<FormPage> {
                                   );
                                 }
                               },
-                              label: 'Submit',
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                  Colors.blue[700],
+                                ),
+                                padding: MaterialStateProperty.all<
+                                    EdgeInsetsGeometry>(
+                                  EdgeInsets.symmetric(
+                                    vertical: 8.0,
+                                  ),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),

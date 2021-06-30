@@ -23,6 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  awesome_dialog: ^2.1.0
   convex_bottom_bar: ^2.7.1+2
   cupertino_icons: ^1.0.2
   firebase: ^9.0.1
@@ -52,9 +53,8 @@ dependencies:
   syncfusion_flutter_datagrid: ^19.1.64-beta
   syncfusion_flutter_xlsio: ^19.1.64-beta
   toast: ^0.1.5
+  url_launcher: ^6.0.8
   webview_flutter: ^2.0.2
-  awesome_dialog: ^2.1.0
-
 
 dev_dependencies:
   flutter_test:

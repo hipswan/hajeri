@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 import './Pages/about_us.dart';
 import './Pages/contact_us.dart';
 import './Pages/dashboard.dart';
@@ -116,12 +117,12 @@ void main() async {
   // Any time the token refreshes, store this in the database too.
   messaging.onTokenRefresh.listen(saveTokenToSharedPreferences);
 
-  SharedPreferences.setMockInitialValues({
-    'login': null,
-    'name': '',
-    'number': '',
-    'showcase': null,
-  });
+  // SharedPreferences.setMockInitialValues({
+  //   'login': null,
+  //   'name': '',
+  //   'number': '',
+  //   'showcase': null,
+  // });
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
@@ -396,6 +397,136 @@ class _HomeState extends State<Home> {
     dev.log(status.appStoreLink);
     dev.log(status.localVersion);
     dev.log(status.storeVersion);
+    if (status.canUpdate && Platform.isAndroid) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: 300,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: 225,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            10.0,
+                          ),
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/vectors/update_app.svg',
+                              width: 130,
+                              height: 130,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Update "Hajeri"',
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 10.0,
+                                ),
+                                child: Text(
+                                  'You are using ${status.localVersion}, version ${status.storeVersion} is present on playstore',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: 60.0,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(
+                                        8.0,
+                                      ),
+                                      child: OutlinedButton(
+                                        style: ButtonStyle(),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Center(
+                                          child: Text('Ignore'),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(
+                                        8.0,
+                                      ),
+                                      child: OutlinedButton(
+                                        style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                            Colors.blue,
+                                          ),
+                                        ),
+                                        onPressed: () async {
+                                          if (await canLaunch(
+                                              status.appStoreLink)) {
+                                            await launch(status.appStoreLink);
+                                          } else {
+                                            throw 'Could not launch appStoreLink';
+                                          }
+                                        },
+                                        child: Center(
+                                          child: Text(
+                                            'Update',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          });
+    } else {
+      newVersion.showAlertIfNecessary(context: context);
+    }
+
     // newVersion.showUpdateDialog(
     //   context: context,
     //   versionStatus: status,
@@ -405,7 +536,8 @@ class _HomeState extends State<Home> {
     //   dismissButtonText: 'Ignore',
     //   dismissAction: () => functionToRunAfterDialogDismissed(),
     // );
-    newVersion.showAlertIfNecessary(context: context);
+
+    // newVersion.showAlertIfNecessary(context: context);
   }
 
   functionToRunAfterDialogDismissed() {

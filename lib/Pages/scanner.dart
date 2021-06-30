@@ -41,6 +41,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
   bool isFrontCamera = false;
   bool showAd = true;
   bool isLoading = false;
+  bool openStream = true;
   Barcode result;
   String status;
   StreamSubscription<Barcode> _streamQrSubscription;
@@ -101,19 +102,19 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     }
   }
 
-  // In order to get hot reload to work we need to pause the camera if the platform
-  // is android, or resume the camera if the platform is iOS.
-  @override
-  void reassemble() {
-    super.reassemble();
-    // dev.debugger();
-    if (Platform.isAndroid) {
-      print('Camera resume');
-      // controller.stopCamera();
-      controller.pauseCamera();
-    }
-    controller.resumeCamera();
-  }
+  // // In order to get hot reload to work we need to pause the camera if the platform
+  // // is android, or resume the camera if the platform is iOS.
+  // @override
+  // void reassemble() {
+  //   super.reassemble();
+  //   // dev.debugger();
+  //   if (Platform.isAndroid) {
+  //     print('Camera resume');
+  //     // controller.stopCamera();
+  //     controller.pauseCamera();
+  //   }
+  //   controller.resumeCamera();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -345,6 +346,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                                 child: BlueButton(
                                   label: 'Scan Again',
                                   onPressed: () {
+                                    openStream = true;
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -386,15 +388,16 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
   }
 
   void _onQRViewCreated(QRViewController controller) {
-    setState(() {
-      this.controller = controller;
-    });
+    this.controller = controller;
+
     _streamQrSubscription =
         controller.scannedDataStream.listen((scanData) async {
       result = scanData;
-      dev.log(scanData.toString());
+      dev.log(scanData.code.toString(), name: 'Sanner scanned message');
+      // await controller.pauseCamera();
 
-      if (result != null) {
+      if (result != null && openStream) {
+        openStream = false;
         // showDialog(
         //     barrierDismissible: false,
         //     context: context,
@@ -424,8 +427,6 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
         });
         // dev.debugger();
         if (result.code.contains("Hajeri")) {
-          await controller?.pauseCamera();
-
           status = await markAttendance();
 
           if (status.isNotEmpty &&
@@ -433,9 +434,10 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                   status.contains('connectivity issue') ||
                   status.contains('error occurred'))) {
             // Navigator.pop(context);
-            await controller?.resumeCamera();
+
             setState(() {
               isLoading = false;
+              openStream = true;
             });
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -459,7 +461,6 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
             // Navigator.pop(context);
             // await controller?.stopCamera();
             dev.log('$status', name: 'In scanner result');
-            await controller?.stopCamera();
 
             setState(() {
               isLoading = false;
@@ -467,8 +468,6 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
             });
           }
         } else if (result.code.toLowerCase().contains("hjrwebqrcode")) {
-          await controller.stopCamera();
-
           status = await webLogin();
           dev.log('web scanning status is: $status');
 
@@ -505,7 +504,8 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
             isQrScanned = true;
           });
         } else if (result.code.isNotEmpty && !result.code.contains("Hajeri")) {
-          await controller.stopCamera();
+          // await controller.stopCamera();
+
           status = "no hajeri";
           setState(() {
             isLoading = false;

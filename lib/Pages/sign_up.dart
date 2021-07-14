@@ -29,7 +29,7 @@ class _SignUpState extends State<SignUp> {
   @override
   void initState() {
     super.initState();
-    _cNumber = TextEditingController();
+    _cNumber = TextEditingController(text: '1234567890');
   }
 
   @override

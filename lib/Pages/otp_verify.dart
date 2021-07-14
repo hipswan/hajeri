@@ -31,6 +31,29 @@ class _OtpVerifyState extends State<OtpVerify> {
   String workerId, orgId, orgName, empName, role, hajeriLevel, mainBankId;
 
   Future<void> sendCode(String number) async {
+    if (number.trim().contains('1234567890')) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('You have joined as a tester'),
+            content: Text(
+              'Enter 3231 as a otp to progress further, note: you will be shown dummy data',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'close',
+                ),
+              ),
+            ],
+          ),
+        );
+      });
+    }
     try {
       var response = await http.get(Uri.parse('$kSendOtp$number'), headers: {
         'Content-Type': 'application/json',
@@ -153,7 +176,9 @@ class _OtpVerifyState extends State<OtpVerify> {
 
           // dev.log(data.toString());
           setState(() {
-            verificationCode = data['id'].toString() ?? "error";
+            verificationCode = number.contains('1234567890')
+                ? '3231'
+                : data['id'].toString() ?? "error";
 
             // otpcode = verificationCode;
           });

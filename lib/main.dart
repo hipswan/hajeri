@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -46,95 +47,92 @@ Future<void> saveTokenToSharedPreferences(String token) async {
   prefs.setString('token', token);
 }
 
-Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-  print('Got a message whilst in the foreground!');
-  print('Message data: ${message.data}');
-  if (message.notification != null) {
-    print('Message also contained a notification: ${message.notification}');
-  }
-  RemoteNotification notification = message.notification;
-  AndroidNotification android = message.notification?.android;
-  if (notification != null && android != null) {
-    dev.log('In foreground');
-    flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channel.description,
-            importance: Importance.max,
-            priority: Priority.high,
-            playSound: true,
-            tag: 'hajeri',
-            visibility: NotificationVisibility.public,
-            icon: '@drawable/ic_stat_hajeri',
-          ),
-        ));
-  }
-}
-
+// Declared as global, outside of any class
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
 
-  print('Got a message whilst in the background or terminated!');
-  print('Message data: ${message.data}');
-  if (message.notification != null) {
-    print('Message also contained a notification: ${message.notification}');
-  }
-  print("Handling a background message: ${message.messageId}");
+  dev.log("Handling a background message: ${message.messageId}");
+
+  // Use this method to automatically convert the push data, in case you gonna use our data standard
+  await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 1,
+        channelKey: 'basic_channel',
+        title: 'FCM Awesome Notification',
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'REJECT',
+          label: 'Reject',
+          buttonType: ActionButtonType.KeepOnTop,
+        ),
+      ]);
 }
 
-const AndroidNotificationChannel channel = AndroidNotificationChannel(
-  'high_importance_channel', // id
-  'High Importance Notifications', // title
-  'This channel is used for important notifications.', // description
-  importance: Importance.high,
-);
+Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+
+  dev.log("Handling a background message: ${message.messageId}");
+
+  // Use this method to automatically convert the push data, in case you gonna use our data standard
+  await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 1,
+        channelKey: 'basic_channel',
+        title: 'FCM Awesome Notification',
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'REJECT',
+          label: 'Reject',
+          buttonType: ActionButtonType.KeepOnTop,
+        ),
+      ]);
+}
 
 /// Initialize the [FlutterLocalNotificationsPlugin] package.
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+
+_onRejectClicked(ReceivedAction event) {
+  dev.log(event.title);
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterDownloader.initialize(
     debug: false,
   );
-  await Firebase.initializeApp();
+  AwesomeNotifications().initialize(
+    null,
+    [
+      NotificationChannel(
+        channelKey: 'basic_channel',
+        channelName: 'Basic notifications',
+        channelDescription: 'Notification channel for attendance reject',
+        defaultColor: Colors.blue,
+        ledColor: Colors.white,
+      )
+    ],
+    debug: true,
+  );
 
+  // Create the initialization for your desired push service here
+  FirebaseApp firebaseApp = await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
   prefs = await SharedPreferences.getInstance();
   messaging = FirebaseMessaging.instance;
-  FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   String token = await messaging.getToken();
   dev.log(token, name: 'Firebase notification');
   await saveTokenToSharedPreferences(token);
   // Any time the token refreshes, store this in the database too.
   messaging.onTokenRefresh.listen(saveTokenToSharedPreferences);
-
-  // SharedPreferences.setMockInitialValues({
-  //   'login': null,
-  //   'name': '',
-  //   'number': '',
-  //   'showcase': null,
-  // });
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
-
-  /// Update the iOS foreground notification presentation options to allow
-  /// heads up notifications.
-  await messaging.setForegroundNotificationPresentationOptions(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
   runApp(
     MyApp(),
   );
@@ -389,7 +387,53 @@ class _HomeState extends State<Home> {
         });
       });
     }
+    requestNotificationPermission();
     checkVersion();
+
+    AwesomeNotifications().actionStream.listen(_onRejectClicked);
+
+    AwesomeNotifications()
+        .displayedStream
+        .listen((ReceivedNotification _receivedNotif) {
+      dev.log('Hello alll........');
+    });
+  }
+
+  requestNotificationPermission() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (prefs?.getBool('notification_denied') ?? true)
+        await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Notification Request'),
+                content: Text(
+                  'To stay updated with the attendance status kindly allow notifications on your device',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      await AwesomeNotifications()
+                          .requestPermissionToSendNotifications();
+                      var isNotificationAllowed =
+                          await AwesomeNotifications().isNotificationAllowed();
+                      dev.log(
+                          'Notification permission result ${isNotificationAllowed.toString()}');
+                      await prefs.setBool('notification_denied', false);
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('CANCEL'),
+                  ),
+                ],
+              );
+            });
+    });
   }
 
   checkVersion() async {

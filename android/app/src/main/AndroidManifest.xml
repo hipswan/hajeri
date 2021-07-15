@@ -32,9 +32,9 @@
 
   <application android:label="Hajeri" android:icon="@mipmap/ic_launcher" android:requestLegacyExternalStorage="true">
     <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyAHclva_YtimUjaG7triSn15ZB6BRCl2Gk" />
-    <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="high_importance_channel" />
-    <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_hajeri" />
-    <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/colorAccent" />
+    <!-- <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="basic_channel" /> -->
+    <!-- <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_hajeri" />
+    <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/colorAccent" /> -->
     <provider android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider" android:authorities="${applicationId}.flutter_downloader.provider" android:exported="false" android:grantUriPermissions="true">
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths" />
 

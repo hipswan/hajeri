@@ -55,7 +55,7 @@ dependencies:
   toast: ^0.1.5
   url_launcher: ^6.0.8
   webview_flutter: ^2.0.2
-
+  awesome_notifications: any # Any attribute updates automatically your source to the last version
 dev_dependencies:
   flutter_test:
     sdk: flutter
